@@ -1,0 +1,7 @@
+type Item {
+  url: String! @unique
+}
+
+type Query {
+  allItems: [Item!]
+}
