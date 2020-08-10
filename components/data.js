@@ -1,9 +1,16 @@
 import useSWR from "swr";
-import { jsonFetcher } from "../lib/fetcher";
+import { jsonParser } from "../lib/fetcher";
 import { getHostname } from "../lib/urls";
 
-const Data = ({ url, renderPlaceholder }) => {
-  const { data, error } = useSWR(`/api/html?url=${url}`, jsonFetcher);
+export const fetcher = (path, options) => {
+  return fetch(path, options).then(jsonParser);
+};
+
+const Data = ({ url, rawUrl, renderPlaceholder }) => {
+  const { data, error } = useSWR(
+    `https://backyard-data.blwsk.vercel.app/api/index?url=${rawUrl}`,
+    fetcher
+  );
 
   const { hostname, withProtocol } = getHostname(url);
 
@@ -19,6 +26,8 @@ const Data = ({ url, renderPlaceholder }) => {
                 <a href={withProtocol}>{hostname}</a>
               </div>
             )}
+
+            <div dangerouslySetInnerHTML={{ __html: data.body }} />
           </div>
         ) : (
           renderPlaceholder()

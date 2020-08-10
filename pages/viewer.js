@@ -21,6 +21,7 @@ const Viewer = ({ router }) => {
         >
           {validURL(decodedUrl) && (
             <Data
+              rawUrl={urlString}
               url={decodedUrl}
               renderPlaceholder={() => <h2>{decodedUrl}</h2>}
             />

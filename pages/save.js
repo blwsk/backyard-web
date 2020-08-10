@@ -117,6 +117,7 @@ const SaveUrl = ({ urlString }) => {
         >
           {isValid ? (
             <Data
+              rawUrl={urlString}
               url={urlString}
               renderPlaceholder={() => <h2>{decodedUrl}</h2>}
             />
