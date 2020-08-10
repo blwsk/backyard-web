@@ -32,7 +32,11 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
         ) : (
           renderPlaceholder()
         )}
-        {error && <div className="color-red">Something went wrong.</div>}
+        {error && (
+          <div className="color-red">
+            Something went wrong. Try refreshing the page.
+          </div>
+        )}
       </div>
     </div>
   );
