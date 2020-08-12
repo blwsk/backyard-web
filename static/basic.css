@@ -9,11 +9,10 @@
     Fira Sans, sans-serif;
   --mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier,
     "Courier New", monospace;
-  --c1: #0074d9;
-  --c2: #eee;
+  --c1: #1b1b1b;
+  --c2: #406fd3;
   --c3: #fff;
-  --c4: #000;
-  --c5: #fff;
+
   --c6: rgb(255, 0, 0);
   --c7: rgb(0, 255, 0);
   --m1: 8px;
@@ -21,10 +20,9 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --c1: #fff;
-    --c2: #333;
-    --c3: #1e1f20;
-    --c4: #fff;
+    --c1: #b0b0b0;
+    --c2: #77c5f5;
+    --c3: #121212;
   }
 }
 html {
@@ -39,7 +37,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   background-color: var(--c3);
-  color: var(--c4);
+  color: var(--c1);
 }
 iframe,
 img {
@@ -47,29 +45,28 @@ img {
   max-width: 100%;
 }
 a {
-  color: var(--c1);
+  color: var(--c2);
   text-decoration: none;
 }
 a:hover {
-  color: var(--c1);
+  color: var(--c2);
   text-decoration: underline;
 }
 pre {
   font: 1em/1.6 var(--mono);
-  /* background: var(--c2); */
   padding: 1em;
 }
 code {
   font: 1em/1.6 var(--mono);
 }
 blockquote {
-  border-left: 5px solid var(--c2);
+  border-left: 5px solid var(--c1);
   padding: 1em 1.5em;
   margin: 0;
 }
 hr {
   border: 0;
-  border-bottom: 1px solid var(--c4);
+  border-bottom: 1px solid var(--c1);
 }
 h1,
 h2,
@@ -78,7 +75,7 @@ h4,
 h5,
 h6 {
   margin: 0.6em 0;
-  font-weight: 400;
+  font-weight: 800;
 }
 h1 {
   font-size: 2.625em;
@@ -115,7 +112,6 @@ th {
 }
 tfoot,
 thead {
-  background: var(--c2);
 }
 button,
 code,
@@ -130,8 +126,6 @@ input,
 select,
 textarea {
   font-size: 1em;
-  color: var(--c4);
-  background: var(--c2);
   border: 0;
   padding: 0.6em;
 }
@@ -142,8 +136,6 @@ input[type="submit"] {
   -webkit-appearance: none;
   font-size: 1em;
   display: inline-block;
-  color: var(--c5);
-  background: var(--c1);
   border: 0;
   margin: 4px;
   padding: 0.6em 1.2em;
@@ -169,7 +161,6 @@ section > section {
   margin: var(--m1);
 }
 article {
-  border: 1px solid var(--c4);
   padding: 1em;
 }
 [style*="--c:"]:first-child,
@@ -203,7 +194,7 @@ article:last-child {
 }
 
 .color-black {
-  color: var(--c4);
+  color: var(--c1);
 }
 
 .color-red {
@@ -215,5 +206,5 @@ article:last-child {
 }
 
 .background-gray {
-  background: var(--c2);
+  background: var(--c3);
 }
