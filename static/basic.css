@@ -198,7 +198,8 @@ article:last-child {
 .column {
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
 }
 
 .color-black {
@@ -219,4 +220,14 @@ article:last-child {
 
 .background-blue {
   background: var(--c2);
+}
+
+.rendered-html-body * {
+  box-sizing: border-box;
+  overflow: scroll;
+}
+
+.rendered-html-body img {
+  display: flex;
+  margin-bottom: 16px;
 }

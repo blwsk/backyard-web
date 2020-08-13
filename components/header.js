@@ -28,6 +28,17 @@ const Header = () => {
               marginRight: 16,
             }}
           ></div>
+          <div style={{ marginRight: 16 }}>
+            <a
+              href="/"
+              style={{
+                fontWeight: 500,
+              }}
+              className="color-black"
+            >
+              Home
+            </a>
+          </div>
           <div>
             <a
               href="/my-content"

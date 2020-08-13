@@ -3,6 +3,7 @@ import useSWR from "swr";
 import { gqlFetcher } from "../lib/fetcher";
 import Header from "../components/header";
 import { stripParams } from "../lib/urls";
+import Wrapper from "../components/wrapper";
 
 const MyContent = () => {
   const { data, error, isValidating } = useSWR(
@@ -26,8 +27,8 @@ const MyContent = () => {
   return (
     <div>
       <Header />
-      <div className="m-all-4 p-all-2">
-        <section
+      <Wrapper>
+        <div
           style={{
             alignItems: "center",
             justifyContent: "center",
@@ -35,7 +36,7 @@ const MyContent = () => {
           }}
         >
           <h1>My Content</h1>
-        </section>
+        </div>
         {isLoading && <h2>Loading...</h2>}
         {data && (
           <div>
@@ -53,7 +54,7 @@ const MyContent = () => {
           </div>
         )}
         {error && <div style={{ color: "red" }}>Oops. Refresh the page.</div>}
-      </div>
+      </Wrapper>
     </div>
   );
 };

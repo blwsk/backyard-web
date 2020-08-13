@@ -16,32 +16,33 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
   const { hostname, withProtocol } = getHostname(url);
 
   return (
-    <div className="background-gray" style={{ maxWidth: 800, padding: 40 }}>
-      <div>
-        {error && (
-          <div className="color-red">
-            Something went wrong. Try refreshing the page.
-          </div>
-        )}
-        {data ? (
-          <div>
-            <h2>{data.metaTitle}</h2>
-            <h3>{data.metaDescription}</h3>
-            {hostname && (
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>{hostname}</span>
-                <a href={url}>Original</a>
-              </div>
-            )}
-            <br />
-            <hr />
-            <br />
-            <div dangerouslySetInnerHTML={{ __html: data.body }} />
-          </div>
-        ) : (
-          renderPlaceholder()
-        )}
-      </div>
+    <div>
+      {error && (
+        <div className="color-red">
+          Something went wrong. Try refreshing the page.
+        </div>
+      )}
+      {data ? (
+        <div>
+          <h2>{data.metaTitle}</h2>
+          <h3>{data.metaDescription}</h3>
+          {hostname && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>{hostname}</span>
+              <a href={url}>Original</a>
+            </div>
+          )}
+          <br />
+          <hr />
+          <br />
+          <div
+            className="rendered-html-body"
+            dangerouslySetInnerHTML={{ __html: data.body }}
+          />
+        </div>
+      ) : (
+        renderPlaceholder()
+      )}
     </div>
   );
 };
