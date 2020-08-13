@@ -180,11 +180,19 @@ article:last-child {
 .m-all-4 {
   margin: 16px;
 }
+.m-y-4 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
 .p-all-2 {
   padding: 8px;
 }
 .p-all-4 {
   padding: 16px;
+}
+.p-y-2 {
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .column {
@@ -207,4 +215,8 @@ article:last-child {
 
 .background-gray {
   background: var(--c3);
+}
+
+.background-blue {
+  background: var(--c2);
 }

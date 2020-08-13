@@ -23,7 +23,11 @@ const Viewer = ({ router }) => {
             <Data
               rawUrl={urlString}
               url={decodedUrl}
-              renderPlaceholder={() => <h2>{decodedUrl}</h2>}
+              renderPlaceholder={() => (
+                <div style={{ wordBreak: "break-word" }}>
+                  <h2>{decodedUrl}</h2>
+                </div>
+              )}
             />
           )}
         </div>

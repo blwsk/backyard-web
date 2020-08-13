@@ -2,6 +2,7 @@ import gql from "gql-tag";
 import useSWR from "swr";
 import { gqlFetcher } from "../lib/fetcher";
 import Header from "../components/header";
+import { stripParams } from "../lib/urls";
 
 const MyContent = () => {
   const { data, error, isValidating } = useSWR(
@@ -38,17 +39,17 @@ const MyContent = () => {
         {isLoading && <h2>Loading...</h2>}
         {data && (
           <div>
-            <ul>
+            <div style={{ wordBreak: "break-word" }}>
               {items.map((item) => {
                 return (
-                  <li key={item._id}>
+                  <div key={item._id} className="p-y-2">
                     <a href={`/viewer?url=${encodeURI(item.url)}`}>
-                      {item.url}
+                      {stripParams(item.url)}
                     </a>
-                  </li>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           </div>
         )}
         {error && <div style={{ color: "red" }}>Oops. Refresh the page.</div>}

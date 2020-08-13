@@ -14,8 +14,8 @@ const Header = () => {
       {isAuthenticated && (
         <>
           <div
+            className="background-blue"
             style={{
-              background: "#12b886",
               borderRadius: "50%",
               padding: "10px",
               fontSize: "20px",
