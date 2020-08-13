@@ -8,8 +8,8 @@ export const fetcher = (path, options) => {
 
 const Data = ({ url, rawUrl, renderPlaceholder }) => {
   const { data, error } = useSWR(
-    // `https://backyard-data.vercel.app/api/index?url=${rawUrl}`,
-    `http://localhost:3001/api/index?url=${rawUrl}`,
+    `https://backyard-data.vercel.app/api/index?url=${rawUrl}`,
+    // `http://localhost:3001/api/index?url=${rawUrl}`,
     fetcher
   );
 
