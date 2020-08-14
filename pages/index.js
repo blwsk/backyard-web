@@ -25,6 +25,8 @@ const Index = ({ router }) => {
     <div>
       <Header />
       <Wrapper align="center">
+        <h1>Backyard</h1>
+        <br />
         {isAuthenticated ? (
           <>
             <input
