@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useAuth } from "../lib/useAuth";
 
 const Header = () => {
@@ -29,26 +30,28 @@ const Header = () => {
             }}
           ></div>
           <div style={{ marginRight: 16 }}>
-            <a
-              href="/"
-              style={{
-                fontWeight: 500,
-              }}
-              className="color-black"
-            >
-              Home
-            </a>
+            <Link href="/">
+              <a
+                style={{
+                  fontWeight: 500,
+                }}
+                className="color-black"
+              >
+                Home
+              </a>
+            </Link>
           </div>
           <div>
-            <a
-              href="/my-content"
-              style={{
-                fontWeight: 500,
-              }}
-              className="color-black"
-            >
-              My Content
-            </a>
+            <Link href="/my-content">
+              <a
+                style={{
+                  fontWeight: 500,
+                }}
+                className="color-black"
+              >
+                My Content
+              </a>
+            </Link>
           </div>
         </>
       )}

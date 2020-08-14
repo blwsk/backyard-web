@@ -29,7 +29,6 @@ const Index = ({ router }) => {
           <>
             <input
               style={{
-                border: `1px solid black`,
                 width: `100%`,
                 marginBottom: 16,
               }}

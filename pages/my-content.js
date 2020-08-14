@@ -1,3 +1,4 @@
+import Link from "next/link";
 import gql from "gql-tag";
 import useSWR from "swr";
 import { gqlFetcher } from "../lib/fetcher";
@@ -44,9 +45,9 @@ const MyContent = () => {
               {items.map((item) => {
                 return (
                   <div key={item._id} className="p-y-2">
-                    <a href={`/viewer?url=${encodeURI(item.url)}`}>
-                      {stripParams(item.url)}
-                    </a>
+                    <Link href={`/viewer?url=${encodeURI(item.url)}`}>
+                      <a>{stripParams(item.url)}</a>
+                    </Link>
                   </div>
                 );
               })}
