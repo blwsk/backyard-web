@@ -4,6 +4,7 @@ import Header from "../components/header";
 import Login from "../components/login";
 import Wrapper from "../components/wrapper";
 import { withRouter } from "next/router";
+import { validURL } from "../lib/urls";
 
 const Index = ({ router }) => {
   const { isAuthenticated } = useAuth();
@@ -15,8 +16,10 @@ const Index = ({ router }) => {
   });
 
   const onSave = useCallback(() => {
-    router.push(`/save?url=${value}`);
+    router.push(`/save?url=${encodeURI(value)}`);
   });
+
+  const isValidUrl = validURL(value);
 
   return (
     <div>
@@ -35,7 +38,12 @@ const Index = ({ router }) => {
               value={value}
               onChange={onChange}
             />
-            <button style={{ margin: 0 }} onClick={onSave}>
+            <button
+              style={{ margin: 0 }}
+              onClick={onSave}
+              disabled={!isValidUrl}
+              title={!isValidUrl ? "URL is invalid" : undefined}
+            >
               Save
             </button>
           </>
