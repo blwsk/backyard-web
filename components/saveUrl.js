@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { withRouter } from "next/router";
 import gql from "gql-tag";
 import { validURL } from "../lib/urls";
 import Data from "../components/data";

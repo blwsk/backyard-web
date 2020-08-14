@@ -1,11 +1,22 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { useAuth } from "../lib/useAuth";
 import Header from "../components/header";
 import Login from "../components/login";
 import Wrapper from "../components/wrapper";
+import { withRouter } from "next/router";
 
-const Index = () => {
+const Index = ({ router }) => {
   const { isAuthenticated } = useAuth();
+
+  const [value, updater] = useState("");
+
+  const onChange = useCallback((e) => {
+    updater(e.target.value);
+  });
+
+  const onSave = useCallback(() => {
+    router.push(`/save?url=${value}`);
+  });
 
   return (
     <div>
@@ -21,8 +32,12 @@ const Index = () => {
               }}
               type="text"
               placeholder="https://url-you-want-to-save.com"
+              value={value}
+              onChange={onChange}
             />
-            <button style={{ margin: 0 }}>Save</button>
+            <button style={{ margin: 0 }} onClick={onSave}>
+              Save
+            </button>
           </>
         ) : (
           <Login />
@@ -32,4 +47,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default withRouter(Index);
