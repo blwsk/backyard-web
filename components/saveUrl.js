@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import gql from "gql-tag";
 import { validURL } from "../lib/urls";
 import Data from "../components/data";
-import { mutation } from "../lib/mutation";
+import { gqlFetcher } from "../lib/fetcher";
 
 const SaveUrl = ({ urlString }) => {
   const decodedUrl = decodeURIComponent(urlString);
@@ -32,7 +32,7 @@ const SaveUrl = ({ urlString }) => {
 
       updateSaveState({ ...saveState, loading: true, message: "Saving..." });
 
-      mutation(query)
+      gqlFetcher(query)
         .then((res) => {
           updateSaveState({
             ...saveState,
