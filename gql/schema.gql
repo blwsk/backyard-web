@@ -4,4 +4,6 @@ type Item {
 
 type Query {
   allItems: [Item!]
+  allItemsReverseChrono: [Item!]
+    @resolver(name: "all_Items_reverse_chrono", paginated: true)
 }
