@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import gql from "gql-tag";
 import { validURL } from "../lib/urls";
-import Data from "../components/data";
+import Metadata from "../components/metadata";
 import { gqlFetcher } from "../lib/fetcher";
+
+const messages = {
+  ALREADY_SAVED: "Already saved.",
+};
 
 const SaveUrl = ({ urlString }) => {
   const decodedUrl = decodeURIComponent(urlString);
@@ -26,6 +30,8 @@ const SaveUrl = ({ urlString }) => {
               }
             ) {
               url
+              _id
+              _ts
             }
           }
         `;
@@ -55,7 +61,7 @@ const SaveUrl = ({ urlString }) => {
                 data: null,
                 loading: false,
                 error: false,
-                message: "Already saved.",
+                message: messages.ALREADY_SAVED,
               });
 
               return;
@@ -84,23 +90,23 @@ const SaveUrl = ({ urlString }) => {
           marginBottom: 24,
         }}
       >
-        {saveState.message && (
-          <h1 className={saveState.error ? "color-red" : undefined}>
-            {saveState.message}
-          </h1>
-        )}
+        {saveState.message && <h1>{saveState.message}</h1>}
       </section>
-      <>
-        {isValid ? (
-          <Data
-            rawUrl={urlString}
-            url={urlString}
-            renderPlaceholder={() => <h2>{decodedUrl}</h2>}
-          />
-        ) : (
-          <div className="color-red">Error. URL is invalid.</div>
-        )}
-      </>
+      {isValid ? (
+        <>
+          {saveState.loading && <div>Loading...</div>}
+          {saveState.error && <div>Error.</div>}
+          {(saveState.data || saveState.message === messages.ALREADY_SAVED) && (
+            <Metadata
+              rawUrl={urlString}
+              url={urlString}
+              renderPlaceholder={() => <h2>{decodedUrl}</h2>}
+            />
+          )}
+        </>
+      ) : (
+        <div className="color-red">Error. URL is invalid.</div>
+      )}
     </>
   );
 };
