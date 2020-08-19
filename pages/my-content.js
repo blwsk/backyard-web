@@ -66,7 +66,7 @@ const usePaginatedContent = ({
   };
 };
 
-const ContentPage = ({ items }) => {
+const ContentPage = ({ items, onSelect, onDeselect, selectionState }) => {
   return (
     <div>
       {items.map((item) => {
@@ -80,20 +80,156 @@ const ContentPage = ({ items }) => {
         const timeString = date.toLocaleTimeString();
 
         return (
-          <div key={_id} className="p-y-2">
-            <Link href={`/viewer?url=${encodedUrl}`}>
-              <a>{withParamsStripped}</a>
-            </Link>
+          <div
+            key={_id}
+            className="p-y-3"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <div>
-              <small>
-                <span>{dateString}</span>
-                <span>・</span>
-                <span>{timeString}</span>
-              </small>
+              <Link href={{ pathname: "/viewer", query: { url: encodedUrl } }}>
+                <a>{withParamsStripped}</a>
+              </Link>
+              <div>
+                <small>
+                  <span>{dateString}</span>
+                  <span>・</span>
+                  <span>{timeString}</span>
+                </small>
+              </div>
             </div>
+            <input
+              type="checkbox"
+              checked={!!selectionState[_id]}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  onSelect(_id);
+                } else {
+                  onDeselect(_id);
+                }
+              }}
+            />
           </div>
         );
       })}
+    </div>
+  );
+};
+
+const ContentPageList = ({ pages }) => {
+  const [selectionState, updateSelectionState] = useState({});
+
+  const onSelect = useCallback((id) => {
+    const temp = Object.assign({}, selectionState, {
+      [id]: true,
+    });
+    updateSelectionState(temp);
+  });
+  const onDeselect = useCallback((id) => {
+    const temp = Object.assign({}, selectionState);
+    delete temp[id];
+    updateSelectionState(temp);
+  });
+  const onClearSelection = useCallback(() => {
+    updateSelectionState({});
+  });
+
+  const numSelected = Object.keys(selectionState).length;
+
+  const [deletionState, updateDeletionState] = useState({
+    pending: false,
+  });
+
+  const onClickDelete = useCallback(() => {
+    updateDeletionState({
+      pending: true,
+    });
+  });
+
+  const onCancelPendingDelete = useCallback(() => {
+    updateDeletionState({
+      pending: false,
+    });
+  });
+
+  return (
+    <div>
+      {pages.map((result) => (
+        <ContentPage
+          key={`before.${getResultObject(result).before}`}
+          items={getResultObject(result).data}
+          onSelect={onSelect}
+          onDeselect={onDeselect}
+          selectionState={selectionState}
+        />
+      ))}
+      <div>
+        {numSelected > 0 && (
+          <footer
+            style={{
+              background: "pink",
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              width: "100%",
+              height: 80,
+            }}
+          >
+            <div style={{ color: "black", textAlign: "center", paddingTop: 8 }}>
+              <div>
+                <b style={{ fontWeight: 500 }}>
+                  You've selected <span>{numSelected}</span>{" "}
+                  <span>{numSelected === 1 ? "item" : "items"}</span>
+                </b>
+              </div>
+              <div>
+                <button onClick={onClickDelete}>Delete</button>
+                <button onClick={onClearSelection}>Clear</button>
+              </div>
+            </div>
+          </footer>
+        )}
+        {deletionState.pending && (
+          <div className="pending-modal p-all-4">
+            <h2>
+              Are you sure you want to delete <span>{numSelected}</span>{" "}
+              <span>{numSelected === 1 ? "item" : "items"}</span>?
+            </h2>
+            <div>
+              <button>Yes. Delete.</button>
+              <button onClick={onCancelPendingDelete}>Nope. Cancel.</button>
+            </div>
+          </div>
+        )}
+        <style jsx>{`
+          button {
+            background: black;
+            color: white;
+          }
+          .pending-modal {
+            background: teal;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+          }
+          h2 {
+            text-align: center;
+          }
+        `}</style>
+      </div>
     </div>
   );
 };
@@ -136,13 +272,8 @@ const MyContent = ({ sortOrder }) => {
 
   return (
     <>
-      <div>
-        {pages.map((result) => (
-          <ContentPage
-            key={`before.${getResultObject(result).before}`}
-            items={getResultObject(result).data}
-          />
-        ))}
+      <div style={{ paddingBottom: 80 }}>
+        <ContentPageList pages={pages} />
         {data &&
           !isValidating &&
           (hasMore ? (

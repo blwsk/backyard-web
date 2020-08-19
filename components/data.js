@@ -24,7 +24,7 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
       )}
       {data ? (
         <div>
-          <h2>{data.metaTitle}</h2>
+          <h2>{data.metaTitle || data.title}</h2>
           <h3>{data.metaDescription}</h3>
           {hostname && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>

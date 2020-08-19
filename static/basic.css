@@ -204,6 +204,10 @@ article:last-child {
   padding-top: 8px;
   padding-bottom: 8px;
 }
+.p-y-3 {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
 
 .column {
   width: 100%;
@@ -234,6 +238,10 @@ article:last-child {
 
 .rendered-html-body {
   box-sizing: border-box;
+}
+
+.rendered-html-body * {
+  font: var(--sans) !important;
 }
 
 .rendered-html-body img {
