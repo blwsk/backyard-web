@@ -1,7 +1,7 @@
 import Link from "next/link";
 import gql from "gql-tag";
 import useSWR from "swr";
-import { gqlFetcher } from "../lib/fetcher";
+import { gqlFetcher, jsonFetcher } from "../lib/fetcher";
 import Header from "../components/header";
 import { stripParams } from "../lib/urls";
 import Wrapper from "../components/wrapper";
@@ -66,7 +66,13 @@ const usePaginatedContent = ({
   };
 };
 
-const ContentPage = ({ items, onSelect, onDeselect, selectionState }) => {
+const ContentPage = ({
+  items,
+  onSelect,
+  onDeselect,
+  selectionState,
+  deletedIds,
+}) => {
   return (
     <div>
       {items.map((item) => {
@@ -78,6 +84,12 @@ const ContentPage = ({ items, onSelect, onDeselect, selectionState }) => {
         const date = new Date(_ts / 1000);
         const dateString = date.toDateString();
         const timeString = date.toLocaleTimeString();
+
+        const isDeleted = deletedIds.indexOf(_id) > -1;
+
+        if (isDeleted) {
+          return <div key={_id} />;
+        }
 
         return (
           <div
@@ -155,6 +167,41 @@ const ContentPageList = ({ pages }) => {
     });
   });
 
+  const [deletedIds, updateDeletedIds] = useState([]);
+
+  const onConfirmDelete = useCallback(() => {
+    const ids = Object.keys(selectionState);
+
+    updateDeletionState({
+      started: true,
+    });
+
+    jsonFetcher("/api/items", {
+      method: "DELETE",
+      body: JSON.stringify(ids),
+    })
+      .then((res) => {
+        updateDeletionState({
+          pending: false,
+          started: false,
+          success: true,
+          res,
+        });
+
+        onClearSelection();
+
+        updateDeletedIds([...deletedIds, ...ids]);
+      })
+      .catch((error) => {
+        updateDeletionState({
+          pending: false,
+          started: false,
+          success: false,
+          error,
+        });
+      });
+  });
+
   return (
     <div>
       {pages.map((result) => (
@@ -164,6 +211,7 @@ const ContentPageList = ({ pages }) => {
           onSelect={onSelect}
           onDeselect={onDeselect}
           selectionState={selectionState}
+          deletedIds={deletedIds}
         />
       ))}
       <div>
@@ -199,10 +247,17 @@ const ContentPageList = ({ pages }) => {
               Are you sure you want to delete <span>{numSelected}</span>{" "}
               <span>{numSelected === 1 ? "item" : "items"}</span>?
             </h2>
-            <div>
-              <button>Yes. Delete.</button>
-              <button onClick={onCancelPendingDelete}>Nope. Cancel.</button>
-            </div>
+            {deletionState.started ? (
+              <div>Progress...</div>
+            ) : (
+              <div>
+                <button onClick={onConfirmDelete}>Yes. Delete.</button>
+                <button onClick={onCancelPendingDelete}>Nope. Cancel.</button>
+              </div>
+            )}
+            {deletionState.error && (
+              <div className="error">Oops. Something went wrong.</div>
+            )}
           </div>
         )}
         <style jsx>{`
@@ -227,6 +282,10 @@ const ContentPageList = ({ pages }) => {
           }
           h2 {
             text-align: center;
+          }
+          .error {
+            color: red;
+            background-color: white;
           }
         `}</style>
       </div>
