@@ -247,6 +247,12 @@ article:last-child {
 .rendered-html-body img {
   display: flex;
   margin-bottom: 16px;
+  width: 100%;
+  height: auto;
+}
+
+.rendered-html-body div {
+  width: 100% !important;
 }
 
 .rendered-html-body pre {
