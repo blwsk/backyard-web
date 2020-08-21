@@ -143,7 +143,7 @@ const ContentPage = ({
   );
 };
 
-const SelectList = () => {
+const SelectList = ({ selectionState }) => {
   const [selected, updateSelected] = useState();
   const { data, error, isValidating } = useSWR(listQuery, gqlFetcher);
 
@@ -156,6 +156,25 @@ const SelectList = () => {
   const onSelectList = useCallback((e) => {
     const id = e.target.value;
     updateSelected(id);
+  });
+
+  const onCreateListItem = useCallback(() => {
+    /**
+     * Do state updates based on request status
+     */
+    jsonFetcher("/api/list-items", {
+      method: "POST",
+      body: JSON.stringify({
+        ids: Object.keys(selectionState),
+        listId: selected._id,
+      }),
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   });
 
   return (
@@ -175,10 +194,7 @@ const SelectList = () => {
         (isValidating && <span style={{ marginLeft: 8 }}>Loading...</span>)}
       <div>
         <br />
-        {/**
-         * Fill in this button
-         */}
-        <button>Add</button>
+        <button onClick={onCreateListItem}>Add</button>
       </div>
       <style jsx>{`
         button {
@@ -406,7 +422,7 @@ const ContentPageList = ({ pages }) => {
             ) : (
               <div>
                 <h4>Select a list</h4>
-                <SelectList />
+                <SelectList selectionState={selectionState} />
                 <br />
                 <h4>Create a new list</h4>
                 <CreateList />
