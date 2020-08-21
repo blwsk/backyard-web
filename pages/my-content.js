@@ -489,7 +489,7 @@ const MyContent = ({ sortOrder }) => {
   });
 
   useEffect(() => {
-    if (pages.length === 0 && data) {
+    if (data && getResultObject(data.data).before === null) {
       /**
        * First page
        */
