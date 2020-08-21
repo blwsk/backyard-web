@@ -158,10 +158,17 @@ const SelectList = ({ selectionState }) => {
     updateSelected(id);
   });
 
+  const [createListItemState, updateCreateListItemState] = useState({
+    started: false,
+  });
+
   const onCreateListItem = useCallback(() => {
     /**
      * Do state updates based on request status
      */
+    updateCreateListItemState({
+      started: true,
+    });
     jsonFetcher("/api/list-items", {
       method: "POST",
       body: JSON.stringify({
@@ -169,11 +176,17 @@ const SelectList = ({ selectionState }) => {
         listId: selected._id,
       }),
     })
-      .then((res) => {
-        console.log(res);
+      .then((result) => {
+        updateCreateListItemState({
+          started: false,
+          result,
+        });
       })
       .catch((error) => {
-        console.log(error);
+        updateCreateListItemState({
+          started: false,
+          error,
+        });
       });
   });
 
@@ -194,12 +207,24 @@ const SelectList = ({ selectionState }) => {
         (isValidating && <span style={{ marginLeft: 8 }}>Loading...</span>)}
       <div>
         <br />
-        <button onClick={onCreateListItem}>Add</button>
+        <div>
+          {!createListItemState.started && (
+            <button onClick={onCreateListItem}>Add</button>
+          )}
+          {createListItemState.result && (
+            <Link href={{ pathname: "/lists", query: { id: selected._id } }}>
+              <a>{`View ${selected.name}`}</a>
+            </Link>
+          )}
+        </div>
       </div>
       <style jsx>{`
         button {
           background: purple;
           color: white;
+        }
+        a {
+          color: black;
         }
       `}</style>
     </div>

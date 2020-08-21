@@ -41,7 +41,7 @@ const Header = () => {
               </a>
             </Link>
           </div>
-          <div>
+          <div style={{ marginRight: 16 }}>
             <Link href="/my-content">
               <a
                 style={{
@@ -50,6 +50,18 @@ const Header = () => {
                 className="color-black"
               >
                 My Content
+              </a>
+            </Link>
+          </div>
+          <div>
+            <Link href="/lists">
+              <a
+                style={{
+                  fontWeight: 500,
+                }}
+                className="color-black"
+              >
+                Lists
               </a>
             </Link>
           </div>
