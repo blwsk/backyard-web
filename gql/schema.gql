@@ -2,8 +2,19 @@ type Item {
   url: String! @unique
 }
 
+type List {
+  name: String!
+}
+
+type ListItem {
+  item: Item!
+  list: List!
+}
+
 type Query {
   allItems: [Item!]
   allItemsReverseChrono: [Item!]
     @resolver(name: "all_Items_reverse_chrono", paginated: true)
+  allLists: [List!]
+  allListItems: [ListItem!]
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import gql from "gql-tag";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { gqlFetcher, jsonFetcher } from "../lib/fetcher";
 import Header from "../components/header";
 import { stripParams } from "../lib/urls";
@@ -14,6 +14,18 @@ const sortOrderEnum = {
   ascending: "ascending",
   descending: "descending",
 };
+
+const listQuery = gql`
+  query {
+    allLists {
+      data {
+        name
+        _id
+        _ts
+      }
+    }
+  }
+`;
 
 const getResultObject = (result) =>
   result.allItems || result.allItemsReverseChrono;
@@ -131,6 +143,110 @@ const ContentPage = ({
   );
 };
 
+const SelectList = () => {
+  const [selected, updateSelected] = useState();
+  const { data, error, isValidating } = useSWR(listQuery, gqlFetcher);
+
+  const lists = data && data.data.allLists.data.sort((a, b) => b._ts - a._ts);
+
+  useEffect(() => {
+    if (lists) updateSelected(lists[0]);
+  }, [lists]);
+
+  const onSelectList = useCallback((e) => {
+    const id = e.target.value;
+    updateSelected(id);
+  });
+
+  return (
+    <div>
+      <select style={{ width: 200 }} value={selected} onChange={onSelectList}>
+        {lists
+          ? lists.map((list) => {
+              return (
+                <option key={list._id} value={list._id}>
+                  {list.name}
+                </option>
+              );
+            })
+          : null}
+      </select>
+      {!lists ||
+        (isValidating && <span style={{ marginLeft: 8 }}>Loading...</span>)}
+      <div>
+        <br />
+        {/**
+         * Fill in this button
+         */}
+        <button>Add</button>
+      </div>
+      <style jsx>{`
+        button {
+          background: purple;
+          color: white;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+const CreateList = () => {
+  const [listName, updateListName] = useState("");
+  const onChange = useCallback((e) => {
+    updateListName(e.target.value);
+  });
+  const [createState, updateCreateState] = useState({ started: false });
+  const onCreateList = useCallback(() => {
+    updateCreateState({ started: true });
+    gqlFetcher(gql`
+      mutation {
+        createList(
+          data: {
+            name: "${listName}"
+          }
+        ) {
+          name
+          _id
+          _ts
+        }
+      }
+    `)
+      .then((response) => {
+        updateCreateState({ started: false, response });
+        mutate(listQuery);
+        updateListName("");
+      })
+      .catch((error) => {
+        updateCreateState({ started: false, error });
+      });
+  });
+
+  return (
+    <div>
+      {createState.started === false ? (
+        <input
+          type="text"
+          value={listName}
+          placeholder="List name"
+          onChange={onChange}
+          style={{ width: 200 }}
+        />
+      ) : (
+        <span>Loading...</span>
+      )}
+      <button onClick={onCreateList} disabled={createState.started}>
+        Create
+      </button>
+      <style jsx>{`
+        button {
+          background: rgb(55, 55, 55);
+          color: white;
+        }
+      `}</style>
+    </div>
+  );
+};
+
 const ContentPageList = ({ pages }) => {
   const [selectionState, updateSelectionState] = useState({});
 
@@ -152,6 +268,10 @@ const ContentPageList = ({ pages }) => {
   const numSelected = Object.keys(selectionState).length;
 
   const [deletionState, updateDeletionState] = useState({
+    pending: false,
+  });
+
+  const [addToListState, updateAddToListState] = useState({
     pending: false,
   });
 
@@ -202,6 +322,18 @@ const ContentPageList = ({ pages }) => {
       });
   });
 
+  const onClickAddToList = useCallback(() => {
+    updateAddToListState({
+      pending: true,
+    });
+  });
+
+  const onCancelPendingAddToList = useCallback(() => {
+    updateAddToListState({
+      pending: false,
+    });
+  });
+
   return (
     <div>
       {pages.map((result) => (
@@ -236,6 +368,7 @@ const ContentPageList = ({ pages }) => {
               </div>
               <div>
                 <button onClick={onClickDelete}>Delete</button>
+                <button onClick={onClickAddToList}>Add to list</button>
                 <button onClick={onClearSelection}>Clear</button>
               </div>
             </div>
@@ -251,7 +384,9 @@ const ContentPageList = ({ pages }) => {
               <div>Progress...</div>
             ) : (
               <div>
-                <button onClick={onConfirmDelete}>Yes. Delete.</button>
+                <button className="primary" onClick={onConfirmDelete}>
+                  Yes. Delete.
+                </button>
                 <button onClick={onCancelPendingDelete}>Nope. Cancel.</button>
               </div>
             )}
@@ -260,9 +395,41 @@ const ContentPageList = ({ pages }) => {
             )}
           </div>
         )}
+        {addToListState.pending && (
+          <div className="pending-modal p-all-4">
+            <h2>
+              Add <span>{numSelected}</span>{" "}
+              <span>{numSelected === 1 ? "item" : "items"}</span> to list
+            </h2>
+            {addToListState.started ? (
+              <div>Progress...</div>
+            ) : (
+              <div>
+                <h4>Select a list</h4>
+                <SelectList />
+                <br />
+                <h4>Create a new list</h4>
+                <CreateList />
+                <br />
+                <div>
+                  <button onClick={onCancelPendingAddToList}>
+                    Nope. Cancel.
+                  </button>
+                </div>
+              </div>
+            )}
+            {addToListState.error && (
+              <div className="error">Oops. Something went wrong.</div>
+            )}
+          </div>
+        )}
         <style jsx>{`
           button {
-            background: black;
+            background: rgb(55, 55, 55);
+            color: white;
+          }
+          button.primary {
+            background: purple;
             color: white;
           }
           .pending-modal {
