@@ -144,18 +144,20 @@ const ContentPage = ({
 };
 
 const SelectList = ({ selectionState }) => {
-  const [selected, updateSelected] = useState();
+  const [selectedListId, updateSelectedListId] = useState();
   const { data, error, isValidating } = useSWR(listQuery, gqlFetcher);
 
   const lists = data && data.data.allLists.data.sort((a, b) => b._ts - a._ts);
 
   useEffect(() => {
-    if (lists) updateSelected(lists[0]);
+    if (lists && lists.length > 0) {
+      updateSelectedListId(lists[0]._id);
+    }
   }, [lists]);
 
   const onSelectList = useCallback((e) => {
     const id = e.target.value;
-    updateSelected(id);
+    updateSelectedListId(id);
   });
 
   const [createListItemState, updateCreateListItemState] = useState({
@@ -173,7 +175,7 @@ const SelectList = ({ selectionState }) => {
       method: "POST",
       body: JSON.stringify({
         ids: Object.keys(selectionState),
-        listId: selected._id,
+        listId: selectedListId,
       }),
     })
       .then((result) => {
@@ -192,7 +194,11 @@ const SelectList = ({ selectionState }) => {
 
   return (
     <div>
-      <select style={{ width: 200 }} value={selected} onChange={onSelectList}>
+      <select
+        style={{ width: 200 }}
+        value={selectedListId}
+        onChange={onSelectList}
+      >
         {lists
           ? lists.map((list) => {
               return (
@@ -208,13 +214,27 @@ const SelectList = ({ selectionState }) => {
       <div>
         <br />
         <div>
-          {!createListItemState.started && (
-            <button onClick={onCreateListItem}>Add</button>
-          )}
-          {createListItemState.result && (
-            <Link href={{ pathname: "/lists", query: { id: selected._id } }}>
-              <a>{`View ${selected.name}`}</a>
-            </Link>
+          <button
+            onClick={onCreateListItem}
+            disabled={
+              !selectedListId ||
+              typeof selectedListId !== "string" ||
+              createListItemState.started
+            }
+          >
+            Add
+          </button>
+          {createListItemState.started ? (
+            <span>Adding...</span>
+          ) : (
+            createListItemState.result &&
+            typeof selectedListId === "string" && (
+              <Link
+                href={{ pathname: "/lists", query: { id: selectedListId } }}
+              >
+                <a>View list</a>
+              </Link>
+            )
           )}
         </div>
       </div>
@@ -222,6 +242,10 @@ const SelectList = ({ selectionState }) => {
         button {
           background: purple;
           color: white;
+        }
+        button:disabled {
+          cursor: auto;
+          background: gray;
         }
         a {
           color: black;
