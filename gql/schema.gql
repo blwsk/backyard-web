@@ -17,4 +17,6 @@ type Query {
     @resolver(name: "all_Items_reverse_chrono", paginated: true)
   allLists: [List!]
   allListItems: [ListItem!]
+  findListItemsByList(id: String!): [ListItem]
+    @resolver(name: "list_items_for_list", paginated: true)
 }
