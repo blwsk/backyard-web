@@ -45,15 +45,17 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
           text,
           htmlChunk,
           anchorNode: currentSelection.anchorNode,
+          focusNode: currentSelection.focusNode,
         });
       } else {
         updateSelection({
           text: null,
           htmlChunk: null,
           anchorNode: null,
+          focusNode: null,
         });
       }
-    }),
+    }, 250),
     []
   );
 
@@ -71,6 +73,14 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
   useEffect(() => {
     console.log(selection);
   }, [selection]);
+
+  const upperSelectionNode =
+    selection.anchorNode &&
+    selection.focusNode &&
+    (selection.anchorNode.parentElement.offsetTop <
+    selection.focusNode.parentElement.offsetTop
+      ? selection.anchorNode
+      : selection.focusNode);
 
   return (
     <div>
@@ -96,30 +106,58 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
             className="rendered-html-body"
             dangerouslySetInnerHTML={{ __html: data.body }}
           />
-          {selection.anchorNode && (
+          {upperSelectionNode && (
             <div
               key={viewportSizeKey}
               style={{
                 position: "absolute",
-                height: 200,
+                height: 100,
                 width: 200,
                 background: "black",
                 color: "white",
                 borderRadius: 4,
-                top: selection.anchorNode.parentElement.offsetTop - (200 + 8),
+                top: upperSelectionNode.parentElement.offsetTop - (100 + 8),
                 left:
-                  selection.anchorNode.parentElement.offsetLeft +
+                  upperSelectionNode.parentElement.offsetLeft +
                   Math.round(
-                    0.5 * selection.anchorNode.parentElement.offsetWidth
+                    0.5 * upperSelectionNode.parentElement.offsetWidth
                   ) -
                   100,
                 display: "flex",
                 justifyContent: "center",
-                overflow: "auto",
+                alignItems: "center",
                 padding: 8,
+                flexDirection: "column",
               }}
             >
-              {selection.text}
+              <div className="p-all-1">
+                <small>
+                  <b>{selection.text.length}</b> characters
+                </small>
+              </div>
+              <div>
+                <button
+                  onClick={(e) => {
+                    debugger;
+                  }}
+                >
+                  Save 🗄
+                </button>
+                <button
+                  onClick={(e) => {
+                    debugger;
+                  }}
+                >
+                  Share 📤
+                </button>
+              </div>
+              <style jsx>{`
+                button {
+                  background: aliceblue;
+                  color: black;
+                  padding: 0.4em 0.6em;
+                }
+              `}</style>
             </div>
           )}
         </div>
