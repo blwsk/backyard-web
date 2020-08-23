@@ -7,7 +7,7 @@ export const fetcher = (path, options) => {
   return fetch(path, options).then(jsonParser);
 };
 
-const Metadata = ({ url, rawUrl, renderPlaceholder }) => {
+const Metadata = ({ url, rawUrl, itemId, renderPlaceholder }) => {
   const { data, error } = useSWR(
     `https://backyard-data.vercel.app/api/simple?url=${rawUrl}`,
     // `http://localhost:3001/api/simple?url=${rawUrl}`,
@@ -37,7 +37,12 @@ const Metadata = ({ url, rawUrl, renderPlaceholder }) => {
           <hr />
           <br />
           <div>
-            <Link href={{ pathname: "/viewer", query: { url: rawUrl } }}>
+            <Link
+              href={{
+                pathname: "/viewer",
+                query: { url: rawUrl, ...(itemId && { id: itemId }) },
+              }}
+            >
               <button>View now</button>
             </Link>
           </div>

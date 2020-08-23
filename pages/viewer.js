@@ -5,7 +5,7 @@ import { validURL } from "../lib/urls";
 import Wrapper from "../components/wrapper";
 
 const Viewer = ({ router }) => {
-  const urlString = router.query.url;
+  const { url: urlString, id: itemId } = router.query;
 
   const decodedUrl = decodeURIComponent(urlString);
 
@@ -17,6 +17,7 @@ const Viewer = ({ router }) => {
           <Data
             rawUrl={urlString}
             url={decodedUrl}
+            itemId={itemId}
             renderPlaceholder={() => (
               <div style={{ wordBreak: "break-word" }}>
                 <h2>{decodedUrl}</h2>

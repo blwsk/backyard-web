@@ -11,6 +11,11 @@ type ListItem {
   list: List!
 }
 
+type TextSelection {
+  text: String!
+  item: Item!
+}
+
 type Query {
   allItems: [Item!]
   allItemsReverseChrono: [Item!]
@@ -19,4 +24,5 @@ type Query {
   allListItems: [ListItem!]
   findListItemsByList(id: String!): [ListItem]
     @resolver(name: "list_items_for_list", paginated: true)
+  allTextSelections: [TextSelection!]
 }

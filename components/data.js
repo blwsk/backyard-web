@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { jsonParser } from "../lib/fetcher";
+import { jsonParser, jsonFetcher } from "../lib/fetcher";
 import { getHostname } from "../lib/urls";
 import { useEffect, useCallback, useState } from "react";
 import { debounce } from "../lib/debounce";
@@ -8,7 +8,7 @@ export const fetcher = (path, options) => {
   return fetch(path, options).then(jsonParser);
 };
 
-const Data = ({ url, rawUrl, renderPlaceholder }) => {
+const Data = ({ url, rawUrl, renderPlaceholder, itemId }) => {
   const { data, error } = useSWR(
     `https://backyard-data.vercel.app/api/index?url=${rawUrl}`,
     // `http://localhost:3001/api/index?url=${rawUrl}`,
@@ -24,6 +24,10 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
   const [selection, updateSelection] = useState({
     text: null,
     htmlChunk: null,
+  });
+
+  const [textSelectionSaveState, updateTextSelectionSaveState] = useState({
+    started: false,
   });
 
   const onSelectionChange = useCallback(
@@ -54,6 +58,7 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
           anchorNode: null,
           focusNode: null,
         });
+        updateTextSelectionSaveState({ started: false });
       }
     }, 250),
     []
@@ -70,17 +75,41 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
     window.onresize = onResize;
   }, []);
 
-  useEffect(() => {
-    console.log(selection);
-  }, [selection]);
-
-  const upperSelectionNode =
-    selection.anchorNode &&
+  /**
+   * If the selection is from bottom to top, the following is preferable, but does not support click to highlight very well:
+   * 
+   selection.anchorNode &&
     selection.focusNode &&
     (selection.anchorNode.parentElement.offsetTop <
     selection.focusNode.parentElement.offsetTop
       ? selection.anchorNode
-      : selection.focusNode);
+      : selection.focusNode)
+   */
+  const upperSelectionNode = selection.anchorNode;
+
+  const onSave = useCallback(() => {
+    updateTextSelectionSaveState({ started: true });
+    jsonFetcher("/api/text-selection", {
+      method: "POST",
+      body: JSON.stringify({
+        itemId,
+        text: selection.text,
+      }),
+    })
+      .then((res) => {
+        updateTextSelectionSaveState({
+          started: false,
+          success: true,
+          data: res,
+        });
+      })
+      .catch((error) => {
+        updateTextSelectionSaveState({
+          started: false,
+          error,
+        });
+      });
+  }, [selection, itemId]);
 
   return (
     <div>
@@ -112,17 +141,12 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
               style={{
                 position: "absolute",
                 height: 100,
-                width: 200,
-                background: "black",
-                color: "white",
+                width: 160,
+                background: "var(--c1)",
+                color: "var(--c3)",
                 borderRadius: 4,
                 top: upperSelectionNode.parentElement.offsetTop - (100 + 8),
-                left:
-                  upperSelectionNode.parentElement.offsetLeft +
-                  Math.round(
-                    0.5 * upperSelectionNode.parentElement.offsetWidth
-                  ) -
-                  100,
+                left: Math.round(0.5 * window.innerWidth) - 80,
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -136,25 +160,21 @@ const Data = ({ url, rawUrl, renderPlaceholder }) => {
                 </small>
               </div>
               <div>
-                <button
-                  onClick={(e) => {
-                    debugger;
-                  }}
-                >
-                  Save 🗄
-                </button>
-                <button
-                  onClick={(e) => {
-                    debugger;
-                  }}
-                >
-                  Share 📤
-                </button>
+                {selection.text && selection.text.length > 0 && (
+                  <>
+                    {!textSelectionSaveState.started &&
+                      !textSelectionSaveState.success && (
+                        <button onClick={onSave}>Save 🗄</button>
+                      )}
+                    {textSelectionSaveState.success && <span>Success ✨</span>}
+                    {textSelectionSaveState.error && <span>Error ❌</span>}
+                  </>
+                )}
               </div>
               <style jsx>{`
                 button {
-                  background: aliceblue;
-                  color: black;
+                  background: var(--c3);
+                  color: var(--c1);
                   padding: 0.4em 0.6em;
                 }
               `}</style>

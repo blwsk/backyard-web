@@ -43,7 +43,7 @@ const SaveUrl = ({ urlString }) => {
           updateSaveState({
             ...saveState,
             saved: true,
-            data: res,
+            data: res.data.createItem,
             loading: false,
             error: false,
             message: "Saved.",
@@ -100,6 +100,7 @@ const SaveUrl = ({ urlString }) => {
             <Metadata
               rawUrl={urlString}
               url={urlString}
+              itemId={saveState.data ? saveState.data._id : undefined}
               renderPlaceholder={() => <h2>{decodedUrl}</h2>}
             />
           )}

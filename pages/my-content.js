@@ -114,7 +114,12 @@ const ContentPage = ({
             }}
           >
             <div>
-              <Link href={{ pathname: "/viewer", query: { url: encodedUrl } }}>
+              <Link
+                href={{
+                  pathname: "/viewer",
+                  query: { url: encodedUrl, id: _id },
+                }}
+              >
                 <a>{withParamsStripped}</a>
               </Link>
               <div>
