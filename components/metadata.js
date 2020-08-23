@@ -37,7 +37,7 @@ const Metadata = ({ url, rawUrl, renderPlaceholder }) => {
           <hr />
           <br />
           <div>
-            <Link href={`/viewer?url=${rawUrl}`}>
+            <Link href={{ pathname: "/viewer", query: { url: rawUrl } }}>
               <button>View now</button>
             </Link>
           </div>
