@@ -56,16 +56,16 @@ const SelectionList = () => {
   );
 };
 
-const Selections = () => {
+const Clips = () => {
   return (
     <div>
       <Header />
       <Wrapper>
-        <h1>Selections</h1>
+        <h1>Clips</h1>
         <SelectionList />
       </Wrapper>
     </div>
   );
 };
 
-export default Selections;
+export default Clips;

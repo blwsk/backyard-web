@@ -3,6 +3,22 @@ import { jsonParser, jsonFetcher } from "../lib/fetcher";
 import { getHostname } from "../lib/urls";
 import { useEffect, useCallback, useState } from "react";
 import { debounce } from "../lib/debounce";
+import Link from "next/link";
+
+function isiOs() {
+  return (
+    [
+      "iPad Simulator",
+      "iPhone Simulator",
+      "iPod Simulator",
+      "iPad",
+      "iPhone",
+      "iPod",
+    ].includes(navigator.platform) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+  );
+}
 
 export const fetcher = (path, options) => {
   return fetch(path, options).then(jsonParser);
@@ -144,19 +160,31 @@ const Data = ({ url, rawUrl, renderPlaceholder, itemId }) => {
             <div
               key={viewportSizeKey}
               style={{
-                position: "absolute",
-                height: 100,
-                width: 160,
                 background: "var(--c1)",
                 color: "var(--c3)",
-                borderRadius: 4,
-                top: upperSelectionNode.parentElement.offsetTop - (100 + 8),
-                left: Math.round(0.5 * window.innerWidth) - 80,
+                borderRadius: 8,
+
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 padding: 8,
                 flexDirection: "column",
+                ...(isiOs()
+                  ? {
+                      position: "sticky",
+                      bottom: 16,
+                      width: "100%",
+                      borderRadius: 8,
+                      height: 100,
+                    }
+                  : {
+                      position: "absolute",
+                      height: 100,
+                      width: 200,
+                      top:
+                        upperSelectionNode.parentElement.offsetTop - (100 + 8),
+                      left: Math.round(0.5 * window.innerWidth) - 100,
+                    }),
               }}
             >
               <div className="p-all-1">
@@ -171,7 +199,14 @@ const Data = ({ url, rawUrl, renderPlaceholder, itemId }) => {
                       !textSelectionSaveState.success && (
                         <button onClick={onSave}>Save 🗄</button>
                       )}
-                    {textSelectionSaveState.success && <span>Success ✨</span>}
+                    {textSelectionSaveState.success && (
+                      <div>
+                        <span style={{ marginRight: 8 }}>Success</span>
+                        <Link href="/clips">
+                          <button>View</button>
+                        </Link>
+                      </div>
+                    )}
                     {textSelectionSaveState.error && <span>Error ❌</span>}
                   </>
                 )}

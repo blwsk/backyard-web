@@ -14,35 +14,17 @@ const Header = () => {
     >
       {isAuthenticated && (
         <>
-          <div
+          <span
             style={{
-              borderRadius: "50%",
-              padding: "10px",
               fontSize: "30px",
-              height: "52px",
-              width: "52px",
-              justifyContent: "center",
-              display: "flex",
-              alignItems: "center",
-              marginRight: 16,
-              paddingBottom: 12,
+              marginRight: 24,
             }}
           >
-            🏕
-          </div>
-          <div style={{ marginRight: 16 }}>
             <Link href="/">
-              <a
-                style={{
-                  fontWeight: 500,
-                }}
-                className="color-black"
-              >
-                Home
-              </a>
+              <a>🏕</a>
             </Link>
-          </div>
-          <div style={{ marginRight: 16 }}>
+          </span>
+          <span style={{ marginRight: 20 }}>
             <Link href="/my-content">
               <a
                 style={{
@@ -50,11 +32,11 @@ const Header = () => {
                 }}
                 className="color-black"
               >
-                My Content
+                Saved
               </a>
             </Link>
-          </div>
-          <div style={{ marginRight: 16 }}>
+          </span>
+          <span style={{ marginRight: 20 }}>
             <Link href="/lists">
               <a
                 style={{
@@ -65,19 +47,19 @@ const Header = () => {
                 Lists
               </a>
             </Link>
-          </div>
-          <div style={{ marginRight: 16 }}>
-            <Link href="/selections">
+          </span>
+          <span style={{ marginRight: 20 }}>
+            <Link href="/clips">
               <a
                 style={{
                   fontWeight: 500,
                 }}
                 className="color-black"
               >
-                Selections
+                Clips
               </a>
             </Link>
-          </div>
+          </span>
         </>
       )}
     </header>
