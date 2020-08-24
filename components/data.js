@@ -73,6 +73,11 @@ const Data = ({ url, rawUrl, renderPlaceholder, itemId }) => {
   useEffect(() => {
     document.onselectionchange = onSelectionChange;
     window.onresize = onResize;
+
+    return () => {
+      document.onselectionchange = () => {};
+      window.onresize = () => {};
+    };
   }, []);
 
   /**

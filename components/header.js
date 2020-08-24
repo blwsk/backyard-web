@@ -15,20 +15,21 @@ const Header = () => {
       {isAuthenticated && (
         <>
           <div
-            className="background-blue"
             style={{
               borderRadius: "50%",
               padding: "10px",
-              fontSize: "20px",
+              fontSize: "30px",
               height: "52px",
               width: "52px",
               justifyContent: "center",
               display: "flex",
               alignItems: "center",
-              color: "rgba(255,255,255,0.6)",
               marginRight: 16,
+              paddingBottom: 12,
             }}
-          ></div>
+          >
+            🏕
+          </div>
           <div style={{ marginRight: 16 }}>
             <Link href="/">
               <a
@@ -53,7 +54,7 @@ const Header = () => {
               </a>
             </Link>
           </div>
-          <div>
+          <div style={{ marginRight: 16 }}>
             <Link href="/lists">
               <a
                 style={{
@@ -62,6 +63,18 @@ const Header = () => {
                 className="color-black"
               >
                 Lists
+              </a>
+            </Link>
+          </div>
+          <div style={{ marginRight: 16 }}>
+            <Link href="/selections">
+              <a
+                style={{
+                  fontWeight: 500,
+                }}
+                className="color-black"
+              >
+                Selections
               </a>
             </Link>
           </div>
