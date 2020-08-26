@@ -570,19 +570,26 @@ const MyContent = ({ sortOrder }) => {
     <>
       <div style={{ paddingBottom: 80 }}>
         <ContentPageList pages={pages} />
-        {data &&
-          !isValidating &&
-          (hasMore ? (
-            <div>
-              <br />
-              <button onClick={onLoadMoreClick}>Load more</button>
-            </div>
+        <div style={{ height: 100 }}>
+          {data ? (
+            hasMore ? (
+              <div>
+                <br />
+                <button onClick={onLoadMoreClick}>Load more</button>
+              </div>
+            ) : (
+              <div>
+                <br />
+                <div>All caught up.</div>
+              </div>
+            )
           ) : (
             <div>
               <br />
-              <div>All caught up.</div>
+              <div>Loading...</div>
             </div>
-          ))}
+          )}
+        </div>
       </div>
       {isValidating && <h2>Loading...</h2>}
       {error && <div style={{ color: "red" }}>Oops. Refresh the page.</div>}

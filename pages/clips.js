@@ -4,12 +4,50 @@ import useSWR from "swr";
 import gql from "gql-tag";
 import { gqlFetcher } from "../lib/fetcher";
 import ListItem from "../components/listItem";
+import { useState, useCallback, useEffect } from "react";
 
-const SelectionList = () => {
+const PAGE_LENGTH = 10;
+
+const getResultObject = (result) => result.allTextSelections;
+
+const Clip = ({ item, text, _id }) => {
+  return (
+    <div key={_id} className="selection-item">
+      <ListItem item={item} />
+      <blockquote>{text}</blockquote>
+    </div>
+  );
+};
+
+const Page = ({ pageData }) => {
+  return (
+    <>
+      {pageData.map((pageItem) => {
+        const { item, text, _id } = pageItem;
+
+        return <Clip key={_id} item={item} text={text} id={_id} />;
+      })}
+    </>
+  );
+};
+
+const PageList = ({ pages }) => {
+  return (
+    <>
+      {pages.map((page) => {
+        const { data: pageData, before } = getResultObject(page);
+
+        return <Page key={before} pageData={pageData} />;
+      })}
+    </>
+  );
+};
+
+const usePaginatedContent = ({ cursorValue }) => {
   const { data, error, isValidating } = useSWR(
     gql`
       query {
-        allTextSelections {
+        allTextSelections(_size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
           data {
             item {
               url
@@ -19,39 +57,79 @@ const SelectionList = () => {
             text
             _id
           }
+          before
+          after
         }
       }
     `,
     gqlFetcher
   );
 
-  if (!data) {
-    return <div>Loading...</div>;
-  }
+  return {
+    data,
+    error,
+    isValidating,
+  };
+};
 
-  const textSelections = data.data.allTextSelections.data;
+const SelectionList = () => {
+  const [cursor, updateCursor] = useState(null);
 
-  if (textSelections.length === 0) {
-    <div>Save text selections and view them here.</div>;
-  }
+  const [pages, updatesPages] = useState([]);
+
+  const cursorValue = cursor ? `"${cursor}"` : cursor;
+
+  const { data, error, isValidating } = usePaginatedContent({
+    cursorValue,
+  });
+
+  const onLoadMoreClick = useCallback(() => {
+    updateCursor(getResultObject(data.data).after);
+  });
+
+  useEffect(() => {
+    if (data && getResultObject(data.data).before === null) {
+      /**
+       * First page
+       */
+      updatesPages([data.data]);
+      return;
+    }
+
+    if (data && !isValidating && typeof cursor === "string") {
+      /**
+       * Subsequent pages
+       */
+      updatesPages([...pages, data.data]);
+      return;
+    }
+  }, [data, cursor]);
+
+  const hasMore = data && typeof getResultObject(data.data).after === "string";
 
   return (
     <div>
-      {textSelections.map((selection) => {
-        const { item, text, _id } = selection;
-
-        return (
-          <div key={_id} className="selection-item">
-            <ListItem item={item} />
-            <blockquote>{text}</blockquote>
+      <PageList pages={pages} />
+      <div style={{ height: 100 }}>
+        {data ? (
+          hasMore ? (
+            <div>
+              <br />
+              <button onClick={onLoadMoreClick}>Load more</button>
+            </div>
+          ) : (
+            <div>
+              <br />
+              <div>All caught up.</div>
+            </div>
+          )
+        ) : (
+          <div>
+            <br />
+            <div>Loading...</div>
           </div>
-        );
-      })}
-      <style jsx>{`
-        .selection-item {
-          margin-bottom: 16px;
-        }
-      `}</style>
+        )}
+      </div>
     </div>
   );
 };
@@ -64,6 +142,14 @@ const Clips = () => {
         <h1>Clips</h1>
         <SelectionList />
       </Wrapper>
+      <style jsx global>{`
+        .selection-item {
+          margin-bottom: 16px;
+        }
+        .selection-item:last-of-type {
+          margin-bottom: 0;
+        }
+      `}</style>
     </div>
   );
 };
