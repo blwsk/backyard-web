@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import gql from "gql-tag";
 import { validURL } from "../lib/urls";
 import Metadata from "../components/metadata";
-import { gqlFetcher } from "../lib/fetcher";
+import { jsonFetcher } from "../lib/fetcher";
 
 const messages = {
   ALREADY_SAVED: "Already saved.",
+  SAVED: "Saved.",
 };
 
 const SaveUrl = ({ urlString }) => {
@@ -22,54 +22,23 @@ const SaveUrl = ({ urlString }) => {
 
   useEffect(() => {
     if (isValid) {
-      const query = gql`
-          mutation {
-            createItem(
-              data: {
-                url: "${decodedUrl}"
-              }
-            ) {
-              url
-              _id
-              _ts
-            }
-          }
-        `;
-
       updateSaveState({ ...saveState, loading: true, message: "Saving..." });
 
-      gqlFetcher(query)
+      jsonFetcher("/api/create-item", {
+        method: "POST",
+        body: JSON.stringify({ url: decodedUrl }),
+      })
         .then((res) => {
           updateSaveState({
             ...saveState,
             saved: true,
-            data: res.data.createItem,
+            data: res.result,
             loading: false,
             error: false,
-            message: "Saved.",
+            message: res.alreadySaved ? messages.ALREADY_SAVED : messages.SAVED,
           });
         })
         .catch((err) => {
-          try {
-            const alreadySaved = err.errors.some(
-              (error) => error.message.indexOf("not unique") > 0
-            );
-            if (alreadySaved) {
-              updateSaveState({
-                ...saveState,
-                saved: true,
-                data: null,
-                loading: false,
-                error: false,
-                message: messages.ALREADY_SAVED,
-              });
-
-              return;
-            }
-          } catch (e) {
-            void e;
-          }
-
           updateSaveState({
             ...saveState,
             error: err,
@@ -96,11 +65,11 @@ const SaveUrl = ({ urlString }) => {
         <>
           {saveState.loading && <div>Loading...</div>}
           {saveState.error && <div>Error.</div>}
-          {(saveState.data || saveState.message === messages.ALREADY_SAVED) && (
+          {saveState.data && (
             <Metadata
               rawUrl={urlString}
               url={urlString}
-              itemId={saveState.data ? saveState.data._id : undefined}
+              itemId={saveState.data.id}
               renderPlaceholder={() => <h2>{decodedUrl}</h2>}
             />
           )}
