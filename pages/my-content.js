@@ -7,6 +7,7 @@ import { stripParams } from "../lib/urls";
 import Wrapper from "../components/wrapper";
 import { useState, useCallback, useEffect } from "react";
 import { withRouter } from "next/router";
+import ListItem from "../components/listItem";
 
 const PAGE_LENGTH = 20;
 
@@ -88,14 +89,7 @@ const ContentPage = ({
   return (
     <div>
       {items.map((item) => {
-        const { _id, _ts, url } = item;
-
-        const encodedUrl = encodeURI(url);
-        const withParamsStripped = stripParams(url);
-
-        const date = new Date(_ts / 1000);
-        const dateString = date.toDateString();
-        const timeString = date.toLocaleTimeString();
+        const { _id } = item;
 
         const isDeleted = deletedIds.indexOf(_id) > -1;
 
@@ -106,30 +100,13 @@ const ContentPage = ({
         return (
           <div
             key={_id}
-            className="p-y-3"
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
             }}
           >
-            <div>
-              <Link
-                href={{
-                  pathname: "/viewer",
-                  query: { url: encodedUrl, id: _id },
-                }}
-              >
-                <a>{withParamsStripped}</a>
-              </Link>
-              <div>
-                <small>
-                  <span>{dateString}</span>
-                  <span>・</span>
-                  <span>{timeString}</span>
-                </small>
-              </div>
-            </div>
+            <ListItem item={item} />
             <input
               type="checkbox"
               checked={!!selectionState[_id]}

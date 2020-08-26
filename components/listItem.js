@@ -11,7 +11,6 @@ import Link from "next/link";
 const ListItem = ({ item }) => {
   const { _id, _ts, url } = item;
 
-  const encodedUrl = encodeURI(url);
   const withParamsStripped = stripParams(url);
 
   const date = new Date(_ts / 1000);
@@ -20,7 +19,6 @@ const ListItem = ({ item }) => {
 
   return (
     <div
-      key={_id}
       className="p-y-3"
       style={{
         display: "flex",
@@ -29,9 +27,7 @@ const ListItem = ({ item }) => {
       }}
     >
       <div>
-        <Link
-          href={{ pathname: "/viewer", query: { url: encodedUrl, id: _id } }}
-        >
+        <Link href={{ pathname: "/viewer", query: { id: _id } }}>
           <a>{withParamsStripped}</a>
         </Link>
         <div>

@@ -1,9 +1,10 @@
 import useSWR from "swr";
-import { jsonParser, jsonFetcher } from "../lib/fetcher";
+import { jsonParser, jsonFetcher, gqlFetcher } from "../lib/fetcher";
 import { getHostname } from "../lib/urls";
 import { useEffect, useCallback, useState } from "react";
 import { debounce } from "../lib/debounce";
 import Link from "next/link";
+import gql from "gql-tag";
 
 function isiOs() {
   return (
@@ -24,9 +25,9 @@ export const fetcher = (path, options) => {
   return fetch(path, options).then(jsonParser);
 };
 
-const Data = ({ url, rawUrl, renderPlaceholder, itemId }) => {
+const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
   const { data, error } = useSWR(
-    `https://backyard-data.vercel.app/api/index?url=${rawUrl}`,
+    `https://backyard-data.vercel.app/api/index?url=${rawUrl}&id=${itemId}`,
     // `http://localhost:3001/api/index?url=${rawUrl}`,
     fetcher
   );
@@ -227,4 +228,38 @@ const Data = ({ url, rawUrl, renderPlaceholder, itemId }) => {
     </div>
   );
 };
+
+const Data = ({ itemId }) => {
+  const { data, error, isValidating } = useSWR(
+    gql`
+    query {
+      findItemByID(id: ${itemId}) {
+        url
+      }
+    }
+  `,
+    gqlFetcher
+  );
+
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  const url = data.data.findItemByID.url;
+  const rawUrl = encodeURI(url);
+
+  return (
+    <ReactiveItemData
+      url={url}
+      rawUrl={rawUrl}
+      renderPlaceholder={() => (
+        <div style={{ wordBreak: "break-word" }}>
+          <h2>{url}</h2>
+        </div>
+      )}
+      itemId={itemId}
+    />
+  );
+};
+
 export default Data;
