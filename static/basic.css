@@ -249,7 +249,13 @@ article:last-child {
 }
 
 .rendered-html-body * {
-  font: var(--sans) !important;
+  font-family: "inter", system-ui, -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans,
+    sans-serif !important;
+}
+.rendered-html-body pre,
+.rendered-html-body code {
+  font-family: var(--mono) !important;
 }
 
 .rendered-html-body img {
