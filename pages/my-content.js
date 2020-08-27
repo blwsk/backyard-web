@@ -8,6 +8,7 @@ import Wrapper from "../components/wrapper";
 import { useState, useCallback, useEffect } from "react";
 import { withRouter } from "next/router";
 import ListItem from "../components/listItem";
+import { capitalize } from "../lib/capitalize";
 
 const PAGE_LENGTH = 20;
 
@@ -30,12 +31,6 @@ const listQuery = gql`
 
 const getResultObject = (result) =>
   result.allItems || result.allItemsReverseChrono;
-
-const capitalize = (s) => {
-  if (typeof s !== "string") return "";
-  const l = s.toLowerCase();
-  return l.charAt(0).toUpperCase() + l.slice(1);
-};
 
 const usePaginatedContent = ({
   cursorValue,
