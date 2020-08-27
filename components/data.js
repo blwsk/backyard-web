@@ -5,6 +5,7 @@ import { useEffect, useCallback, useState } from "react";
 import { debounce } from "../lib/debounce";
 import Link from "next/link";
 import gql from "gql-tag";
+import TweetEmbed from "./tweetEmbed";
 
 function isiOs() {
   return (
@@ -23,6 +24,19 @@ function isiOs() {
 
 export const fetcher = (path, options) => {
   return fetch(path, options).then(jsonParser);
+};
+
+const ContentBody = ({ hostname, data, url }) => {
+  if (hostname === "twitter.com") {
+    return <TweetEmbed url={url} />;
+  }
+
+  return (
+    <div
+      className="rendered-html-body"
+      dangerouslySetInnerHTML={{ __html: data.body }}
+    />
+  );
 };
 
 const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
@@ -153,10 +167,7 @@ const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
           <br />
           <hr />
           <br />
-          <div
-            className="rendered-html-body"
-            dangerouslySetInnerHTML={{ __html: data.body }}
-          />
+          <ContentBody data={data} hostname={hostname} url={url} />
           {upperSelectionNode && (
             <div
               key={viewportSizeKey}

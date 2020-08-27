@@ -58,7 +58,6 @@ a:hover {
 }
 pre {
   font: 1em/1.6 var(--mono);
-  padding: 1em;
 }
 code {
   font: 1em/1.6 var(--mono);
@@ -174,9 +173,7 @@ section > section {
   flex: var(--c, 1);
   margin: var(--m1);
 }
-article {
-  padding: 1em;
-}
+
 [style*="--c:"]:first-child,
 article:first-child,
 section > section:first-child {
