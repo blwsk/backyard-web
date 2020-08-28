@@ -6,6 +6,7 @@ import { debounce } from "../lib/debounce";
 import Link from "next/link";
 import gql from "gql-tag";
 import TweetEmbed from "./tweetEmbed";
+import YouTubeEmbed from "./youTubeEmbed";
 
 function isiOs() {
   return (
@@ -29,6 +30,10 @@ export const fetcher = (path, options) => {
 const ContentBody = ({ hostname, data, url }) => {
   if (hostname === "twitter.com") {
     return <TweetEmbed url={url} />;
+  }
+
+  if (hostname === "youtube.com" || hostname === "www.youtube.com") {
+    return <YouTubeEmbed url={url} />;
   }
 
   return (
