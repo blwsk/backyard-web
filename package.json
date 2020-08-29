@@ -5,6 +5,7 @@
   "author": "Kevin Bielawski <kbielawsk7@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@auth0/auth0-react": "^1.0.0",
     "date-fns": "^2.15.0",
     "faunadb": "^3.0.1",
     "gql-tag": "^1.0.1",

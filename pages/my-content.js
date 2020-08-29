@@ -563,7 +563,6 @@ const MyContent = ({ sortOrder }) => {
           )}
         </div>
       </div>
-      {isValidating && <h2>Loading...</h2>}
       {error && <div style={{ color: "red" }}>Oops. Refresh the page.</div>}
     </>
   );
