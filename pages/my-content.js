@@ -9,6 +9,7 @@ import { useState, useCallback, useEffect } from "react";
 import { withRouter } from "next/router";
 import ListItem from "../components/listItem";
 import { capitalize } from "../lib/capitalize";
+import requireAuth from "../lib/requireAuth";
 
 const PAGE_LENGTH = 20;
 
@@ -605,4 +606,4 @@ const WrappedMyContent = ({ router }) => {
   );
 };
 
-export default withRouter(WrappedMyContent);
+export default requireAuth(withRouter(WrappedMyContent));

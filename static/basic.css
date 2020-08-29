@@ -166,6 +166,11 @@ button:disabled:hover {
   opacity: 1;
   cursor: auto;
 }
+button.small {
+  background: var(--c1);
+  color: var(--c3);
+  padding: 0.4em 0.6em;
+}
 section {
   display: flex;
   flex-flow: row wrap;

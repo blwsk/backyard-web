@@ -2,6 +2,7 @@ import { withRouter } from "next/router";
 import Header from "../components/header";
 import SaveUrl from "../components/saveUrl";
 import Wrapper from "../components/wrapper";
+import requireAuth from "../lib/requireAuth";
 
 const Save = ({ router }) => {
   const urlString = router.query.url;
@@ -14,4 +15,4 @@ const Save = ({ router }) => {
   );
 };
 
-export default withRouter(Save);
+export default requireAuth(withRouter(Save));

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AuthInteraction from "./authInteraction";
 
 const Header = () => {
   return (
@@ -54,6 +55,9 @@ const Header = () => {
             Clips
           </a>
         </Link>
+      </span>
+      <span style={{ marginRight: 20 }}>
+        <AuthInteraction />
       </span>
     </header>
   );

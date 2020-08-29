@@ -6,6 +6,7 @@ import gql from "gql-tag";
 import { gqlFetcher } from "../lib/fetcher";
 import { useState } from "react";
 import ListItem from "../components/listItem";
+import requireAuth from "../lib/requireAuth";
 
 const ListDrawerContent = ({ list }) => {
   const { _id } = list;
@@ -124,4 +125,4 @@ const Lists = ({ router }) => {
   );
 };
 
-export default withRouter(Lists);
+export default requireAuth(withRouter(Lists));

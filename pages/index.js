@@ -1,23 +1,8 @@
 import React, { useCallback, useState } from "react";
 import Header from "../components/header";
-import Login from "../components/login";
 import Wrapper from "../components/wrapper";
 import { withRouter } from "next/router";
 import { validURL } from "../lib/urls";
-import LoginButton from "../components/loginButton";
-import LogoutButton from "../components/logoutButton";
-import { useAuth0 } from "@auth0/auth0-react";
-
-const Auth = () => {
-  const { user, isAuthenticated } = useAuth0();
-
-  return (
-    <div>
-      {isAuthenticated ? <LogoutButton /> : <LoginButton />}
-      {user && <div>{user.email}</div>}
-    </div>
-  );
-};
 
 const Index = ({ router }) => {
   const [value, updater] = useState("");
@@ -57,8 +42,33 @@ const Index = ({ router }) => {
           >
             Save
           </button>
-          <Auth />
         </>
+      </Wrapper>
+      <br />
+      <Wrapper>
+        <div>
+          <h3>How to save</h3>
+          <ul>
+            <li>
+              <span style={{ marginRight: 8 }}>
+                Drag this bookmarklet onto your bookmark bar:
+              </span>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: `
+                  <a  href="javascript:(function hey(){ window.open('https://backyard-web.blwsk.vercel.app/save?url=' + encodeURIComponent(window.location.href), '_blank'); })()">
+                    <pre style="display:inline;">Save</pre>
+                  </a>
+                `,
+                }}
+              />
+            </li>
+            <li>
+              Send links, images, files, and text to{" "}
+              <a href="tel:9089671305">9089671305</a> via SMS
+            </li>
+          </ul>
+        </div>
       </Wrapper>
     </div>
   );

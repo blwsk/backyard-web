@@ -5,6 +5,7 @@ import gql from "gql-tag";
 import { gqlFetcher } from "../lib/fetcher";
 import ListItem from "../components/listItem";
 import { useState, useCallback, useEffect } from "react";
+import requireAuth from "../lib/requireAuth";
 
 const PAGE_LENGTH = 10;
 
@@ -154,4 +155,4 @@ const Clips = () => {
   );
 };
 
-export default Clips;
+export default requireAuth(Clips);

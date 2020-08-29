@@ -6,11 +6,12 @@ const LoginButton = () => {
 
   return (
     <button
-      onClick={() =>
+      className="small"
+      onClick={() => {
         loginWithRedirect({
           redirectUri: window.location.origin,
-        })
-      }
+        });
+      }}
     >
       Log In
     </button>
