@@ -1,5 +1,6 @@
 import Head from "next/head";
 import "../static/basic.css";
+import withAuth from "../lib/withAuth";
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -12,4 +13,4 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-export default MyApp;
+export default withAuth(MyApp);
