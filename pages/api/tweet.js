@@ -1,4 +1,5 @@
 import fetch from "isomorphic-unfetch";
+import authedEndpoint from "../../api-utils/authedEndpoint";
 
 const { TWITTER_BEARER_TOKEN: secret } = process.env;
 
@@ -20,7 +21,7 @@ const mediaFields = [
   "width",
 ].join(",");
 
-const tweet = async (req, res) => {
+const tweet = authedEndpoint(async (req, res) => {
   if (req.method !== "GET") {
     res.status(400).send(null);
     return;
@@ -43,6 +44,6 @@ const tweet = async (req, res) => {
     message: `Success.`,
     tweets: tweetJson,
   });
-};
+});
 
 export default tweet;

@@ -1,8 +1,9 @@
 import fetch from "isomorphic-unfetch";
+import authedEndpoint from "../../api-utils/authedEndpoint";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
-const graphql = async (req, res) => {
+const graphql = authedEndpoint(async (req, res) => {
   if (req.method !== "POST") {
     res.status(400).send(null);
     return;
@@ -19,6 +20,6 @@ const graphql = async (req, res) => {
   const json = await gqlResponse.json();
 
   res.status(gqlResponse.status).send(json);
-};
+});
 
 export default graphql;

@@ -5,7 +5,12 @@ import LogoutButton from "./logoutButton";
 import LoginButton from "./loginButton";
 
 const AuthInteraction = ({ className, style, router }) => {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+
+  getAccessTokenSilently({
+    audience: `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/api/v2/`,
+    scope: "read:items",
+  }).then((t) => console.log(t));
 
   return (
     <span className={className} style={style}>

@@ -1,11 +1,12 @@
 import fetch from "isomorphic-unfetch";
 import faunadb, { query as q } from "faunadb";
+import authedEndpoint from "../../api-utils/authedEndpoint";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
-const items = async (req, res) => {
+const items = authedEndpoint(async (req, res) => {
   if (req.method !== "DELETE") {
     res.status(400).send(null);
     return;
@@ -51,6 +52,6 @@ const items = async (req, res) => {
     ids,
     result: JSON.stringify(result),
   });
-};
+});
 
 export default items;

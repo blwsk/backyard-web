@@ -1,10 +1,11 @@
 import faunadb, { query as q } from "faunadb";
+import authedEndpoint from "../../api-utils/authedEndpoint";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
-const textSelection = async (req, res) => {
+const textSelection = authedEndpoint(async (req, res) => {
   if (req.method !== "POST") {
     res.status(400).send(null);
     return;
@@ -66,6 +67,6 @@ const textSelection = async (req, res) => {
     itemId,
     result: JSON.stringify(result),
   });
-};
+});
 
 export default textSelection;

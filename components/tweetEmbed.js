@@ -3,7 +3,7 @@ import { jsonFetcher } from "../lib/fetcher";
 import formatRelative from "date-fns/formatRelative";
 import { capitalize } from "../lib/capitalize";
 
-const TCO_PATTERN = /https:\/\/t.co\/[a-zA-Z]\w+/g;
+const TCO_PATTERN = /https:\/\/t.co\/[0-9a-zA-Z]\w+/g;
 
 const getIdFromUrl = (url) => {
   const urlObj = new URL(url);

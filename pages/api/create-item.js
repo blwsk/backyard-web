@@ -1,10 +1,11 @@
 import faunadb, { query as q } from "faunadb";
+import authedEndpoint from "../../api-utils/authedEndpoint";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
-const createItem = async (req, res) => {
+const createItem = authedEndpoint(async (req, res) => {
   if (req.method !== "POST") {
     res.status(400).send(null);
     return;
@@ -87,6 +88,6 @@ const createItem = async (req, res) => {
     },
     alreadySaved: false,
   });
-};
+});
 
 export default createItem;
