@@ -5,6 +5,7 @@ const KEY_SET_URI = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/.well-known
 
 const jwksClient = jwks({
   jwksUri: KEY_SET_URI,
+  cache: true,
 });
 
 const getTokenFromHeaderValue = (str) => {
