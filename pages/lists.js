@@ -1,17 +1,17 @@
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import { withRouter } from "next/router";
-import useSWR from "swr";
 import gql from "gql-tag";
-import { gqlFetcher } from "../lib/fetcher";
 import { useState } from "react";
 import ListItem from "../components/listItem";
 import requireAuth from "../lib/requireAuth";
+import { useAuthedSWR } from "../lib/requestHooks";
+import { gqlFetcherFactory } from "../lib/fetcherFactories";
 
 const ListDrawerContent = ({ list }) => {
   const { _id } = list;
 
-  const { data, error } = useSWR(
+  const { data, error } = useAuthedSWR(
     gql`
       query {
         findListItemsByList(id: "${_id}") {
@@ -26,7 +26,7 @@ const ListDrawerContent = ({ list }) => {
         }
       }
     `,
-    gqlFetcher
+    gqlFetcherFactory
   );
 
   if (!data) {
@@ -75,7 +75,7 @@ const ListDrawer = ({ list, startOpen }) => {
 };
 
 const ListList = ({ openListId }) => {
-  const { data, error, isValidating } = useSWR(
+  const { data, error, isValidating } = useAuthedSWR(
     gql`
       query {
         allLists {
@@ -87,7 +87,7 @@ const ListList = ({ openListId }) => {
         }
       }
     `,
-    gqlFetcher
+    gqlFetcherFactory
   );
 
   if (!data) {

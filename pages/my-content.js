@@ -1,15 +1,16 @@
 import Link from "next/link";
 import gql from "gql-tag";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
 import { gqlFetcher, jsonFetcher } from "../lib/fetcher";
 import Header from "../components/header";
-import { stripParams } from "../lib/urls";
 import Wrapper from "../components/wrapper";
 import { useState, useCallback, useEffect } from "react";
 import { withRouter } from "next/router";
 import ListItem from "../components/listItem";
 import { capitalize } from "../lib/capitalize";
 import requireAuth from "../lib/requireAuth";
+import { useAuthedSWR } from "../lib/requestHooks";
+import { gqlFetcherFactory } from "../lib/fetcherFactories";
 
 const PAGE_LENGTH = 20;
 
@@ -66,7 +67,7 @@ const usePaginatedContent = ({
           }
         `;
 
-  const { data, error, isValidating } = useSWR(query, gqlFetcher);
+  const { data, error, isValidating } = useAuthedSWR(query, gqlFetcherFactory);
 
   return {
     data,
@@ -123,7 +124,10 @@ const ContentPage = ({
 
 const SelectList = ({ selectionState }) => {
   const [selectedListId, updateSelectedListId] = useState();
-  const { data, error, isValidating } = useSWR(listQuery, gqlFetcher);
+  const { data, error, isValidating } = useAuthedSWR(
+    listQuery,
+    gqlFetcherFactory
+  );
 
   const lists = data && data.data.allLists.data.sort((a, b) => b._ts - a._ts);
 

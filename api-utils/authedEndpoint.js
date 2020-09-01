@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken";
+import jwks from "jwks-rsa";
 
-const { AUTH0_SECRET_KEY: secret } = process.env;
+const KEY_SET_URI = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/.well-known/jwks.json`;
+
+const jwksClient = jwks({
+  jwksUri: KEY_SET_URI,
+});
 
 const getTokenFromHeaderValue = (str) => {
   try {
@@ -15,33 +20,20 @@ const getTokenFromHeaderValue = (str) => {
   return;
 };
 
-const verifyJwt = async (authorizationHeaderValue) => {
-  return new Promise((resolve, reject) => {
-    const token = getTokenFromHeaderValue(authorizationHeaderValue);
-
-    jwt.verify(token, secret, (err, decoded) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(decoded);
-      }
-    });
-  });
-};
-
 const authedEndpoint = (endpointFn) => async (req, res) => {
+  const { authorization } = req.headers;
+
+  const token = getTokenFromHeaderValue(authorization);
+
+  const decodedToken = jwt.decode(token, { complete: true });
+
   const {
-    Authorization = "Bearer 1ysnjcl8jacQHeTaxynUUeDGor4-KUXM",
-  } = req.headers;
-  let isVerified;
-  try {
-    const decoded = await verifyJwt(Authorization);
-    console.log(decoded);
-    isVerified = true;
-  } catch (error) {
-    console.log(error);
-    isVerified = false;
-  }
+    header: { alg, kid },
+  } = decodedToken;
+
+  const { publicKey } = await jwksClient.getSigningKeyAsync(kid);
+
+  const isVerified = jwt.verify(token, publicKey, { algorithms: [alg] });
 
   if (!isVerified) {
     res.status(401).send(null);

@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { jsonParser, jsonFetcher, gqlFetcher } from "../lib/fetcher";
+import { jsonParser, jsonFetcher } from "../lib/fetcher";
 import { getHostname } from "../lib/urls";
 import { useEffect, useCallback, useState } from "react";
 import { debounce } from "../lib/debounce";
@@ -7,6 +7,8 @@ import Link from "next/link";
 import gql from "gql-tag";
 import TweetEmbed from "./tweetEmbed";
 import YouTubeEmbed from "./youTubeEmbed";
+import { useAuthedSWR } from "../lib/requestHooks";
+import { gqlFetcherFactory } from "../lib/fetcherFactories";
 
 function isiOs() {
   return (
@@ -246,7 +248,7 @@ const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
 };
 
 const Data = ({ itemId }) => {
-  const { data, error, isValidating } = useSWR(
+  const { data, error, isValidating } = useAuthedSWR(
     gql`
     query {
       findItemByID(id: ${itemId}) {
@@ -254,7 +256,7 @@ const Data = ({ itemId }) => {
       }
     }
   `,
-    gqlFetcher
+    gqlFetcherFactory
   );
 
   if (!data) {
