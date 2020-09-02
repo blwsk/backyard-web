@@ -1,7 +1,6 @@
 import Link from "next/link";
 import gql from "gql-tag";
 import { mutate } from "swr";
-import { gqlFetcher, jsonFetcher } from "../lib/fetcher";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import { useState, useCallback, useEffect } from "react";
@@ -9,8 +8,8 @@ import { withRouter } from "next/router";
 import ListItem from "../components/listItem";
 import { capitalize } from "../lib/capitalize";
 import requireAuth from "../lib/requireAuth";
-import { useAuthedSWR } from "../lib/requestHooks";
-import { gqlFetcherFactory } from "../lib/fetcherFactories";
+import { useAuthedSWR, useAuthedCallback } from "../lib/requestHooks";
+import { gqlFetcherFactory, jsonFetcherFactory } from "../lib/fetcherFactories";
 
 const PAGE_LENGTH = 20;
 
@@ -146,6 +145,18 @@ const SelectList = ({ selectionState }) => {
     started: false,
   });
 
+  const doCreateListItem = useAuthedCallback(
+    "/api/list-items",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        ids: Object.keys(selectionState),
+        listId: selectedListId,
+      }),
+    },
+    jsonFetcherFactory
+  );
+
   const onCreateListItem = useCallback(() => {
     /**
      * Do state updates based on request status
@@ -153,13 +164,8 @@ const SelectList = ({ selectionState }) => {
     updateCreateListItemState({
       started: true,
     });
-    jsonFetcher("/api/list-items", {
-      method: "POST",
-      body: JSON.stringify({
-        ids: Object.keys(selectionState),
-        listId: selectedListId,
-      }),
-    })
+
+    doCreateListItem()
       .then((result) => {
         updateCreateListItemState({
           started: false,
@@ -243,9 +249,9 @@ const CreateList = () => {
     updateListName(e.target.value);
   });
   const [createState, updateCreateState] = useState({ started: false });
-  const onCreateList = useCallback(() => {
-    updateCreateState({ started: true });
-    gqlFetcher(gql`
+
+  const doCreateList = useAuthedCallback(
+    gql`
       mutation {
         createList(
           data: {
@@ -257,7 +263,15 @@ const CreateList = () => {
           _ts
         }
       }
-    `)
+    `,
+    {},
+    gqlFetcherFactory
+  );
+
+  const onCreateList = useCallback(() => {
+    updateCreateState({ started: true });
+
+    doCreateList()
       .then((response) => {
         updateCreateState({ started: false, response });
         mutate(listQuery);
@@ -336,17 +350,23 @@ const ContentPageList = ({ pages }) => {
 
   const [deletedIds, updateDeletedIds] = useState([]);
 
-  const onConfirmDelete = useCallback(() => {
-    const ids = Object.keys(selectionState);
+  const ids = Object.keys(selectionState);
 
+  const doDeleteItems = useAuthedCallback(
+    "/api/items",
+    {
+      method: "DELETE",
+      body: JSON.stringify(ids),
+    },
+    jsonFetcherFactory
+  );
+
+  const onConfirmDelete = useCallback(() => {
     updateDeletionState({
       started: true,
     });
 
-    jsonFetcher("/api/items", {
-      method: "DELETE",
-      body: JSON.stringify(ids),
-    })
+    doDeleteItems()
       .then((res) => {
         updateDeletionState({
           pending: false,

@@ -1,5 +1,4 @@
 import useSWR from "swr";
-import { jsonParser, jsonFetcher } from "../lib/fetcher";
 import { getHostname } from "../lib/urls";
 import { useEffect, useCallback, useState } from "react";
 import { debounce } from "../lib/debounce";
@@ -7,8 +6,8 @@ import Link from "next/link";
 import gql from "gql-tag";
 import TweetEmbed from "./tweetEmbed";
 import YouTubeEmbed from "./youTubeEmbed";
-import { useAuthedSWR } from "../lib/requestHooks";
-import { gqlFetcherFactory } from "../lib/fetcherFactories";
+import { useAuthedSWR, useAuthedCallback } from "../lib/requestHooks";
+import { gqlFetcherFactory, jsonFetcherFactory } from "../lib/fetcherFactories";
 
 function isiOs() {
   return (
@@ -26,7 +25,7 @@ function isiOs() {
 }
 
 export const fetcher = (path, options) => {
-  return fetch(path, options).then(jsonParser);
+  return fetch(path, options).then((res) => res.json());
 };
 
 const ContentBody = ({ hostname, data, url }) => {
@@ -130,15 +129,22 @@ const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
    */
   const upperSelectionNode = selection.anchorNode;
 
-  const onSave = useCallback(() => {
-    updateTextSelectionSaveState({ started: true });
-    jsonFetcher("/api/text-selection", {
+  const doTextSelection = useAuthedCallback(
+    "/api/text-selection",
+    {
       method: "POST",
       body: JSON.stringify({
         itemId,
         text: selection.text,
       }),
-    })
+    },
+    jsonFetcherFactory
+  );
+
+  const onSave = useCallback(() => {
+    updateTextSelectionSaveState({ started: true });
+
+    doTextSelection()
       .then((res) => {
         updateTextSelectionSaveState({
           started: false,

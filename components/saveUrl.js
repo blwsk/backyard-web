@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { validURL } from "../lib/urls";
 import Metadata from "../components/metadata";
-import { jsonFetcher } from "../lib/fetcher";
+import { useAuthedCallback } from "../lib/requestHooks";
+import { jsonFetcherFactory } from "../lib/fetcherFactories";
 
 const messages = {
   ALREADY_SAVED: "Already saved.",
@@ -20,14 +21,20 @@ const SaveUrl = ({ urlString }) => {
     message: null,
   });
 
+  const doCreateItem = useAuthedCallback(
+    "/api/create-item",
+    {
+      method: "POST",
+      body: JSON.stringify({ url: decodedUrl }),
+    },
+    jsonFetcherFactory
+  );
+
   useEffect(() => {
     if (isValid) {
       updateSaveState({ ...saveState, loading: true, message: "Saving..." });
 
-      jsonFetcher("/api/create-item", {
-        method: "POST",
-        body: JSON.stringify({ url: decodedUrl }),
-      })
+      doCreateItem()
         .then((res) => {
           updateSaveState({
             ...saveState,
