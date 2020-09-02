@@ -130,6 +130,7 @@ const SelectionList = () => {
             <div>Loading...</div>
           </div>
         )}
+        {error && <div>{JSON.stringify(error)}</div>}
       </div>
     </div>
   );
