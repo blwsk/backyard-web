@@ -22,9 +22,9 @@ const getTokenFromHeaderValue = (str) => {
 };
 
 const authedEndpoint = (endpointFn) => async (req, res) => {
-  const { authorization } = req.headers;
-  console.log(req.headers);
-  const token = getTokenFromHeaderValue(authorization);
+  const { authorization, Authorization } = req.headers;
+
+  const token = getTokenFromHeaderValue(authorization || Authorization);
 
   const decodedToken = jwt.decode(token, { complete: true });
 
