@@ -1,11 +1,11 @@
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
-import useSWR from "swr";
 import gql from "gql-tag";
-import { gqlFetcher } from "../lib/fetcher";
 import ListItem from "../components/listItem";
 import { useState, useCallback, useEffect } from "react";
 import requireAuth from "../lib/requireAuth";
+import { useAuthedSWR } from "../lib/requestHooks";
+import { gqlFetcherFactory } from "../lib/fetcherFactories";
 
 const PAGE_LENGTH = 10;
 
@@ -45,7 +45,7 @@ const PageList = ({ pages }) => {
 };
 
 const usePaginatedContent = ({ cursorValue }) => {
-  const { data, error, isValidating } = useSWR(
+  const { data, error, isValidating } = useAuthedSWR(
     gql`
       query {
         allTextSelections(_size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
@@ -63,7 +63,7 @@ const usePaginatedContent = ({ cursorValue }) => {
         }
       }
     `,
-    gqlFetcher
+    gqlFetcherFactory
   );
 
   return {
@@ -130,6 +130,7 @@ const SelectionList = () => {
             <div>Loading...</div>
           </div>
         )}
+        {error && <div>{JSON.stringify(error)}</div>}
       </div>
     </div>
   );

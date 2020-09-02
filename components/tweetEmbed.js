@@ -1,9 +1,9 @@
-import useSWR from "swr";
-import { jsonFetcher } from "../lib/fetcher";
 import formatRelative from "date-fns/formatRelative";
 import { capitalize } from "../lib/capitalize";
+import { useAuthedSWR } from "../lib/requestHooks";
+import { jsonFetcherFactory } from "../lib/fetcherFactories";
 
-const TCO_PATTERN = /https:\/\/t.co\/[a-zA-Z]\w+/g;
+const TCO_PATTERN = /https:\/\/t.co\/[0-9a-zA-Z]\w+/g;
 
 const getIdFromUrl = (url) => {
   const urlObj = new URL(url);
@@ -90,12 +90,12 @@ const Tweet = ({ data }) => {
 const TweetEmbed = ({ url }) => {
   const id = getIdFromUrl(url);
 
-  const { data, error, isValidating } = useSWR(
+  const { data, error, isValidating } = useAuthedSWR(
     /**
      * purposefully throw if no id
      */
     () => `/api/tweet?ids=${id.id}`,
-    jsonFetcher
+    jsonFetcherFactory
   );
 
   return (

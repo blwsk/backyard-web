@@ -1,10 +1,9 @@
 import useSWR from "swr";
-import { jsonParser } from "../lib/fetcher";
 import { getHostname } from "../lib/urls";
 import Link from "next/link";
 
 export const fetcher = (path, options) => {
-  return fetch(path, options).then(jsonParser);
+  return fetch(path, options).then((res) => res.json());
 };
 
 const Metadata = ({ url, rawUrl, itemId, renderPlaceholder }) => {
