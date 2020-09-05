@@ -146,7 +146,7 @@ const SelectList = ({ selectionState }) => {
   });
 
   const doCreateListItem = useAuthedCallback(
-    "/api/list-items",
+    "/api/create-list-items",
     {
       method: "POST",
       body: JSON.stringify({
@@ -251,21 +251,12 @@ const CreateList = () => {
   const [createState, updateCreateState] = useState({ started: false });
 
   const doCreateList = useAuthedCallback(
-    gql`
-      mutation {
-        createList(
-          data: {
-            name: "${listName}"
-          }
-        ) {
-          name
-          _id
-          _ts
-        }
-      }
-    `,
-    {},
-    gqlFetcherFactory
+    "/api/create-list",
+    {
+      method: "POST",
+      body: JSON.stringify({ name: listName }),
+    },
+    jsonFetcherFactory
   );
 
   const onCreateList = useCallback(() => {
@@ -353,7 +344,7 @@ const ContentPageList = ({ pages }) => {
   const ids = Object.keys(selectionState);
 
   const doDeleteItems = useAuthedCallback(
-    "/api/items",
+    "/api/delete-items",
     {
       method: "DELETE",
       body: JSON.stringify(ids),

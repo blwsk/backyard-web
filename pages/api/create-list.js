@@ -5,7 +5,7 @@ const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
-const createItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
+const createList = authedEndpoint(async (req, res, { user, err: userErr }) => {
   if (req.method !== "POST") {
     res.status(400).send(null);
     return;
@@ -27,45 +27,12 @@ const createItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
     void error;
   }
 
-  const { url } = bodyObject;
+  const { name } = bodyObject;
 
-  if (typeof url !== "string") {
+  if (typeof name !== "string") {
     res.status(400).send({
       message: "Invalid request body",
-      error: "Missing url string",
-    });
-    return;
-  }
-
-  let result;
-  let error;
-  try {
-    result = await client.query(
-      q.Get(q.Match(q.Index("unique_Item_url"), url))
-    );
-  } catch (err) {
-    error = err;
-  }
-
-  if (result) {
-    res.status(200).send({
-      message: `Already saved`,
-      result: {
-        id: result.ref.id,
-        ts: result.ts,
-        data: result.data,
-      },
-      alreadySaved: true,
-    });
-    return;
-  }
-
-  /**
-   * Some other error aside from 404
-   */
-  if (error && error.name !== "NotFound") {
-    res.status(500).send({
-      error,
+      error: "Missing name string",
     });
     return;
   }
@@ -74,9 +41,9 @@ const createItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
   let createError;
   try {
     createResult = await client.query(
-      q.Create(q.Collection("Item"), {
+      q.Create(q.Collection("List"), {
         data: {
-          url,
+          name,
           createdBy: user.sub,
           createdAt: Date.now(),
         },
@@ -94,14 +61,13 @@ const createItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
   }
 
   res.status(200).send({
-    message: `Saved`,
+    message: `List created.`,
     result: {
       id: createResult.ref.id,
       ts: createResult.ts,
       data: createResult.data,
     },
-    alreadySaved: false,
   });
 });
 
-export default createItem;
+export default createList;

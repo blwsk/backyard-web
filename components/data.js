@@ -130,7 +130,7 @@ const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
   const upperSelectionNode = selection.anchorNode;
 
   const doTextSelection = useAuthedCallback(
-    "/api/text-selection",
+    "/api/create-text-selection",
     {
       method: "POST",
       body: JSON.stringify({

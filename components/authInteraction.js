@@ -5,12 +5,15 @@ import LogoutButton from "./logoutButton";
 import LoginButton from "./loginButton";
 
 const AuthInteraction = ({ className, style, router }) => {
-  const { isAuthenticated } = useAuth0();
+  const { user, isAuthenticated } = useAuth0();
 
   return (
     <span className={className} style={style}>
       {isAuthenticated ? (
-        <LogoutButton />
+        <span>
+          <LogoutButton />
+          <small style={{ marginLeft: 8 }}>{user.email}</small>
+        </span>
       ) : (
         <LoginButton redirectTo={router.asPath} />
       )}

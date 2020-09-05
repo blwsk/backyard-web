@@ -22,9 +22,9 @@ const getTokenFromHeaderValue = (str) => {
 };
 
 const authedEndpoint = (endpointFn) => async (req, res) => {
-  const { authorization } = req.headers;
+  const { authorization: Authorization } = req.headers;
 
-  const token = getTokenFromHeaderValue(authorization);
+  const token = getTokenFromHeaderValue(Authorization);
 
   const decodedToken = jwt.decode(token, { complete: true });
 
@@ -41,7 +41,22 @@ const authedEndpoint = (endpointFn) => async (req, res) => {
     return;
   }
 
-  return endpointFn(req, res);
+  let userinfoRes;
+  let err;
+  try {
+    userinfoRes = await fetch(
+      `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/userinfo`,
+      {
+        headers: { Authorization },
+      }
+    );
+  } catch (e) {
+    err = e;
+  }
+
+  const user = await userinfoRes.json();
+
+  return endpointFn(req, res, { user, err });
 };
 
 export default authedEndpoint;
