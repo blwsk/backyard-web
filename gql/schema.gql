@@ -43,4 +43,7 @@ type Query {
 
   clipsByUser(userId: String!): [TextSelection!]
   @resolver(name: "clips_by_user", paginated: true)
+
+  listsByUser(userId: String!): [List!]
+  @resolver(name: "lists_by_user", paginated: true)
 }

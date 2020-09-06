@@ -19,8 +19,8 @@ const sortOrderEnum = {
 };
 
 const listQuery = gql`
-  query {
-    allLists {
+  query ListsByUser($userId: String!) {
+    listsByUser(userId: $userId) {
       data {
         name
         _id
@@ -128,7 +128,8 @@ const SelectList = ({ selectionState }) => {
     gqlFetcherFactory
   );
 
-  const lists = data && data.data.allLists.data.sort((a, b) => b._ts - a._ts);
+  const lists =
+    data && data.data.listsByUser.data.sort((a, b) => b._ts - a._ts);
 
   useEffect(() => {
     if (lists && lists.length > 0) {
