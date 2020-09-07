@@ -11,7 +11,7 @@ import requireAuth from "../lib/requireAuth";
 import { useAuthedSWR, useAuthedCallback } from "../lib/requestHooks";
 import { gqlFetcherFactory, jsonFetcherFactory } from "../lib/fetcherFactories";
 
-const PAGE_LENGTH = 20;
+const PAGE_LENGTH = 1;
 
 const sortOrderEnum = {
   ascending: "ascending",
@@ -31,7 +31,7 @@ const listQuery = gql`
 `;
 
 const getResultObject = (result) =>
-  result.allItems || result.allItemsReverseChrono;
+  result.itemsByUser || result.itemsByUserReverse;
 
 const usePaginatedContent = ({
   cursorValue,
@@ -40,8 +40,8 @@ const usePaginatedContent = ({
   const query =
     sortOrder === sortOrderEnum.ascending
       ? gql`
-          query {
-            allItems(_size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+          query ItemsByUser($userId: String!) {
+            itemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
               data {
                 url
                 _id
@@ -53,8 +53,8 @@ const usePaginatedContent = ({
           }
         `
       : gql`
-          query {
-            allItemsReverseChrono(_size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+          query ItemsByUserReverse($userId: String!) {
+            itemsByUserReverse(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
               data {
                 url
                 _id

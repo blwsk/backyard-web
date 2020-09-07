@@ -46,4 +46,10 @@ type Query {
 
   listsByUser(userId: String!): [List!]
   @resolver(name: "lists_by_user", paginated: true)
+
+  itemsByUser(userId: String!): [Item!]
+  @resolver(name: "items_by_user", paginated: true)
+
+  itemsByUserReverse(userId: String!): [Item!]
+  @resolver(name: "items_by_user_reverse", paginated: true)
 }
