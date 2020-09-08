@@ -11,7 +11,7 @@ import requireAuth from "../lib/requireAuth";
 import { useAuthedSWR, useAuthedCallback } from "../lib/requestHooks";
 import { gqlFetcherFactory, jsonFetcherFactory } from "../lib/fetcherFactories";
 
-const PAGE_LENGTH = 1;
+const PAGE_LENGTH = 20;
 
 const sortOrderEnum = {
   ascending: "ascending",
