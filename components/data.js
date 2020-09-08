@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import { getHostname } from "../lib/urls";
 import { useEffect, useCallback, useState } from "react";
+import { withRouter } from "next/router";
 import { debounce } from "../lib/debounce";
 import Link from "next/link";
 import gql from "gql-tag";
@@ -45,12 +46,46 @@ const ContentBody = ({ hostname, data, url }) => {
   );
 };
 
-const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
+const ClipsList = ({ clips }) => {
+  return (
+    <>
+      <ul>
+        {clips.map(({ text, _id }) => (
+          <li key={_id}>
+            <blockquote>{text}</blockquote>
+          </li>
+        ))}
+      </ul>
+      <style jsx>{`
+        ul {
+          padding-left: 0;
+        }
+        li {
+          list-style-type: none;
+          margin-bottom: 12px;
+        }
+      `}</style>
+    </>
+  );
+};
+
+const ReactiveItemData = ({
+  url,
+  rawUrl,
+  renderPlaceholder,
+  itemId,
+  clips,
+}) => {
   const { data, error } = useSWR(
     `https://backyard-data.vercel.app/api/index?url=${rawUrl}&id=${itemId}`,
     // `http://localhost:3001/api/index?url=${rawUrl}`,
     fetcher
   );
+
+  const [showClips, updateShowClips] = useState(false);
+
+  const onShowClips = useCallback(() => updateShowClips(true));
+  const onShowContent = useCallback(() => updateShowClips(false));
 
   const { hostname, withProtocol } = getHostname(url);
 
@@ -172,78 +207,100 @@ const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
           <h2>{data.metaTitle || data.title}</h2>
           <h3>{data.metaDescription}</h3>
           {hostname && (
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <span>{hostname}</span>
               <a href={url}>Original</a>
+              {showClips ? (
+                <button className="small" onClick={onShowContent}>
+                  Show content
+                </button>
+              ) : (
+                <button className="small" onClick={onShowClips}>
+                  Show clips
+                </button>
+              )}
             </div>
           )}
           <br />
           <hr />
           <br />
-          <ContentBody data={data} hostname={hostname} url={url} />
-          {upperSelectionNode && (
-            <div
-              key={viewportSizeKey}
-              style={{
-                background: "var(--c1)",
-                color: "var(--c3)",
-                borderRadius: 8,
+          {!showClips ? (
+            <>
+              <ContentBody data={data} hostname={hostname} url={url} />
+              {upperSelectionNode && (
+                <div
+                  key={viewportSizeKey}
+                  style={{
+                    background: "var(--c1)",
+                    color: "var(--c3)",
+                    borderRadius: 8,
 
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 8,
-                flexDirection: "column",
-                ...(isiOs()
-                  ? {
-                      position: "sticky",
-                      bottom: 16,
-                      width: "100%",
-                      borderRadius: 8,
-                      height: 100,
-                    }
-                  : {
-                      position: "absolute",
-                      height: 100,
-                      width: 200,
-                      top:
-                        upperSelectionNode.parentElement.offsetTop - (100 + 8),
-                      left: Math.round(0.5 * window.innerWidth) - 100,
-                    }),
-              }}
-            >
-              <div className="p-all-1">
-                <small>
-                  <b>{selection.text.length}</b> characters
-                </small>
-              </div>
-              <div>
-                {selection.text && selection.text.length > 0 && (
-                  <>
-                    {!textSelectionSaveState.started &&
-                      !textSelectionSaveState.success && (
-                        <button onClick={onSave}>Save 🗄</button>
-                      )}
-                    {textSelectionSaveState.success && (
-                      <div>
-                        <span style={{ marginRight: 8 }}>Success</span>
-                        <Link href="/clips">
-                          <button>View</button>
-                        </Link>
-                      </div>
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 8,
+                    flexDirection: "column",
+                    ...(isiOs()
+                      ? {
+                          position: "sticky",
+                          bottom: 16,
+                          width: "100%",
+                          borderRadius: 8,
+                          height: 100,
+                        }
+                      : {
+                          position: "absolute",
+                          height: 100,
+                          width: 200,
+                          top:
+                            upperSelectionNode.parentElement.offsetTop -
+                            (100 + 8),
+                          left: Math.round(0.5 * window.innerWidth) - 100,
+                        }),
+                  }}
+                >
+                  <div className="p-all-1">
+                    <small>
+                      <b>{selection.text.length}</b> characters
+                    </small>
+                  </div>
+                  <div>
+                    {selection.text && selection.text.length > 0 && (
+                      <>
+                        {!textSelectionSaveState.started &&
+                          !textSelectionSaveState.success && (
+                            <button onClick={onSave}>Save 🗄</button>
+                          )}
+                        {textSelectionSaveState.success && (
+                          <div>
+                            <span style={{ marginRight: 8 }}>Success</span>
+                            <Link href="/clips">
+                              <button>View</button>
+                            </Link>
+                          </div>
+                        )}
+                        {textSelectionSaveState.error && <span>Error ❌</span>}
+                      </>
                     )}
-                    {textSelectionSaveState.error && <span>Error ❌</span>}
-                  </>
-                )}
-              </div>
-              <style jsx>{`
-                button {
-                  background: var(--c3);
-                  color: var(--c1);
-                  padding: 0.4em 0.6em;
-                }
-              `}</style>
-            </div>
+                  </div>
+                  <style jsx>{`
+                    button {
+                      background: var(--c3);
+                      color: var(--c1);
+                      padding: 0.4em 0.6em;
+                    }
+                  `}</style>
+                </div>
+              )}
+            </>
+          ) : (
+            <ClipsList clips={clips} />
           )}
         </div>
       ) : (
@@ -256,9 +313,15 @@ const ReactiveItemData = ({ url, rawUrl, renderPlaceholder, itemId }) => {
 const Data = ({ itemId }) => {
   const { data, error, isValidating } = useAuthedSWR(
     gql`
-    query {
+     query {
       findItemByID(id: ${itemId}) {
         url
+      }
+      clipsByItemId(itemId: "${itemId}") {
+        data {
+          text
+          _id
+        }
       }
     }
   `,
@@ -272,17 +335,22 @@ const Data = ({ itemId }) => {
   const url = data.data.findItemByID.url;
   const rawUrl = encodeURI(url);
 
+  const clips = data.data.clipsByItemId.data;
+
   return (
-    <ReactiveItemData
-      url={url}
-      rawUrl={rawUrl}
-      renderPlaceholder={() => (
-        <div style={{ wordBreak: "break-word" }}>
-          <h2>{url}</h2>
-        </div>
-      )}
-      itemId={itemId}
-    />
+    <>
+      <ReactiveItemData
+        url={url}
+        rawUrl={rawUrl}
+        renderPlaceholder={() => (
+          <div style={{ wordBreak: "break-word" }}>
+            <h2>{url}</h2>
+          </div>
+        )}
+        itemId={itemId}
+        clips={clips}
+      />
+    </>
   );
 };
 
