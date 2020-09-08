@@ -9,7 +9,7 @@ import { gqlFetcherFactory } from "../lib/fetcherFactories";
 
 const PAGE_LENGTH = 10;
 
-const getResultObject = (result) => result.allTextSelections;
+const getResultObject = (result) => result.clipsByUser;
 
 const Clip = ({ item, text, _id }) => {
   return (
@@ -47,8 +47,8 @@ const PageList = ({ pages }) => {
 const usePaginatedContent = ({ cursorValue }) => {
   const { data, error, isValidating } = useAuthedSWR(
     gql`
-      query {
-        allTextSelections(_size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+      query ClipsByUser($userId: String!) {
+        clipsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
           data {
             item {
               url

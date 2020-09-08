@@ -77,8 +77,8 @@ const ListDrawer = ({ list, startOpen }) => {
 const ListList = ({ openListId }) => {
   const { data, error, isValidating } = useAuthedSWR(
     gql`
-      query {
-        allLists {
+      query ListsByUser($userId: String!) {
+        listsByUser(userId: $userId) {
           data {
             name
             _id
@@ -96,7 +96,7 @@ const ListList = ({ openListId }) => {
 
   return (
     <div>
-      {data.data.allLists.data.map((list) => {
+      {data.data.listsByUser.data.map((list) => {
         return (
           <ListDrawer
             key={list._id}

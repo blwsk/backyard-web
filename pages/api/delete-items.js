@@ -6,7 +6,7 @@ const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
-const items = authedEndpoint(async (req, res) => {
+const deleteItems = authedEndpoint(async (req, res) => {
   if (req.method !== "DELETE") {
     res.status(400).send(null);
     return;
@@ -54,4 +54,4 @@ const items = authedEndpoint(async (req, res) => {
   });
 });
 
-export default items;
+export default deleteItems;

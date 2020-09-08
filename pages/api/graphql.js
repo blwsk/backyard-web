@@ -3,15 +3,21 @@ import authedEndpoint from "../../api-utils/authedEndpoint";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
-const graphql = authedEndpoint(async (req, res) => {
+const graphql = authedEndpoint(async (req, res, { user, err }) => {
   if (req.method !== "POST") {
     res.status(400).send(null);
     return;
   }
 
+  /**
+   * Pass user as a graphql variable
+   */
+
+  const { sub: userId } = user;
+
   const gqlResponse = await fetch("https://graphql.fauna.com/graphql", {
     method: "POST",
-    body: JSON.stringify(req.body),
+    body: JSON.stringify({ ...req.body, variables: { userId } }),
     headers: {
       Authorization: `Bearer ${secret}`,
     },

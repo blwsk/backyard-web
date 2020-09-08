@@ -19,8 +19,8 @@ const sortOrderEnum = {
 };
 
 const listQuery = gql`
-  query {
-    allLists {
+  query ListsByUser($userId: String!) {
+    listsByUser(userId: $userId) {
       data {
         name
         _id
@@ -31,7 +31,7 @@ const listQuery = gql`
 `;
 
 const getResultObject = (result) =>
-  result.allItems || result.allItemsReverseChrono;
+  result.itemsByUser || result.itemsByUserReverse;
 
 const usePaginatedContent = ({
   cursorValue,
@@ -40,8 +40,8 @@ const usePaginatedContent = ({
   const query =
     sortOrder === sortOrderEnum.ascending
       ? gql`
-          query {
-            allItems(_size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+          query ItemsByUser($userId: String!) {
+            itemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
               data {
                 url
                 _id
@@ -53,8 +53,8 @@ const usePaginatedContent = ({
           }
         `
       : gql`
-          query {
-            allItemsReverseChrono(_size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+          query ItemsByUserReverse($userId: String!) {
+            itemsByUserReverse(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
               data {
                 url
                 _id
@@ -128,7 +128,8 @@ const SelectList = ({ selectionState }) => {
     gqlFetcherFactory
   );
 
-  const lists = data && data.data.allLists.data.sort((a, b) => b._ts - a._ts);
+  const lists =
+    data && data.data.listsByUser.data.sort((a, b) => b._ts - a._ts);
 
   useEffect(() => {
     if (lists && lists.length > 0) {
@@ -146,7 +147,7 @@ const SelectList = ({ selectionState }) => {
   });
 
   const doCreateListItem = useAuthedCallback(
-    "/api/list-items",
+    "/api/create-list-items",
     {
       method: "POST",
       body: JSON.stringify({
@@ -251,21 +252,12 @@ const CreateList = () => {
   const [createState, updateCreateState] = useState({ started: false });
 
   const doCreateList = useAuthedCallback(
-    gql`
-      mutation {
-        createList(
-          data: {
-            name: "${listName}"
-          }
-        ) {
-          name
-          _id
-          _ts
-        }
-      }
-    `,
-    {},
-    gqlFetcherFactory
+    "/api/create-list",
+    {
+      method: "POST",
+      body: JSON.stringify({ name: listName }),
+    },
+    jsonFetcherFactory
   );
 
   const onCreateList = useCallback(() => {
@@ -353,7 +345,7 @@ const ContentPageList = ({ pages }) => {
   const ids = Object.keys(selectionState);
 
   const doDeleteItems = useAuthedCallback(
-    "/api/items",
+    "/api/delete-items",
     {
       method: "DELETE",
       body: JSON.stringify(ids),
