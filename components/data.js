@@ -221,10 +221,10 @@ const ReactiveItemData = ({
               </span>
               <span className="button-group">
                 <button className="small blue" onClick={onShowContent}>
-                  Content {!showClips && "✔"}
+                  Content {!showClips && "👀"}
                 </button>
                 <button className="small blue" onClick={onShowClips}>
-                  Clips {showClips && "✔"}
+                  Clips {showClips && "👀"}
                 </button>
               </span>
             </div>
