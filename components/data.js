@@ -214,17 +214,19 @@ const ReactiveItemData = ({
                 alignItems: "center",
               }}
             >
-              <span>{hostname}</span>
-              <a href={url}>Original</a>
-              {showClips ? (
-                <button className="small" onClick={onShowContent}>
-                  Show content
+              <span>
+                <a href={`//${hostname}`}>{hostname}</a>
+                {" ・ "}
+                <a href={url}>Original</a>
+              </span>
+              <span className="button-group">
+                <button className="small blue" onClick={onShowContent}>
+                  Content {!showClips && "✔"}
                 </button>
-              ) : (
-                <button className="small" onClick={onShowClips}>
-                  Show clips
+                <button className="small blue" onClick={onShowClips}>
+                  Clips {showClips && "✔"}
                 </button>
-              )}
+              </span>
             </div>
           )}
           <br />
