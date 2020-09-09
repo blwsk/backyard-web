@@ -52,4 +52,7 @@ type Query {
 
   itemsByUserReverse(userId: String!): [Item!]
   @resolver(name: "items_by_user_reverse", paginated: true)
+
+  clipsByItemId(itemId: String!): [TextSelection!]
+  @resolver(name: "clips_by_item_id", paginated: true)
 }

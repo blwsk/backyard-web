@@ -171,6 +171,11 @@ button.small {
   color: var(--c3);
   padding: 0.4em 0.6em;
 }
+button.small.blue {
+  background: var(--c2);
+  color: var(--c3);
+  line-height: 1.4em;
+}
 section {
   display: flex;
   flex-flow: row wrap;
