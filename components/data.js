@@ -1,4 +1,4 @@
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { getHostname } from "../lib/urls";
 import { useEffect, useCallback, useState } from "react";
 import { withRouter } from "next/router";
@@ -75,6 +75,7 @@ const ReactiveItemData = ({
   renderPlaceholder,
   itemId,
   clips,
+  invalidateQuery,
 }) => {
   const { data, error } = useSWR(
     `https://backyard-data.vercel.app/api/index?url=${rawUrl}&id=${itemId}`,
@@ -186,6 +187,8 @@ const ReactiveItemData = ({
           success: true,
           data: res,
         });
+
+        invalidateQuery();
       })
       .catch((error) => {
         updateTextSelectionSaveState({
@@ -313,9 +316,8 @@ const ReactiveItemData = ({
 };
 
 const Data = ({ itemId }) => {
-  const { data, error, isValidating } = useAuthedSWR(
-    gql`
-     query {
+  const query = gql`
+    query {
       findItemByID(id: ${itemId}) {
         url
       }
@@ -326,9 +328,12 @@ const Data = ({ itemId }) => {
         }
       }
     }
-  `,
-    gqlFetcherFactory
-  );
+  `;
+  const { data, error, isValidating } = useAuthedSWR(query, gqlFetcherFactory);
+
+  const invalidateQuery = useCallback(() => {
+    mutate(query);
+  });
 
   if (!data) {
     return <div>Loading...</div>;
@@ -351,6 +356,7 @@ const Data = ({ itemId }) => {
         )}
         itemId={itemId}
         clips={clips}
+        invalidateQuery={invalidateQuery}
       />
     </>
   );
