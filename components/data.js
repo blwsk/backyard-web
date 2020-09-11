@@ -49,13 +49,17 @@ const ContentBody = ({ hostname, data, url }) => {
 const ClipsList = ({ clips }) => {
   return (
     <>
-      <ul>
-        {clips.map(({ text, _id }) => (
-          <li key={_id}>
-            <blockquote>{text}</blockquote>
-          </li>
-        ))}
-      </ul>
+      {clips && clips.length > 0 ? (
+        <ul>
+          {clips.map(({ text, _id }) => (
+            <li key={_id}>
+              <blockquote>{text}</blockquote>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div>No clips. Save one!</div>
+      )}
       <style jsx>{`
         ul {
           padding-left: 0;
