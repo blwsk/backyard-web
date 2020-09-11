@@ -2,8 +2,10 @@ import useSWR from "swr";
 import { getHostname } from "../lib/urls";
 import Link from "next/link";
 
-export const fetcher = (path, options) => {
-  return fetch(path, options).then((res) => res.json());
+export const fetcher = (path) => {
+  return fetch(path, {
+    method: "PUT",
+  }).then((res) => res.json());
 };
 
 const Metadata = ({ url, rawUrl, itemId, renderPlaceholder }) => {
