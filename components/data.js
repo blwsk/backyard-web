@@ -25,8 +25,10 @@ function isiOs() {
   );
 }
 
-export const fetcher = (path, options) => {
-  return fetch(path, options).then((res) => res.json());
+export const fetcher = (path) => {
+  return fetch(path, {
+    method: "PUT",
+  }).then((res) => res.json());
 };
 
 const ContentBody = ({ hostname, data, url }) => {
