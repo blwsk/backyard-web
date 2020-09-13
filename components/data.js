@@ -85,8 +85,6 @@ const ReactiveItemData = ({
   invalidateQuery,
 }) => {
   const { data, error } = useSWR(
-    // `https://backyard-data.vercel.app/api/index?url=${rawUrl}&id=${itemId}`,
-    // `http://localhost:3001/api/index?url=${rawUrl}&id=${itemId}`,
     /**
      * The /api/item-content endpoint does not currently use the ?id param,
      * but it is useful for ensuring that SWR does not show cached result for
