@@ -28,6 +28,12 @@ const Index = ({ router }) => {
     updateFocused(false);
   });
 
+  const onKeyDown = useCallback((e) => {
+    if (e.keyCode === 13) {
+      onSave();
+    }
+  });
+
   return (
     <div>
       <Header />
@@ -52,6 +58,7 @@ const Index = ({ router }) => {
             onChange={onChange}
             onFocus={onFocus}
             onBlur={onBlur}
+            onKeyDown={onKeyDown}
           />
           {(value || focused) && (
             <button
@@ -73,7 +80,7 @@ const Index = ({ router }) => {
             width: "100%",
           }}
         >
-          <h3>How to save</h3>
+          <h3>Other ways to save</h3>
           <ul>
             <li>
               <span style={{ marginRight: 8 }}>
