@@ -1,6 +1,9 @@
 import fetch from "isomorphic-unfetch";
 
-const REQUEST_URI = true ? `http://localhost:3001/api/index` : "";
+const REQUEST_URI =
+  process.env.NODE_ENV === "development"
+    ? `http://localhost:3001/api/index`
+    : "https://backyard-data.vercel.app/api/index";
 
 const itemContent = async (req, res) => {
   if (req.method !== "PUT") {
@@ -11,8 +14,6 @@ const itemContent = async (req, res) => {
   let id;
   let url;
 
-  console.log(req.body.id);
-
   try {
     const bodyJson = JSON.parse(req.body);
     id = bodyJson.id;
@@ -20,8 +21,6 @@ const itemContent = async (req, res) => {
   } catch (error) {
     void error;
   }
-
-  //   const { id, url } = req.body;
 
   if (!url || !id) {
     res.status(400).send({
@@ -43,8 +42,6 @@ const itemContent = async (req, res) => {
   });
 
   const contentJson = await contentResponse.json();
-
-  console.log(contentJson);
 
   res.status(200).send({
     message: `Success.`,
