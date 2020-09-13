@@ -70,6 +70,7 @@ const Index = ({ router }) => {
             background: "var(--c8)",
             padding: 16,
             borderRadius: 8,
+            width: "100%",
           }}
         >
           <h3>How to save</h3>
