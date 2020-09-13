@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { validURL } from "../lib/urls";
-import Metadata from "../components/metadata";
+import { validURL, ensureProtocol } from "../lib/urls";
 import { useAuthedCallback } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
+import { withRouter } from "next/router";
 
 const messages = {
   ALREADY_SAVED: "Already saved.",
   SAVED: "Saved.",
 };
 
-const SaveUrl = ({ urlString }) => {
-  const decodedUrl = decodeURIComponent(urlString);
+const SaveUrl = ({ urlString, router }) => {
+  const decodedUrlString = decodeURIComponent(urlString);
+  const decodedUrl = ensureProtocol(decodedUrlString);
   const isValid = validURL(decodedUrl);
 
   const [saveState, updateSaveState] = useState({
@@ -57,6 +58,17 @@ const SaveUrl = ({ urlString }) => {
     }
   }, []);
 
+  const itemId = saveState.data && saveState.data.id;
+
+  useEffect(() => {
+    /**
+     * On save success, redirect to the viewer page
+     */
+    if (typeof itemId === "string") {
+      router.replace(`/viewer?id=${itemId}`);
+    }
+  }, [itemId]);
+
   return (
     <>
       <section
@@ -72,14 +84,6 @@ const SaveUrl = ({ urlString }) => {
         <>
           {saveState.loading && <div>Loading...</div>}
           {saveState.error && <div>Error.</div>}
-          {saveState.data && (
-            <Metadata
-              rawUrl={urlString}
-              url={urlString}
-              itemId={saveState.data.id}
-              renderPlaceholder={() => <h2>{decodedUrl}</h2>}
-            />
-          )}
         </>
       ) : (
         <div className="color-red">Error. URL is invalid.</div>
@@ -87,4 +91,4 @@ const SaveUrl = ({ urlString }) => {
     </>
   );
 };
-export default SaveUrl;
+export default withRouter(SaveUrl);
