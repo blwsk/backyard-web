@@ -17,6 +17,7 @@
 
   --c6: rgb(255, 0, 0);
   --c7: rgb(0, 255, 0);
+  --c8: aliceblue;
   --m1: 8px;
   --rc: 8px;
 
@@ -29,6 +30,8 @@
     --c3: #121212;
     --c4: #2b2b2b;
     --c5: #fff;
+
+    --c8: #2b2b2b;
 
     --ghost: rgba(255, 255, 255, 0.05);
   }
@@ -137,6 +140,19 @@ textarea {
   background-color: var(--c4);
   color: var(--c1);
 }
+input {
+  outline: none;
+  border: 2px solid var(--c4);
+}
+input:focus {
+  outline: none;
+  border: 2px solid var(--c2);
+}
+input.error,
+input.error:focus {
+  border: 2px solid var(--c6);
+}
+
 button,
 input[type="button"],
 input[type="reset"],

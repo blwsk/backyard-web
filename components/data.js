@@ -80,8 +80,8 @@ const ReactiveItemData = ({
   invalidateQuery,
 }) => {
   const { data, error } = useSWR(
-    `https://backyard-data.vercel.app/api/index?url=${rawUrl}&id=${itemId}`,
-    // `http://localhost:3001/api/index?url=${rawUrl}`,
+    // `https://backyard-data.vercel.app/api/index?url=${rawUrl}&id=${itemId}`,
+    `http://localhost:3001/api/index?url=${rawUrl}&id=${itemId}`,
     fetcher
   );
 

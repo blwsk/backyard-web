@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import { withRouter } from "next/router";
@@ -6,6 +6,7 @@ import { validURL } from "../lib/urls";
 
 const Index = ({ router }) => {
   const [value, updater] = useState("");
+  const [focused, updateFocused] = useState(false);
 
   const onChange = useCallback((e) => {
     updater(e.target.value);
@@ -17,14 +18,30 @@ const Index = ({ router }) => {
 
   const isValidUrl = validURL(value);
 
+  const inputError = !isValidUrl && value.length > 0 && !focused;
+
+  const onFocus = useCallback(() => {
+    updateFocused(true);
+  });
+
+  const onBlur = useCallback(() => {
+    updateFocused(false);
+  });
+
   return (
     <div>
       <Header />
       <Wrapper align="center">
         <h1>Backyard</h1>
         <br />
-        <>
+        <div
+          style={{
+            width: "100%",
+            textAlign: "center",
+          }}
+        >
           <input
+            className={inputError ? "error" : ""}
             style={{
               width: `100%`,
               marginBottom: 16,
@@ -33,20 +50,28 @@ const Index = ({ router }) => {
             placeholder="https://url-you-want-to-save.com"
             value={value}
             onChange={onChange}
+            onFocus={onFocus}
+            onBlur={onBlur}
           />
-          <button
-            style={{ margin: 0 }}
-            onClick={onSave}
-            disabled={!isValidUrl}
-            title={!isValidUrl ? "URL is invalid" : undefined}
-          >
-            Save
-          </button>
-        </>
-      </Wrapper>
-      <br />
-      <Wrapper>
-        <div>
+          {(value || focused) && (
+            <button
+              style={{ margin: 0 }}
+              onClick={onSave}
+              disabled={!isValidUrl}
+              title={inputError ? "URL is invalid" : undefined}
+            >
+              Save
+            </button>
+          )}
+        </div>
+        <br />
+        <div
+          style={{
+            background: "var(--c8)",
+            padding: 16,
+            borderRadius: 8,
+          }}
+        >
           <h3>How to save</h3>
           <ul>
             <li>
