@@ -25,8 +25,9 @@ function isiOs() {
   );
 }
 
-export const fetcher = (path) => {
+export const fetcherFactory = (options) => (path) => {
   return fetch(path, {
+    ...options,
     method: "PUT",
   }).then((res) => res.json());
 };
@@ -84,9 +85,18 @@ const ReactiveItemData = ({
   invalidateQuery,
 }) => {
   const { data, error } = useSWR(
-    `https://backyard-data.vercel.app/api/index?url=${rawUrl}&id=${itemId}`,
-    // `http://localhost:3001/api/index?url=${rawUrl}&id=${itemId}`,
-    fetcher
+    /**
+     * The /api/item-content endpoint does not currently use the ?id param,
+     * but it is useful for ensuring that SWR does not show cached result for
+     * other items, since just the key argument is used as cache key
+     */
+    `/api/item-content?id=${itemId}`,
+    fetcherFactory({
+      body: JSON.stringify({
+        url,
+        id: itemId,
+      }),
+    })
   );
 
   const [showClips, updateShowClips] = useState(false);
@@ -211,10 +221,10 @@ const ReactiveItemData = ({
           Something went wrong. Try refreshing the page.
         </div>
       )}
-      {data ? (
+      {data && data.content ? (
         <div>
-          <h2>{data.metaTitle || data.title}</h2>
-          <h3>{data.metaDescription}</h3>
+          <h2>{data.content.metaTitle || data.content.title}</h2>
+          <h3>{data.content.metaDescription}</h3>
           {hostname && (
             <div
               style={{
@@ -243,7 +253,7 @@ const ReactiveItemData = ({
           <br />
           {!showClips ? (
             <>
-              <ContentBody data={data} hostname={hostname} url={url} />
+              <ContentBody data={data.content} hostname={hostname} url={url} />
               {upperSelectionNode && (
                 <div
                   key={viewportSizeKey}
