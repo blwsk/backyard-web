@@ -15,6 +15,8 @@ const graphql = authedEndpoint(async (req, res, { user, err }) => {
 
   const { sub: userId } = user;
 
+  if (err) console.log(err);
+
   const gqlResponse = await fetch("https://graphql.fauna.com/graphql", {
     method: "POST",
     body: JSON.stringify({ ...req.body, variables: { userId } }),
