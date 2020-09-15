@@ -1,7 +1,15 @@
+type ItemContent {
+  body: String
+  title: String
+  metaTitle: String
+  metaDescription: String
+}
+
 type Item {
   url: String! @unique
   createdBy: String!
   createdAt: Long!
+  content: ItemContent
 }
 
 type List {

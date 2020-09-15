@@ -32,11 +32,7 @@ const ClipsList = ({ clips }) => {
   );
 };
 
-const Content = ({ hostname, data, url }) => {
-  if (!data || !data.content) {
-    return <p>Loading...</p>;
-  }
-
+const Content = ({ hostname, data, url, content }) => {
   if (hostname === "twitter.com") {
     return <TweetEmbed url={url} />;
   }
@@ -45,26 +41,37 @@ const Content = ({ hostname, data, url }) => {
     return <YouTubeEmbed url={url} />;
   }
 
+  const body =
+    (data && data.content && data.content.body) || (content && content.body);
+
+  if (!body) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div
       className="rendered-html-body"
-      dangerouslySetInnerHTML={{ __html: data.content.body }}
+      dangerouslySetInnerHTML={{ __html: body }}
     />
   );
 };
 
-const H2 = ({ data }) => {
-  if (!data || !data.content) {
+const H2 = ({ data, content }) => {
+  const contentObj = (data && data.content && data.content) || content;
+
+  if (!contentObj) {
     return <h2>Loading...</h2>;
   }
-  return <h2>{data.content.metaTitle || data.content.title}</h2>;
+  return <h2>{contentObj.metaTitle || contentObj.title}</h2>;
 };
 
-const H3 = ({ data }) => {
-  if (!data || !data.content) {
+const H3 = ({ data, content }) => {
+  const contentObj = (data && data.content && data.content) || content;
+
+  if (!contentObj) {
     return <h3>Loading...</h3>;
   }
-  return <h3>{data.content.metaDescription}</h3>;
+  return <h3>{contentObj.metaDescription}</h3>;
 };
 
 const Metadata = ({
@@ -74,7 +81,10 @@ const Metadata = ({
   onShowContent,
   onShowClips,
   showClips,
+  content,
 }) => {
+  const loaded = data || content;
+
   return (
     <div
       style={{
@@ -91,11 +101,14 @@ const Metadata = ({
       <span className="button-group">
         <button
           className="small blue"
-          onClick={data ? onShowContent : undefined}
+          onClick={loaded ? onShowContent : undefined}
         >
           Content {!showClips && "👀"}
         </button>
-        <button className="small blue" onClick={data ? onShowClips : undefined}>
+        <button
+          className="small blue"
+          onClick={loaded ? onShowClips : undefined}
+        >
           Clips {showClips && "👀"}
         </button>
       </span>
@@ -103,14 +116,22 @@ const Metadata = ({
   );
 };
 
-const ReactiveItemData = ({ url, itemId, clips, invalidateQuery }) => {
+const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
   const { data, error } = useSWR(
     /**
      * The /api/item-content endpoint does not currently use the ?id param,
      * but it is useful for ensuring that SWR does not show cached result for
      * other items, since just the key argument is used as cache key
      */
-    `/api/item-content?id=${itemId}`,
+    () => {
+      /**
+       * If content is pre-fetched, skip fetching it again
+       */
+      if (content) {
+        throw new Error("skip fetch");
+      }
+      return `/api/item-content?id=${itemId}`;
+    },
     (path) => {
       return fetch(path, {
         method: "PUT",
@@ -138,13 +159,14 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery }) => {
         </div>
       )}
       <div>
-        <H2 data={data} />
-        <H3 data={data} />
+        <H2 data={data} content={content} />
+        <H3 data={data} content={content} />
         {hostname && (
           <Metadata
             hostname={hostname}
             url={url}
             data={data}
+            content={content}
             onShowContent={onShowContent}
             onShowClips={onShowClips}
             showClips={showClips}
@@ -153,7 +175,12 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery }) => {
         <hr style={{ margin: "24px 0px 48px 0" }} />
         {!showClips ? (
           <>
-            <Content data={data} hostname={hostname} url={url} />
+            <Content
+              data={data}
+              content={content}
+              hostname={hostname}
+              url={url}
+            />
             <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
           </>
         ) : (
