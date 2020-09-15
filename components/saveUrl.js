@@ -23,9 +23,9 @@ const SaveUrl = ({ urlString, router }) => {
   });
 
   const doCreateItem = useAuthedCallback(
-    "/api/create-item",
+    "/api/save-item",
     {
-      method: "POST",
+      method: "PUT",
       body: JSON.stringify({ url: decodedUrl }),
     },
     jsonFetcherFactory

@@ -10,6 +10,12 @@ const Data = ({ itemId }) => {
     query {
       findItemByID(id: ${itemId}) {
         url
+        content {
+          body
+          title
+          metaTitle
+          metaDescription
+        }
       }
       clipsByItemId(itemId: "${itemId}") {
         data {
@@ -34,6 +40,7 @@ const Data = ({ itemId }) => {
     <>
       <ReactiveItemData
         url={data.data.findItemByID.url}
+        content={data.data.findItemByID.content}
         itemId={itemId}
         clips={data.data.clipsByItemId.data}
         invalidateQuery={invalidateQuery}
