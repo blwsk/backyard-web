@@ -2,16 +2,12 @@ import React from "react";
 import { stripParams } from "../lib/urls";
 import Link from "next/link";
 
-/**
- *
- * Note: this is very similar to MyContent's ContentPage component
- *
- */
-
 const ListItem = ({ item }) => {
-  const { _id, _ts, url } = item;
+  const { _id, _ts, url, content } = item;
 
   const withParamsStripped = stripParams(url);
+
+  const title = content && content.title ? content.title : withParamsStripped;
 
   const date = new Date(_ts / 1000);
   const dateString = date.toDateString();
@@ -28,7 +24,7 @@ const ListItem = ({ item }) => {
     >
       <div>
         <Link href={{ pathname: "/viewer", query: { id: _id } }}>
-          <a>{withParamsStripped}</a>
+          <a>{title}</a>
         </Link>
         <div>
           <small>

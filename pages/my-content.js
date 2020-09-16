@@ -46,6 +46,9 @@ const usePaginatedContent = ({
                 url
                 _id
                 _ts
+                content {
+                  title
+                }
               }
               before
               after
@@ -59,6 +62,9 @@ const usePaginatedContent = ({
                 url
                 _id
                 _ts
+                content {
+                  title
+                }
               }
               before
               after

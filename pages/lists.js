@@ -21,6 +21,9 @@ const ListDrawerContent = ({ list }) => {
               url
               _id
               _ts
+              content {
+                title
+              }
             }
           }
         }
