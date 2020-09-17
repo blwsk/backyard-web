@@ -96,11 +96,6 @@ const Metadata = ({ hostname, url, data, content }) => {
         span a {
           margin-right: 16px;
         }
-        @media (max-width: 600px) {
-          span {
-            justify-content: space-between;
-          }
-        }
       `}</style>
     </>
   );
@@ -144,16 +139,6 @@ const Controls = ({
         button {
           margin: 0;
           margin-right: 8px;
-        }
-        @media (max-width: 600px) {
-          div {
-            flex-direction: row-reverse;
-          }
-
-          button {
-            margin: 0;
-            margin-left: 8px;
-          }
         }
       `}</style>
     </>

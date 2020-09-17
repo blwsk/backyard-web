@@ -10,13 +10,25 @@ const AuthInteraction = ({ className, style, router }) => {
   return (
     <span className={className} style={style}>
       {isAuthenticated ? (
-        <span>
+        <span className="wrapper">
           <LogoutButton />
-          <small style={{ marginLeft: 8 }}>{user.email}</small>
+          <small>{user.email}</small>
         </span>
       ) : (
         <LoginButton redirectTo={router.asPath} />
       )}
+      <style jsx>{`
+        .wrapper small {
+          margin-left: 8px;
+        }
+        @media (max-width: 600px) {
+          .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+        }
+      `}</style>
     </span>
   );
 };
