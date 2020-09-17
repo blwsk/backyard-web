@@ -74,45 +74,89 @@ const H3 = ({ data, content }) => {
   return <h3>{contentObj.metaDescription}</h3>;
 };
 
-const Metadata = ({
-  hostname,
-  url,
-  data,
+const Metadata = ({ hostname, url, data, content }) => {
+  const loaded = data || content;
+
+  return (
+    <>
+      <span
+        style={{
+          marginBottom: 24,
+          opacity: 0.8,
+        }}
+      >
+        <a href={`//${hostname}`}>{hostname}</a>
+        <a href={url}>Original</a>
+      </span>
+      <style jsx>{`
+        span {
+          display: flex;
+          justify-content: flex-start;
+        }
+        span a {
+          margin-right: 16px;
+        }
+        @media (max-width: 600px) {
+          span {
+            justify-content: space-between;
+          }
+        }
+      `}</style>
+    </>
+  );
+};
+
+const Controls = ({
   onShowContent,
   onShowClips,
   showClips,
   content,
+  data,
+  url,
 }) => {
   const loaded = data || content;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <span>
-        <a href={`//${hostname}`}>{hostname}</a>
-        {" ・ "}
-        <a href={url}>Original</a>
-      </span>
-      <span className="button-group">
+    <>
+      <div
+        style={{
+          marginTop: 16,
+        }}
+      >
         <button
-          className="small blue"
+          className={`small secondary ${!showClips ? "current" : ""}`}
           onClick={loaded ? onShowContent : undefined}
         >
-          Content {!showClips && "👀"}
+          Content
         </button>
         <button
-          className="small blue"
+          className={`small secondary ${showClips ? "current" : ""}`}
           onClick={loaded ? onShowClips : undefined}
         >
-          Clips {showClips && "👀"}
+          Clips
         </button>
-      </span>
-    </div>
+      </div>
+      <style jsx>{`
+        div {
+          display: flex;
+          flex-direction: row;
+        }
+        button {
+          margin: 0;
+          margin-right: 8px;
+        }
+        @media (max-width: 600px) {
+          div {
+            flex-direction: row-reverse;
+          }
+
+          button {
+            margin: 0;
+            margin-left: 8px;
+          }
+        }
+      `}</style>
+    </>
   );
 };
 
@@ -159,8 +203,6 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
         </div>
       )}
       <div>
-        <H2 data={data} content={content} />
-        <H3 data={data} content={content} />
         {hostname && (
           <Metadata
             hostname={hostname}
@@ -172,7 +214,26 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
             showClips={showClips}
           />
         )}
-        <hr style={{ margin: "24px 0px 48px 0" }} />
+        <div
+          style={{
+            marginTop: 24,
+            marginBottom: 24,
+          }}
+        >
+          <H2 data={data} content={content} />
+          <H3 data={data} content={content} />
+        </div>
+        {hostname && (
+          <Controls
+            hostname={hostname}
+            url={url}
+            data={data}
+            content={content}
+            onShowContent={onShowContent}
+            onShowClips={onShowClips}
+            showClips={showClips}
+          />
+        )}
         {!showClips ? (
           <>
             <Content
