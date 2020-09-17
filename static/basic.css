@@ -287,6 +287,14 @@ article:last-child {
     sans-serif !important;
   font-size: 1.04em;
 }
+
+.rendered-html-body p,
+.rendered-html-body ul,
+.rendered-html-body ol,
+.rendered-html-body blockquote {
+  margin: 0 0 1em 0;
+}
+
 .rendered-html-body pre,
 .rendered-html-body code {
   font-family: var(--mono) !important;

@@ -234,6 +234,7 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
             showClips={showClips}
           />
         )}
+        <br />
         {!showClips ? (
           <>
             <Content
