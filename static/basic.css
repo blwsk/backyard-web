@@ -285,7 +285,7 @@ article:last-child {
   font-family: "inter", system-ui, -apple-system, BlinkMacSystemFont, Segoe UI,
     Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans,
     sans-serif !important;
-  font-size: 1.04em;
+  font-size: 1.04em !important;
 }
 
 .rendered-html-body p,

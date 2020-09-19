@@ -7,6 +7,8 @@ function MyApp({ Component, pageProps }) {
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Backyard.wtf</title>
+        <link rel="shortcut icon" href="/static/favicon.ico" />
       </Head>
       <Component {...pageProps}></Component>
     </>
