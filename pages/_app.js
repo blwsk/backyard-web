@@ -1,6 +1,7 @@
 import Head from "next/head";
 import "../static/basic.css";
 import withAuth from "../lib/withAuth";
+import DragAndDrop from "../components/dragAndDrop";
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -10,7 +11,14 @@ function MyApp({ Component, pageProps }) {
         <title>Backyard.wtf</title>
         <link rel="shortcut icon" href="/static/favicon.ico" />
       </Head>
-      <Component {...pageProps}></Component>
+      <DragAndDrop
+        style={{
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        <Component {...pageProps} />
+      </DragAndDrop>
     </>
   );
 }
