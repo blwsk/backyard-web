@@ -42,7 +42,14 @@ export const fetchTweet = async (idString) => {
 export const fetchTweetByUrl = async ({ url }) => {
   const { id } = getTweetIdFromUrl(url);
 
-  const tweetJson = await fetchTweet(id);
+  let result;
+  let error;
+  try {
+    const json = await fetchTweet(id);
+    result = { json };
+  } catch (err) {
+    error = err;
+  }
 
-  return { json: tweetJson };
+  return { result, error };
 };

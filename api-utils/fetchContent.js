@@ -14,14 +14,10 @@ const getFn = (url) => {
 export const fetchContent = async ({ url }) => {
   const fn = getFn(url);
 
-  let result;
-  let error;
+  /**
+   * `{ result, error }`
+   */
+  const asyncResultPair = await fn({ url });
 
-  try {
-    result = await fn({ url });
-  } catch (err) {
-    error = err;
-  }
-
-  return { result, error };
+  return asyncResultPair;
 };
