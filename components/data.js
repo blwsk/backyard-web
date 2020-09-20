@@ -15,6 +15,7 @@ const Data = ({ itemId }) => {
           title
           metaTitle
           metaDescription
+          json
         }
       }
       clipsByItemId(itemId: "${itemId}") {

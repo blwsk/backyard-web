@@ -1,25 +1,5 @@
-import fetch from "isomorphic-unfetch";
 import authedEndpoint from "../../api-utils/authedEndpoint";
-
-const { TWITTER_BEARER_TOKEN: secret } = process.env;
-
-const expansions = [
-  "attachments.media_keys",
-  "referenced_tweets.id",
-  "author_id",
-].join(",");
-
-const tweetFields = "created_at";
-
-const mediaFields = [
-  "duration_ms",
-  "height",
-  "media_key",
-  "preview_image_url",
-  "type",
-  "url",
-  "width",
-].join(",");
+import { fetchTweet } from "../../api-utils/fetchTweet";
 
 const tweet = authedEndpoint(async (req, res) => {
   if (req.method !== "GET") {
@@ -29,16 +9,7 @@ const tweet = authedEndpoint(async (req, res) => {
 
   const { ids } = req.query;
 
-  const tweetResponse = await fetch(
-    `https://api.twitter.com/2/tweets?ids=${ids}&expansions=${expansions}&tweet.fields=${tweetFields}&media.fields=${mediaFields}`,
-    {
-      headers: {
-        Authorization: `Bearer ${secret}`,
-      },
-    }
-  );
-
-  const tweetJson = await tweetResponse.json();
+  const tweetJson = await fetchTweet(ids);
 
   res.status(200).send({
     message: `Success.`,

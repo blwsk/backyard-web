@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { getHostname } from "../lib/urls";
+import { isTwitter, isYouTube } from "../lib/contentTypes";
 import { useCallback, useState } from "react";
 import TweetEmbed from "./tweetEmbed";
 import YouTubeEmbed from "./youTubeEmbed";
@@ -33,11 +34,11 @@ const ClipsList = ({ clips }) => {
 };
 
 const Content = ({ hostname, data, url, content }) => {
-  if (hostname === "twitter.com") {
-    return <TweetEmbed url={url} />;
+  if (isTwitter(url)) {
+    return <TweetEmbed url={url} content={content} />;
   }
 
-  if (hostname === "youtube.com" || hostname === "www.youtube.com") {
+  if (isYouTube(url)) {
     return <YouTubeEmbed url={url} />;
   }
 
@@ -156,7 +157,7 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
       /**
        * If content is pre-fetched, skip fetching it again
        */
-      if (content) {
+      if (content && content.body && (content.title || content.metaTitle)) {
         throw new Error("skip fetch");
       }
       return `/api/item-content?id=${itemId}`;
