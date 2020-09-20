@@ -157,7 +157,7 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
       /**
        * If content is pre-fetched, skip fetching it again
        */
-      if (content) {
+      if (content && content.body && (content.title || content.metaTitle)) {
         throw new Error("skip fetch");
       }
       return `/api/item-content?id=${itemId}`;
