@@ -10,7 +10,14 @@ function MyApp({ Component, pageProps }) {
         <title>Backyard.wtf</title>
         <link rel="shortcut icon" href="/static/favicon.ico" />
       </Head>
-      <Component {...pageProps}></Component>
+      <div
+        style={{
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        <Component {...pageProps} />
+      </div>
     </>
   );
 }

@@ -2,20 +2,16 @@ import formatRelative from "date-fns/formatRelative";
 import { capitalize } from "../lib/capitalize";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
+import { getTweetIdFromUrl } from "../lib/tweetIdFromUrl";
 
 const TCO_PATTERN = /https:\/\/t.co\/[0-9a-zA-Z]\w+/g;
 
-const getIdFromUrl = (url) => {
-  const urlObj = new URL(url);
-  const pathname = urlObj.pathname;
-  const pathnameParts = pathname.split("/");
-  const statusIndex = pathnameParts.indexOf("status");
-
-  if (statusIndex > -1) {
-    return { id: pathnameParts[statusIndex + 1] };
+const getTweetData = ({ data, tweetJson }) => {
+  if (tweetJson) {
+    return tweetJson;
   }
 
-  return null;
+  return data.tweets;
 };
 
 const TweetTextWithMedia = ({ tweet, media }) => {
@@ -35,13 +31,11 @@ const TweetTextWithMedia = ({ tweet, media }) => {
   return <pre className="tweet-text">{joinedWithMedia}</pre>;
 };
 
-const Tweet = ({ data }) => {
+const Tweet = ({ data, tweetJson }) => {
   const {
-    tweets: {
-      data: tweets,
-      includes: { media, users },
-    },
-  } = data;
+    data: tweets,
+    includes: { media, users },
+  } = getTweetData({ data, tweetJson });
 
   return (
     <div>
@@ -87,22 +81,29 @@ const Tweet = ({ data }) => {
   );
 };
 
-const TweetEmbed = ({ url }) => {
-  const id = getIdFromUrl(url);
+const TweetEmbed = ({ url, content: persistedTweetData }) => {
+  const id = getTweetIdFromUrl(url);
 
-  const { data, error, isValidating } = useAuthedSWR(
-    /**
-     * purposefully throw if no id
-     */
-    () => `/api/tweet?ids=${id.id}`,
-    jsonFetcherFactory
-  );
+  let tweetJson;
+
+  try {
+    tweetJson = JSON.parse(persistedTweetData.json);
+  } catch (error) {
+    void error;
+  }
+
+  const { data, error, isValidating } = useAuthedSWR(() => {
+    if (tweetJson || !id) {
+      throw new Error("purposefully throw to skip fetch");
+    }
+    return `/api/tweet?ids=${id.id}`;
+  }, jsonFetcherFactory);
 
   return (
     <div>
       {id && id.id ? (
-        data ? (
-          <Tweet data={data} />
+        data || tweetJson ? (
+          <Tweet data={data} tweetJson={tweetJson} />
         ) : (
           <div>Loading...</div>
         )
