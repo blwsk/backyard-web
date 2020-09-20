@@ -1,33 +1,10 @@
-import fetch from "isomorphic-unfetch";
 import faunadb, { query as q } from "faunadb";
 import authedEndpoint from "../../api-utils/authedEndpoint";
+import { fetchContent } from "../../api-utils/fetchContent";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
-
-const REQUEST_URI =
-  process.env.NODE_ENV === "development"
-    ? `http://localhost:3001/api/index`
-    : "https://backyard-data.vercel.app/api/index";
-
-const fetchContent = async ({ url }) => {
-  let result;
-  let error;
-  try {
-    const res = await fetch(REQUEST_URI, {
-      method: "PUT",
-      body: JSON.stringify({
-        url,
-      }),
-    });
-    result = await res.json();
-  } catch (err) {
-    error = err;
-  }
-
-  return { result, error };
-};
 
 const findExistingItem = async ({ url }) => {
   let result;
@@ -44,7 +21,11 @@ const findExistingItem = async ({ url }) => {
 };
 
 const createItem = async ({ url, contentJson, user }) => {
-  const { body, title, metaTitle, metaDescription } = contentJson;
+  /**
+   * - fetchTextContent returns `{ body, title, metaTitle, metaDescription }`
+   * - fetchTweet returns `{ json }`
+   */
+  const { body, title, metaTitle, metaDescription, json } = contentJson;
 
   let itemContentResult;
   let itemContentError;
@@ -56,6 +37,7 @@ const createItem = async ({ url, contentJson, user }) => {
           title,
           metaTitle,
           metaDescription,
+          json: JSON.stringify(json),
         },
       })
     );

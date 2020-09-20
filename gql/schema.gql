@@ -3,6 +3,7 @@ type ItemContent {
   title: String
   metaTitle: String
   metaDescription: String
+  json: String
 }
 
 type Item {
