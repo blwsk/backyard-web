@@ -98,8 +98,9 @@ const Index = ({ router }) => {
             </li>
             <li>
               Send links, images, files, and text to{" "}
-              <a href="tel:9089671305">9089671305</a> via SMS
+              <a href="tel:9089671305">9089671305</a> via SMS 🔜
             </li>
+            <li>Drag-and-drop a file to upload it 🆕</li>
           </ul>
         </div>
       </Wrapper>
