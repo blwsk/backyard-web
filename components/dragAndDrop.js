@@ -1,15 +1,20 @@
 import { useState, useCallback } from "react";
 import { useAuthedCallback } from "../lib/requestHooks";
 
+const uploadFile = (file) => {
+  void file;
+  return new Promise((resolve) => setTimeout(() => resolve(), 1000));
+};
+
 const DragAndDrop = ({ style = {}, children }) => {
   const [isHovering, updateIsHovering] = useState(false);
   const [file, updateFile] = useState(null);
   const [uploading, updateIsUploading] = useState(false);
   const [completedUpload, updateUploadComplete] = useState(false);
 
-  const doFileUpload = useAuthedCallback("/api/file-upload", {}, () => () => {
-    return new Promise((resolve) => setTimeout(() => resolve(), 1000));
-  });
+  const doFileUpload = useAuthedCallback("/api/file-upload", {}, () =>
+    uploadFile(file)
+  );
 
   const onDragStart = useCallback((e) => {
     e.preventDefault();
