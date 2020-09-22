@@ -1,36 +1,15 @@
 import { useState, useCallback } from "react";
-
-function FileUpload(file) {
-  const reader = new FileReader();
-  const xhr = new XMLHttpRequest();
-
-  xhr.upload.addEventListener(
-    "progress",
-    function (e) {
-      if (e.lengthComputable) {
-        const percentage = Math.round((e.loaded * 100) / e.total);
-      }
-    },
-    false
-  );
-
-  xhr.upload.addEventListener(
-    "load",
-    function (e) {
-      // on load
-    },
-    false
-  );
-  xhr.open("POST", "/api/file-upload");
-  xhr.overrideMimeType("text/plain; charset=x-user-defined-binary");
-  reader.onload = function (evt) {
-    xhr.send(evt.target.result);
-  };
-  reader.readAsBinaryString(file);
-}
+import { useAuthedCallback } from "../lib/requestHooks";
 
 const DragAndDrop = ({ style = {}, children }) => {
   const [isHovering, updateIsHovering] = useState(false);
+  const [file, updateFile] = useState(null);
+  const [uploading, updateIsUploading] = useState(false);
+  const [completedUpload, updateUploadComplete] = useState(false);
+
+  const doFileUpload = useAuthedCallback("/api/file-upload", {}, () => () => {
+    return new Promise((resolve) => setTimeout(() => resolve(), 1000));
+  });
 
   const onDragStart = useCallback((e) => {
     e.preventDefault();
@@ -39,17 +18,39 @@ const DragAndDrop = ({ style = {}, children }) => {
     e.preventDefault();
     updateIsHovering(true);
   });
-  const onDragLeave = useCallback((e) => {
-    e.preventDefault();
-    updateIsHovering(false);
-  });
-  const onDrop = useCallback((e) => {
-    e.preventDefault();
-    updateIsHovering(false);
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    new FileUpload(files[0]);
-  });
+  const onDragLeave = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!uploading) {
+        updateIsHovering(false);
+      }
+    },
+    [file, uploading]
+  );
+  const onDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      const firstFile = files[0];
+
+      updateIsUploading(true);
+      updateFile(firstFile);
+
+      doFileUpload().then(() => {
+        updateIsUploading(false);
+        updateUploadComplete(true);
+
+        setTimeout(() => {
+          updateIsHovering(false);
+          updateUploadComplete(false);
+          updateFile(null);
+        }, 1000);
+      });
+    },
+    [file, uploading]
+  );
 
   return (
     <>
@@ -62,14 +63,21 @@ const DragAndDrop = ({ style = {}, children }) => {
         {isHovering && (
           <>
             <div className="bg drop"></div>
+            <div className="drop">
+              <h1>
+                {uploading
+                  ? "Uploading..."
+                  : completedUpload
+                  ? "Successfully uploaded ✅"
+                  : "Drop to upload"}
+              </h1>
+            </div>
             <div
               className="drop"
               onDragStart={onDragStart}
               onDragLeave={onDragLeave}
               onDrop={onDrop}
-            >
-              <h1>Drop to upload</h1>
-            </div>
+            />
           </>
         )}
       </div>
