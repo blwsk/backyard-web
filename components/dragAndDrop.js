@@ -12,7 +12,7 @@ const DragAndDrop = ({ style = {}, children }) => {
   const [uploading, updateIsUploading] = useState(false);
   const [completedUpload, updateUploadComplete] = useState(false);
 
-  const doFileUpload = useAuthedCallback("/api/file-upload", {}, () =>
+  const doFileUpload = useAuthedCallback("/api/file-upload", {}, () => () =>
     uploadFile(file)
   );
 
