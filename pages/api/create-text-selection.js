@@ -5,6 +5,21 @@ const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
+const doTextSelection = ({ itemRef, text, user }) =>
+  client.query(
+    q.Create(q.Collection("TextSelection"), {
+      data: {
+        text,
+        item: itemRef,
+        createdBy: user.sub,
+        createdAt: Date.now(),
+      },
+    })
+  );
+
+const doCountIncrement = ({ itemRef }) =>
+  client.query(q.Call(q.Function("incrementClipCountForItem"), itemRef));
+
 const createTextSelection = authedEndpoint(
   async (req, res, { user, err: userErr }) => {
     if (req.method !== "POST") {
@@ -50,21 +65,16 @@ const createTextSelection = authedEndpoint(
     const itemRef = q.Ref(q.Collection("Item"), itemId);
 
     let result;
+    let resultIncrement;
     let error;
     try {
-      result = await client.query(
-        q.Create(q.Collection("TextSelection"), {
-          data: {
-            text,
-            item: itemRef,
-            createdBy: user.sub,
-            createdAt: Date.now(),
-          },
-        })
-      );
+      result = await doTextSelection({ itemRef, text, user });
+      resultIncrement = await doCountIncrement({ itemRef });
     } catch (err) {
       error = err;
     }
+
+    void resultIncrement;
 
     if (error) {
       res.status(500).send({
