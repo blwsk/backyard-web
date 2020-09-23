@@ -33,6 +33,11 @@ type TextSelection {
   createdAt: Long!
 }
 
+type TextSelectionCount {
+  item: Item!
+  count: Int!
+}
+
 type Query {
   allItems: [Item!]
 
