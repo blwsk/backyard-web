@@ -36,6 +36,7 @@ type TextSelection {
 type TextSelectionCount {
   item: Item!
   count: Int!
+  createdBy: String!
 }
 
 type Query {
@@ -69,4 +70,7 @@ type Query {
 
   clipsByItemId(itemId: String!): [TextSelection!]
   @resolver(name: "clips_by_item_id", paginated: true)
+
+  mostPopularItemsByUser(userId: String!): [Item!]
+  @resolver(name: "most_clipped_items_by_user", paginated: true)
 }

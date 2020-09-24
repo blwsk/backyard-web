@@ -13,6 +13,7 @@ Map(
       data: {
         item: Var("item"),
         count: Count(Match(Index("clipsByItem"), Var("item"))),
+        createdBy: Select(["data", "createdBy"], Get(Var("item"))),
       },
     })
   )

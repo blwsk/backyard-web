@@ -16,6 +16,7 @@ const PAGE_LENGTH = 20;
 const sortOrderEnum = {
   ascending: "ascending",
   descending: "descending",
+  popular: "popular",
 };
 
 const listQuery = gql`
@@ -31,46 +32,109 @@ const listQuery = gql`
 `;
 
 const getResultObject = (result) =>
-  result.itemsByUser || result.itemsByUserReverse;
+  result.itemsByUser ||
+  result.itemsByUserReverse ||
+  result.mostPopularItemsByUser;
+
+const buildQuery = ({ cursorValue, sortOrder }) => {
+  switch (sortOrder) {
+    case sortOrderEnum.popular:
+      return gql`
+        query MostPopularItemsByUser($userId: String!) {
+          mostPopularItemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+            data {
+              url
+              _id
+              _ts
+              content {
+                title
+              }
+            }
+            before
+            after
+          }
+        }
+      `;
+    case sortOrderEnum.ascending:
+      return gql`
+        query ItemsByUser($userId: String!) {
+          itemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+            data {
+              url
+              _id
+              _ts
+              content {
+                title
+              }
+            }
+            before
+            after
+          }
+        }
+      `;
+    case sortOrderEnum.descending:
+    default:
+      return gql`
+        query ItemsByUserReverse($userId: String!) {
+          itemsByUserReverse(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+            data {
+              url
+              _id
+              _ts
+              content {
+                title
+              }
+            }
+            before
+            after
+          }
+        }
+      `;
+  }
+  const query =
+    sortOrder === sortOrderEnum.ascending
+      ? gql`
+        query ItemsByUser($userId: String!) {
+          itemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+            data {
+              url
+              _id
+              _ts
+              content {
+                title
+              }
+            }
+            before
+            after
+          }
+        }
+      `
+      : gql`
+        query ItemsByUserReverse($userId: String!) {
+          itemsByUserReverse(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
+            data {
+              url
+              _id
+              _ts
+              content {
+                title
+              }
+            }
+            before
+            after
+          }
+        }
+      `;
+};
 
 const usePaginatedContent = ({
   cursorValue,
   sortOrder = sortOrderEnum.descending,
 }) => {
-  const query =
-    sortOrder === sortOrderEnum.ascending
-      ? gql`
-          query ItemsByUser($userId: String!) {
-            itemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-              data {
-                url
-                _id
-                _ts
-                content {
-                  title
-                }
-              }
-              before
-              after
-            }
-          }
-        `
-      : gql`
-          query ItemsByUserReverse($userId: String!) {
-            itemsByUserReverse(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-              data {
-                url
-                _id
-                _ts
-                content {
-                  title
-                }
-              }
-              before
-              after
-            }
-          }
-        `;
+  const query = buildQuery({
+    cursorValue,
+    sortOrder,
+  });
 
   const { data, error, isValidating } = useAuthedSWR(query, gqlFetcherFactory);
 
