@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import TweetEmbed from "./tweetEmbed";
 import YouTubeEmbed from "./youTubeEmbed";
 import Selection from "./selection";
+import SelectList from "./selectList";
 
 const ClipsList = ({ clips }) => {
   return (
@@ -109,7 +110,9 @@ const Controls = ({
   content,
   data,
   url,
+  itemId,
 }) => {
+  const [showSelectList, updateShowSelectList] = useState(false);
   const loaded = data || content;
 
   return (
@@ -131,7 +134,20 @@ const Controls = ({
         >
           Clips
         </button>
+        <button
+          className={`small secondary ${showSelectList ? "current" : ""}`}
+          onClick={() => {
+            updateShowSelectList(!showSelectList);
+          }}
+        >
+          More
+        </button>
       </div>
+      {showSelectList && (
+        <div className="p-y-2">
+          <SelectList inline ids={[itemId]} />
+        </div>
+      )}
       <style jsx>{`
         div {
           display: flex;
@@ -219,6 +235,7 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
             onShowContent={onShowContent}
             onShowClips={onShowClips}
             showClips={showClips}
+            itemId={itemId}
           />
         )}
         <br />
