@@ -11,6 +11,7 @@ function MyApp({ Component, pageProps }) {
         <title>Backyard.wtf</title>
         <link rel="shortcut icon" href="/static/favicon.ico" />
       </Head>
+
       <DragAndDrop
         style={{
           height: "100%",
