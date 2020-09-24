@@ -171,7 +171,8 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
           id: itemId,
         }),
       }).then((res) => res.json());
-    }
+    },
+    { revalidateOnFocus: false }
   );
 
   const [showClips, updateShowClips] = useState(false);

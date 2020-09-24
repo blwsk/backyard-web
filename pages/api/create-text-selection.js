@@ -50,9 +50,11 @@ const createTextSelection = authedEndpoint(
     const itemRef = q.Ref(q.Collection("Item"), itemId);
 
     let result;
+    let resultIncrement;
     let error;
-    try {
-      result = await client.query(
+
+    result = await Promise.all([
+      client.query(
         q.Create(q.Collection("TextSelection"), {
           data: {
             text,
@@ -61,10 +63,11 @@ const createTextSelection = authedEndpoint(
             createdAt: Date.now(),
           },
         })
-      );
-    } catch (err) {
-      error = err;
-    }
+      ),
+      client.query(q.Call(q.Function("incrementClipCountForItem"), itemRef)),
+    ]).catch((e) => (error = e));
+
+    void resultIncrement;
 
     if (error) {
       res.status(500).send({
