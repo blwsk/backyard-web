@@ -64,7 +64,9 @@ const createTextSelection = authedEndpoint(
           },
         })
       ),
-      client.query(q.Call(q.Function("incrementClipCountForItem"), itemRef)),
+      client.query(
+        q.Call(q.Function("incrementClipCountForItem"), itemRef, user.sub)
+      ),
     ]).catch((e) => (error = e));
 
     void resultIncrement;
