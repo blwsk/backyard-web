@@ -1,5 +1,3 @@
-import Link from "next/link";
-import gql from "gql-tag";
 import { mutate } from "swr";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
@@ -9,130 +7,13 @@ import ListItem from "../components/listItem";
 import SelectList, { listQuery } from "../components/selectList";
 import { capitalize } from "../lib/capitalize";
 import requireAuth from "../lib/requireAuth";
-import { useAuthedSWR, useAuthedCallback } from "../lib/requestHooks";
-import { gqlFetcherFactory, jsonFetcherFactory } from "../lib/fetcherFactories";
-
-const PAGE_LENGTH = 20;
-
-const sortOrderEnum = {
-  ascending: "ascending",
-  descending: "descending",
-  popular: "popular",
-};
-
-const getResultObject = (result) =>
-  result.itemsByUser ||
-  result.itemsByUserReverse ||
-  result.mostPopularItemsByUser;
-
-const buildQuery = ({ cursorValue, sortOrder }) => {
-  switch (sortOrder) {
-    case sortOrderEnum.popular:
-      return gql`
-        query MostPopularItemsByUser($userId: String!) {
-          mostPopularItemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-            data {
-              url
-              _id
-              _ts
-              content {
-                title
-              }
-            }
-            before
-            after
-          }
-        }
-      `;
-    case sortOrderEnum.ascending:
-      return gql`
-        query ItemsByUser($userId: String!) {
-          itemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-            data {
-              url
-              _id
-              _ts
-              content {
-                title
-              }
-            }
-            before
-            after
-          }
-        }
-      `;
-    case sortOrderEnum.descending:
-    default:
-      return gql`
-        query ItemsByUserReverse($userId: String!) {
-          itemsByUserReverse(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-            data {
-              url
-              _id
-              _ts
-              content {
-                title
-              }
-            }
-            before
-            after
-          }
-        }
-      `;
-  }
-  const query =
-    sortOrder === sortOrderEnum.ascending
-      ? gql`
-        query ItemsByUser($userId: String!) {
-          itemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-            data {
-              url
-              _id
-              _ts
-              content {
-                title
-              }
-            }
-            before
-            after
-          }
-        }
-      `
-      : gql`
-        query ItemsByUserReverse($userId: String!) {
-          itemsByUserReverse(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-            data {
-              url
-              _id
-              _ts
-              content {
-                title
-              }
-            }
-            before
-            after
-          }
-        }
-      `;
-};
-
-const usePaginatedContent = ({
-  cursorValue,
-  sortOrder = sortOrderEnum.descending,
-}) => {
-  const query = buildQuery({
-    cursorValue,
-    sortOrder,
-  });
-
-  const { data, error, isValidating } = useAuthedSWR(query, gqlFetcherFactory);
-
-  return {
-    data,
-    error,
-    isValidating,
-  };
-};
+import { useAuthedCallback } from "../lib/requestHooks";
+import { jsonFetcherFactory } from "../lib/fetcherFactories";
+import {
+  sortOrderEnum,
+  getResultObject,
+  usePaginatedContentList,
+} from "../lib/usePaginatedContentList";
 
 const ContentPage = ({
   items,
@@ -460,10 +341,8 @@ const MyContent = ({ sortOrder }) => {
 
   const [pages, updatesPages] = useState([]);
 
-  const cursorValue = cursor ? `"${cursor}"` : cursor;
-
-  const { data, error, isValidating } = usePaginatedContent({
-    cursorValue,
+  const { data, error, isValidating } = usePaginatedContentList({
+    cursor,
     sortOrder,
   });
 
