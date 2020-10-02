@@ -6,7 +6,7 @@ const Wrapper = ({ children, align }) => {
       style={{
         display: "flex",
         flexDirection: "column",
-        padding: 20,
+        padding: 16,
         wordBreak: "break-word",
         width: "100%",
         maxWidth: "760px",

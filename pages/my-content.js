@@ -97,7 +97,13 @@ const ContentPage = ({
             align-items: center;
             border-radius: 4px;
             margin-bottom: 8px;
-            padding: 8px;
+            padding: 16px;
+          }
+          .content-item input[type="checkbox"] {
+            height: 20px;
+            width: 20px;
+            cursor: pointer;
+            margin-left: 16px;
           }
         `}
       </style>
