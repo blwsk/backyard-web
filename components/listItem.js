@@ -2,7 +2,7 @@ import React from "react";
 import { stripParams } from "../lib/urls";
 import Link from "next/link";
 
-const ListItem = ({ item }) => {
+const ListItem = ({ item, light }) => {
   const { _id, _ts, url, content } = item;
 
   const withParamsStripped = stripParams(url);
@@ -14,18 +14,13 @@ const ListItem = ({ item }) => {
   const timeString = date.toLocaleTimeString();
 
   return (
-    <div
-      className="p-y-3"
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
+    <div className={`list-item ${light ? "light" : ""} p-y-3`}>
       <div>
-        <Link href={{ pathname: "/viewer", query: { id: _id } }}>
-          <a>{title}</a>
-        </Link>
+        <b>
+          <Link href={{ pathname: "/viewer", query: { id: _id } }}>
+            <a>{title}</a>
+          </Link>
+        </b>
         <div>
           <small>
             <span>{dateString}</span>

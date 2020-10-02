@@ -14,6 +14,41 @@ import {
   getResultObject,
   usePaginatedContentList,
 } from "../lib/usePaginatedContentList";
+import { getHostname } from "../lib/urls";
+
+const colors = [
+  "c62828",
+  "AD1457",
+  "6A1B9A",
+  "4527A0",
+  "283593",
+  "1565C0",
+  "0277BD",
+  "00838F",
+  "00695C",
+  "2E7D32",
+  "558B2F",
+  "9E9D24",
+  "F9A825",
+  "FF8F00",
+  "EF6C00",
+  "D84315",
+  "4E342E",
+  "424242",
+  "37474F",
+];
+
+const getColorFromString = (str) => {
+  if (!str) return null;
+
+  const numLetters = 26;
+  const charCode = str.charCodeAt(0);
+  const relative = 122 - charCode; // 122 is the char code for `z`
+  const numColors = colors.length;
+  const selectedColor = colors[Math.floor(relative / (numLetters / numColors))];
+
+  return `#${selectedColor}`;
+};
 
 const ContentPage = ({
   items,
@@ -25,7 +60,7 @@ const ContentPage = ({
   return (
     <div>
       {items.map((item) => {
-        const { _id } = item;
+        const { _id, url } = item;
 
         const isDeleted = deletedIds.indexOf(_id) > -1;
 
@@ -33,16 +68,13 @@ const ContentPage = ({
           return <div key={_id} />;
         }
 
+        const backgroundColor = getColorFromString(
+          getHostname(url).hostname.replace("www.", "")
+        );
+
         return (
-          <div
-            key={_id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <ListItem item={item} />
+          <div className="content-item" key={_id} style={{ backgroundColor }}>
+            <ListItem item={item} light />
             <input
               type="checkbox"
               checked={!!selectionState[_id]}
@@ -57,6 +89,18 @@ const ContentPage = ({
           </div>
         );
       })}
+      <style jsx>
+        {`
+          .content-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            padding: 8px;
+          }
+        `}
+      </style>
     </div>
   );
 };
@@ -400,6 +444,39 @@ const MyContent = ({ sortOrder }) => {
   );
 };
 
+const ListControls = ({ sortOrder, onChangeSortOrder }) => {
+  return (
+    <div>
+      <span className="control">
+        <select id="sort" onChange={onChangeSortOrder} value={sortOrder}>
+          {Object.keys(sortOrderEnum).map((key) => (
+            <option key={key} value={key}>
+              {capitalize(key)}
+            </option>
+          ))}
+        </select>
+      </span>
+      <span className="control">
+        <select id="filter" onChange={onChangeSortOrder} value={sortOrder}>
+          {Object.keys(sortOrderEnum).map((key) => (
+            <option key={key} value={key}>
+              {capitalize(key)}
+            </option>
+          ))}
+        </select>
+      </span>
+      <style jsx>{`
+        .control {
+          margin-right: 16px;
+        }
+        .control:last-of-type {
+          margin-right: 0;
+        }
+      `}</style>
+    </div>
+  );
+};
+
 const WrappedMyContent = ({ router }) => {
   const sortOrder = router.query.sort || sortOrderEnum.descending;
 
@@ -420,16 +497,10 @@ const WrappedMyContent = ({ router }) => {
           }}
         >
           <h1>Saved</h1>
-          <div>
-            <label style={{ marginRight: 8 }}>Sort:</label>
-            <select onChange={onChangeSortOrder} value={sortOrder}>
-              {Object.keys(sortOrderEnum).map((key) => (
-                <option key={key} value={key}>
-                  {capitalize(key)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <ListControls
+            sortOrder={sortOrder}
+            onChangeSortOrder={onChangeSortOrder}
+          />
         </div>
         <MyContent key={sortOrder} sortOrder={sortOrder} />
       </Wrapper>
