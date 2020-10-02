@@ -20,6 +20,7 @@
   --c8: aliceblue;
   --m1: 8px;
   --rc: 8px;
+  --white: #fff;
 
   --ghost: rgba(0, 0, 0, 0.05);
 }
@@ -344,4 +345,15 @@ article:last-child {
 h6 {
   font-size: 1em;
   font-weight: 700;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-item.light,
+.list-item.light a {
+  color: var(--white);
 }

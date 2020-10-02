@@ -7,7 +7,7 @@ import requireAuth from "../lib/requireAuth";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { gqlFetcherFactory } from "../lib/fetcherFactories";
 
-const PAGE_LENGTH = 10;
+const PAGE_LENGTH = 100;
 
 const getResultObject = (result) => result.clipsByUser;
 
