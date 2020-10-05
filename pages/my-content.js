@@ -208,7 +208,7 @@ const CreateList = () => {
   );
 };
 
-const ContentPageList = ({ pages, hasMore, onLoadMore }) => {
+const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
   const [selectionState, updateSelectionState] = useState({});
 
   const onSelect = useCallback((id) => {
@@ -320,7 +320,7 @@ const ContentPageList = ({ pages, hasMore, onLoadMore }) => {
           {hasMore ? (
             <button onClick={onLoadMore}>Load more</button>
           ) : (
-            <div>All caught up.</div>
+            !isValidating && <div>No more content.</div>
           )}
         </>
       )}
@@ -475,15 +475,15 @@ const MyContent = ({ sortOrder }) => {
   return (
     <>
       <div style={{ paddingBottom: 80 }}>
-        {data ? (
+        {(data || pages.length > 0) && (
           <ContentPageList
             pages={pages}
             hasMore={hasMore}
             onLoadMore={onLoadMoreClick}
+            isValidating={isValidating}
           />
-        ) : (
-          <LoadingItem />
         )}
+        {isValidating && <LoadingItem />}
       </div>
       {error && <div style={{ color: "red" }}>Oops. Refresh the page.</div>}
     </>
