@@ -50,45 +50,30 @@ const getColorFromString = (str) => {
   return `#${selectedColor}`;
 };
 
-const ContentPage = ({
-  items,
-  onSelect,
-  onDeselect,
-  selectionState,
-  deletedIds,
+const ContentPageItem = ({
+  item,
+  checked,
+  onChange,
+  disabled,
+  backgroundColor: backgroundColorProp,
 }) => {
+  const { _id, url } = item;
+
+  const backgroundColor =
+    backgroundColorProp ||
+    getColorFromString(getHostname(url).hostname.replace("www.", ""));
+
   return (
-    <div>
-      {items.map((item) => {
-        const { _id, url } = item;
-
-        const isDeleted = deletedIds.indexOf(_id) > -1;
-
-        if (isDeleted) {
-          return <div key={_id} />;
-        }
-
-        const backgroundColor = getColorFromString(
-          getHostname(url).hostname.replace("www.", "")
-        );
-
-        return (
-          <div className="content-item" key={_id} style={{ backgroundColor }}>
-            <ListItem item={item} light />
-            <input
-              type="checkbox"
-              checked={!!selectionState[_id]}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  onSelect(_id);
-                } else {
-                  onDeselect(_id);
-                }
-              }}
-            />
-          </div>
-        );
-      })}
+    <>
+      <div className="content-item" key={_id} style={{ backgroundColor }}>
+        <ListItem item={item} light />
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={onChange}
+          disabled={disabled}
+        />
+      </div>
       <style jsx>
         {`
           .content-item {
@@ -107,6 +92,62 @@ const ContentPage = ({
           }
         `}
       </style>
+    </>
+  );
+};
+
+const LoadingItem = () => (
+  <ContentPageItem
+    item={{
+      _id: 0,
+      _ts: Date.now(),
+      url: "https://loading.com",
+      content: {
+        title: "Loading...",
+      },
+    }}
+    checked={false}
+    onChange={() => {}}
+    disabled={true}
+    backgroundColor="var(--c4)"
+  />
+);
+
+const ContentPage = ({
+  items,
+  onSelect,
+  onDeselect,
+  selectionState,
+  deletedIds,
+}) => {
+  return (
+    <div>
+      {items.map((item) => {
+        const { _id } = item;
+        const isDeleted = deletedIds.indexOf(_id) > -1;
+
+        if (isDeleted) {
+          return <div key={_id} />;
+        }
+
+        const checked = !!selectionState[_id];
+
+        return (
+          <ContentPageItem
+            item={item}
+            key={_id}
+            disabled={false}
+            checked={checked}
+            onChange={(e) => {
+              if (e.target.checked) {
+                onSelect(_id);
+              } else {
+                onDeselect(_id);
+              }
+            }}
+          />
+        );
+      })}
     </div>
   );
 };
@@ -167,7 +208,7 @@ const CreateList = () => {
   );
 };
 
-const ContentPageList = ({ pages }) => {
+const ContentPageList = ({ pages, hasMore, onLoadMore }) => {
   const [selectionState, updateSelectionState] = useState({});
 
   const onSelect = useCallback((id) => {
@@ -260,6 +301,8 @@ const ContentPageList = ({ pages }) => {
     });
   });
 
+  const hasLoadedAtleastFirstPage = pages.length > 0;
+
   return (
     <div>
       {pages.map((result) => (
@@ -272,6 +315,15 @@ const ContentPageList = ({ pages }) => {
           deletedIds={deletedIds}
         />
       ))}
+      {hasLoadedAtleastFirstPage && (
+        <>
+          {hasMore ? (
+            <button onClick={onLoadMore}>Load more</button>
+          ) : (
+            <div>All caught up.</div>
+          )}
+        </>
+      )}
       <div>
         {numSelected > 0 && (
           <footer
@@ -282,13 +334,13 @@ const ContentPageList = ({ pages }) => {
               left: 0,
               right: 0,
               width: "100%",
-              height: 80,
+              height: 100,
             }}
           >
             <div style={{ color: "black", textAlign: "center", paddingTop: 8 }}>
               <div>
                 <b style={{ fontWeight: 500 }}>
-                  You've selected <span>{numSelected}</span>{" "}
+                  You&apos;ve selected <span>{numSelected}</span>{" "}
                   <span>{numSelected === 1 ? "item" : "items"}</span>
                 </b>
               </div>
@@ -423,27 +475,15 @@ const MyContent = ({ sortOrder }) => {
   return (
     <>
       <div style={{ paddingBottom: 80 }}>
-        <ContentPageList pages={pages} />
-        <div style={{ height: 100 }}>
-          {data ? (
-            hasMore ? (
-              <div>
-                <br />
-                <button onClick={onLoadMoreClick}>Load more</button>
-              </div>
-            ) : (
-              <div>
-                <br />
-                <div>All caught up.</div>
-              </div>
-            )
-          ) : (
-            <div>
-              <br />
-              <div>Loading...</div>
-            </div>
-          )}
-        </div>
+        {data ? (
+          <ContentPageList
+            pages={pages}
+            hasMore={hasMore}
+            onLoadMore={onLoadMoreClick}
+          />
+        ) : (
+          <LoadingItem />
+        )}
       </div>
       {error && <div style={{ color: "red" }}>Oops. Refresh the page.</div>}
     </>
