@@ -133,3 +133,27 @@ Call(
   Ref(Collection("Item"), "277289690590085644")
 );
 ```
+
+### Get most recent SMS Verifier Pin Set for user
+
+Or an empty array if no verifier was found
+
+```javascript
+Let(
+  {
+    verifiersMaybe: Paginate(
+      Match(Index("smsVerifiersByUser"), "auth0|5f4a9ce8e9ef5f0067b5aa9f"),
+      { size: 1 }
+    ),
+  },
+  If(
+    IsEmpty(Var("verifiersMaybe")),
+    [],
+    Reduce(
+      Lambda(["acc", "item"], Var("item")),
+      null,
+      Select("data", Var("verifiersMaybe"))
+    )
+  )
+);
+```

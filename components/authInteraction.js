@@ -3,6 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { withRouter } from "next/router";
 import LogoutButton from "./logoutButton";
 import LoginButton from "./loginButton";
+import Link from "next/link";
 
 const AuthInteraction = ({ className, style, router }) => {
   const { user, isAuthenticated } = useAuth0();
@@ -12,7 +13,11 @@ const AuthInteraction = ({ className, style, router }) => {
       {isAuthenticated ? (
         <span className="wrapper">
           <LogoutButton />
-          <small>{user.email}</small>
+          <small>
+            <Link href="/settings">
+              <a className="color-black">{user.email}</a>
+            </Link>
+          </small>
         </span>
       ) : (
         <LoginButton redirectTo={router.asPath} />

@@ -39,6 +39,18 @@ type TextSelectionCount {
   createdBy: String!
 }
 
+type UserMetadata {
+  phoneNumber: Int
+  userId: String!
+}
+
+type SmsVerifierPinSet {
+  expiresAt: Long!
+  number: Int!
+  pin: String!
+  userId: String!
+}
+
 type Query {
   allItems: [Item!]
 
