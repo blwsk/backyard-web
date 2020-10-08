@@ -157,3 +157,66 @@ Let(
   )
 );
 ```
+
+### Get UserMetadata for userId, and create one if one does not yet exist
+
+```javascript
+Let(
+  {
+    userMetadataMaybe: Paginate(
+      Match(Index("userMetadataForUser"), "auth0|5f4a9ce8e9ef5f0067b5aa9f"),
+      { size: 1 }
+    ),
+  },
+  If(
+    IsEmpty(Var("userMetadataMaybe")),
+    Create(Collection("UserMetadata"), {
+      data: {
+        userId: "auth0|5f4a9ce8e9ef5f0067b5aa9f",
+      },
+    }),
+    Reduce(
+      Lambda(["acc", "item"], Get(Var("item"))),
+      null,
+      Select("data", Var("userMetadataMaybe"))
+    )
+  )
+);
+```
+
+### Update UserMetadata with verified phone number
+
+`userMetdata: Let({})` function is stolen from above example
+
+```javascript
+Let(
+  {
+    userMetadata: Let(
+      {
+        userMetadataMaybe: Paginate(
+          Match(Index("userMetadataForUser"), "auth0|5f4a9ce8e9ef5f0067b5aa9f"),
+          { size: 1 }
+        ),
+      },
+      If(
+        IsEmpty(Var("userMetadataMaybe")),
+        Create(Collection("UserMetadata"), {
+          data: {
+            userId: "auth0|5f4a9ce8e9ef5f0067b5aa9f",
+          },
+        }),
+        Reduce(
+          Lambda(["acc", "item"], Get(Var("item"))),
+          null,
+          Select("data", Var("userMetadataMaybe"))
+        )
+      )
+    ),
+  },
+  Update(Select("ref", Var("userMetadata")), {
+    data: {
+      number: 9089671305,
+    },
+  })
+);
+```

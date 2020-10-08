@@ -40,7 +40,7 @@ type TextSelectionCount {
 }
 
 type UserMetadata {
-  phoneNumber: Int
+  phoneNumber: String
   userId: String!
 }
 
@@ -85,4 +85,7 @@ type Query {
 
   mostPopularItemsByUser(userId: String!): [Item!]
   @resolver(name: "most_clipped_items_by_user", paginated: true)
+
+  userMetadataForUser(userId: String!): UserMetadata
+  @resolver(name: "userMetadataForUser")
 }
