@@ -7,6 +7,10 @@ const faunaClient = new faunadb.Client({ secret });
 
 const validPin = (pin) => typeof pin === "string" && pin.length === 4;
 
+type RequestBody = {
+  pin?: string;
+};
+
 const confirmPin = authedEndpoint(async (req, res, { user, err: userErr }) => {
   void userErr;
 
@@ -15,7 +19,7 @@ const confirmPin = authedEndpoint(async (req, res, { user, err: userErr }) => {
     return;
   }
 
-  let bodyObject = {};
+  let bodyObject: RequestBody = {};
 
   try {
     bodyObject = JSON.parse(req.body);

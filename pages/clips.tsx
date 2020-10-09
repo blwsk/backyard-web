@@ -26,7 +26,7 @@ const Page = ({ pageData }) => {
       {pageData.map((pageItem) => {
         const { item, text, _id } = pageItem;
 
-        return <Clip key={_id} item={item} text={text} id={_id} />;
+        return <Clip key={_id} item={item} text={text} _id={_id} />;
       })}
     </>
   );
@@ -86,7 +86,7 @@ const SelectionList = () => {
 
   const onLoadMoreClick = useCallback(() => {
     updateCursor(getResultObject(data.data).after);
-  });
+  }, []);
 
   useEffect(() => {
     if (data && getResultObject(data.data).before === null) {

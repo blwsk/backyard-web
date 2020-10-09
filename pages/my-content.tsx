@@ -55,17 +55,21 @@ const ContentPageItem = ({
   checked,
   onChange,
   disabled,
-  backgroundColor: backgroundColorProp,
+  backgroundColor = undefined,
 }) => {
   const { _id, url } = item;
 
-  const backgroundColor =
-    backgroundColorProp ||
-    getColorFromString(getHostname(url).hostname.replace("www.", ""));
-
   return (
     <>
-      <div className="content-item" key={_id} style={{ backgroundColor }}>
+      <div
+        className="content-item"
+        key={_id}
+        style={{
+          backgroundColor:
+            backgroundColor ||
+            getColorFromString(getHostname(url).hostname.replace("www.", "")),
+        }}
+      >
         <ListItem item={item} light />
         <input
           type="checkbox"
@@ -154,10 +158,14 @@ const ContentPage = ({
 
 const CreateList = () => {
   const [listName, updateListName] = useState("");
-  const onChange = useCallback((e) => {
+  const onChange = (e) => {
     updateListName(e.target.value);
+  };
+  const [createState, updateCreateState] = useState({
+    started: false,
+    response: null,
+    error: null,
   });
-  const [createState, updateCreateState] = useState({ started: false });
 
   const doCreateList = useAuthedCallback(
     "/api/create-list",
@@ -168,19 +176,19 @@ const CreateList = () => {
     jsonFetcherFactory
   );
 
-  const onCreateList = useCallback(() => {
-    updateCreateState({ started: true });
+  const onCreateList = () => {
+    updateCreateState({ started: true, response: null, error: null });
 
     doCreateList()
       .then((response) => {
-        updateCreateState({ started: false, response });
+        updateCreateState({ started: false, response, error: null });
         mutate(listQuery);
         updateListName("");
       })
       .catch((error) => {
-        updateCreateState({ started: false, error });
+        updateCreateState({ started: false, response: null, error });
       });
-  });
+  };
 
   return (
     <div>
@@ -211,42 +219,58 @@ const CreateList = () => {
 const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
   const [selectionState, updateSelectionState] = useState({});
 
-  const onSelect = useCallback((id) => {
+  const onSelect = (id) => {
     const temp = Object.assign({}, selectionState, {
       [id]: true,
     });
     updateSelectionState(temp);
-  });
-  const onDeselect = useCallback((id) => {
+  };
+  const onDeselect = (id) => {
     const temp = Object.assign({}, selectionState);
     delete temp[id];
     updateSelectionState(temp);
-  });
-  const onClearSelection = useCallback(() => {
+  };
+  const onClearSelection = () => {
     updateSelectionState({});
-  });
+  };
 
   const numSelected = Object.keys(selectionState).length;
 
   const [deletionState, updateDeletionState] = useState({
     pending: false,
+    started: false,
+    success: false,
+    res: null,
+    error: null,
   });
 
   const [addToListState, updateAddToListState] = useState({
     pending: false,
+    started: false,
+    success: false,
+    res: null,
+    error: null,
   });
 
-  const onClickDelete = useCallback(() => {
+  const onClickDelete = () => {
     updateDeletionState({
       pending: true,
+      started: false,
+      success: false,
+      res: null,
+      error: null,
     });
-  });
+  };
 
-  const onCancelPendingDelete = useCallback(() => {
+  const onCancelPendingDelete = () => {
     updateDeletionState({
       pending: false,
+      started: false,
+      success: false,
+      res: null,
+      error: null,
     });
-  });
+  };
 
   const [deletedIds, updateDeletedIds] = useState([]);
 
@@ -261,9 +285,13 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
     jsonFetcherFactory
   );
 
-  const onConfirmDelete = useCallback(() => {
+  const onConfirmDelete = () => {
     updateDeletionState({
       started: true,
+      pending: false,
+      success: false,
+      res: null,
+      error: null,
     });
 
     doDeleteItems()
@@ -273,6 +301,7 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
           started: false,
           success: true,
           res,
+          error: null,
         });
 
         onClearSelection();
@@ -285,21 +314,30 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
           started: false,
           success: false,
           error,
+          res: null,
         });
       });
-  });
+  };
 
-  const onClickAddToList = useCallback(() => {
+  const onClickAddToList = () => {
     updateAddToListState({
       pending: true,
+      started: false,
+      success: false,
+      error: null,
+      res: null,
     });
-  });
+  };
 
-  const onCancelPendingAddToList = useCallback(() => {
+  const onCancelPendingAddToList = () => {
     updateAddToListState({
       pending: false,
+      started: false,
+      success: false,
+      error: null,
+      res: null,
     });
-  });
+  };
 
   const hasLoadedAtleastFirstPage = pages.length > 0;
 
@@ -466,9 +504,9 @@ const MyContent = ({ sortOrder }) => {
     }
   }, [data, cursor]);
 
-  const onLoadMoreClick = useCallback(() => {
+  const onLoadMoreClick = () => {
     updateCursor(getResultObject(data.data).after);
-  });
+  };
 
   const hasMore = data && typeof getResultObject(data.data).after === "string";
 
@@ -526,9 +564,9 @@ const ListControls = ({ sortOrder, onChangeSortOrder }) => {
 const WrappedMyContent = ({ router }) => {
   const sortOrder = router.query.sort || sortOrderEnum.descending;
 
-  const onChangeSortOrder = useCallback((e) => {
+  const onChangeSortOrder = (e) => {
     router.push(`/my-content?sort=${e.target.value}`);
-  });
+  };
 
   return (
     <div>

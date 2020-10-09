@@ -1,12 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, ReactNode, CSSProperties } from "react";
 import { useAuthedCallback } from "../lib/requestHooks";
 
-const uploadFile = (file) => {
-  void file;
+const uploadFile = (file: any) => {
   return new Promise((resolve) => setTimeout(() => resolve(), 1000));
 };
 
-const DragAndDrop = ({ style = {}, children }) => {
+type Props = {
+  style: CSSProperties;
+  children: ReactNode;
+};
+
+const DragAndDrop = ({ style = {}, children }: Props) => {
   const [isHovering, updateIsHovering] = useState(false);
   const [file, updateFile] = useState(null);
   const [uploading, updateIsUploading] = useState(false);
@@ -18,11 +22,11 @@ const DragAndDrop = ({ style = {}, children }) => {
 
   const onDragStart = useCallback((e) => {
     e.preventDefault();
-  });
+  }, []);
   const onDragOver = useCallback((e) => {
     e.preventDefault();
     updateIsHovering(true);
-  });
+  }, []);
   const onDragLeave = useCallback(
     (e) => {
       e.preventDefault();

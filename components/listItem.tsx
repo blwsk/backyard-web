@@ -2,7 +2,7 @@ import React from "react";
 import { stripParams } from "../lib/urls";
 import Link from "next/link";
 
-const ListItem = ({ item, light }) => {
+const ListItem = ({ item, light = false }) => {
   const { _id, _ts, url, content } = item;
 
   const withParamsStripped = stripParams(url);

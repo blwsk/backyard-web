@@ -13,10 +13,15 @@ const Selection = ({ itemId, invalidateQuery }) => {
   const [selection, updateSelection] = useState({
     text: null,
     htmlChunk: null,
+    anchorNode: null,
+    focusNode: null,
   });
 
   const [textSelectionSaveState, updateTextSelectionSaveState] = useState({
     started: false,
+    success: false,
+    error: null,
+    data: null,
   });
 
   const onSelectionChange = useCallback(
@@ -47,17 +52,20 @@ const Selection = ({ itemId, invalidateQuery }) => {
           anchorNode: null,
           focusNode: null,
         });
-        updateTextSelectionSaveState({ started: false });
+        updateTextSelectionSaveState({
+          started: false,
+          success: false,
+          error: null,
+          data: null,
+        });
       }
     }, 250),
     []
   );
 
-  const onResize = useCallback(
-    debounce(() => {
-      updateViewportSizeKey(`${window.innerHeight}.${window.innerWidth}`);
-    }, 100)
-  );
+  const onResize = debounce(() => {
+    updateViewportSizeKey(`${window.innerHeight}.${window.innerWidth}`);
+  }, 100);
 
   useEffect(() => {
     document.onselectionchange = onSelectionChange;
@@ -94,7 +102,12 @@ const Selection = ({ itemId, invalidateQuery }) => {
   );
 
   const onSave = useCallback(() => {
-    updateTextSelectionSaveState({ started: true });
+    updateTextSelectionSaveState({
+      started: true,
+      success: false,
+      error: null,
+      data: null,
+    });
 
     doTextSelection()
       .then((res) => {
@@ -102,6 +115,7 @@ const Selection = ({ itemId, invalidateQuery }) => {
           started: false,
           success: true,
           data: res,
+          error: null,
         });
 
         invalidateQuery();
@@ -109,7 +123,9 @@ const Selection = ({ itemId, invalidateQuery }) => {
       .catch((error) => {
         updateTextSelectionSaveState({
           started: false,
+          success: false,
           error,
+          data: null,
         });
       });
   }, [selection, itemId]);

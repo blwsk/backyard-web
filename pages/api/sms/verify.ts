@@ -31,6 +31,10 @@ const generateRandomPin = () => {
   return `${leftPadded}${pinStr}`;
 };
 
+type RequestBody = {
+  phoneNumber?: string;
+};
+
 const verifyPhoneNumber = authedEndpoint(
   async (req, res, { user, err: userErr }) => {
     void userErr;
@@ -40,7 +44,7 @@ const verifyPhoneNumber = authedEndpoint(
       return;
     }
 
-    let bodyObject = {};
+    let bodyObject: RequestBody = {};
 
     try {
       bodyObject = JSON.parse(req.body);

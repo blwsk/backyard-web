@@ -1,9 +1,11 @@
+import React from "react";
 import Head from "next/head";
 import "../static/basic.css";
 import withAuth from "../lib/withAuth";
 import DragAndDrop from "../components/dragAndDrop";
+import { AppProps } from "next/app";
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>

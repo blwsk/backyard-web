@@ -5,6 +5,10 @@ const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
+type RequestBody = {
+  name?: string;
+};
+
 const createList = authedEndpoint(async (req, res, { user, err: userErr }) => {
   if (req.method !== "POST") {
     res.status(400).send(null);
@@ -19,7 +23,7 @@ const createList = authedEndpoint(async (req, res, { user, err: userErr }) => {
     return;
   }
 
-  let bodyObject = {};
+  let bodyObject: RequestBody = {};
 
   try {
     bodyObject = JSON.parse(req.body);

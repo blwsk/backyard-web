@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
-import jwks from "jwks-rsa";
+import jwks, { JwksClient } from "jwks-rsa";
 
 const KEY_SET_URI = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/.well-known/jwks.json`;
 
-const jwksClient = jwks({
+const jwksClient: JwksClient = jwks({
   jwksUri: KEY_SET_URI,
   cache: true,
 });
@@ -32,9 +32,9 @@ const authedEndpoint = (endpointFn) => async (req, res) => {
     header: { alg, kid },
   } = decodedToken;
 
-  const { publicKey } = await jwksClient.getSigningKeyAsync(kid);
+  const { getPublicKey } = await jwksClient.getSigningKeyAsync(kid);
 
-  const isVerified = jwt.verify(token, publicKey, { algorithms: [alg] });
+  const isVerified = jwt.verify(token, getPublicKey(), { algorithms: [alg] });
 
   if (!isVerified) {
     res.status(401).send(null);

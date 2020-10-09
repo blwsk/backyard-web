@@ -36,7 +36,7 @@ export const jsonFetcherFactory = ({
 }) => (path, options = {}) => {
   const fetcherFn = absolutePath ? absolutePathFetcher : fetcherBase;
 
-  const optionsToPass = {
+  const optionsToPass: any = {
     ...options,
     ...factoryFunctionOptions,
   };
