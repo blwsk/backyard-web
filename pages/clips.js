@@ -14,7 +14,7 @@ const getResultObject = (result) => result.clipsByUser;
 const Clip = ({ item, text, _id }) => {
   return (
     <div key={_id} className="selection-item">
-      <ListItem item={item} />
+      {item && <ListItem item={item} />}
       <blockquote>{text}</blockquote>
     </div>
   );

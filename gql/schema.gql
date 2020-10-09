@@ -28,7 +28,7 @@ type ListItem {
 
 type TextSelection {
   text: String!
-  item: Item!
+  item: Item
   createdBy: String!
   createdAt: Long!
 }
