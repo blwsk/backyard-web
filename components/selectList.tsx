@@ -32,13 +32,15 @@ const SelectList = ({ ids, inline = false }) => {
     }
   }, [lists]);
 
-  const onSelectList = useCallback((e) => {
+  const onSelectList = (e) => {
     const id = e.target.value;
     updateSelectedListId(id);
-  });
+  };
 
   const [createListItemState, updateCreateListItemState] = useState({
     started: false,
+    error: null,
+    result: null,
   });
 
   const doCreateListItem = useAuthedCallback(
@@ -53,12 +55,14 @@ const SelectList = ({ ids, inline = false }) => {
     jsonFetcherFactory
   );
 
-  const onCreateListItem = useCallback(() => {
+  const onCreateListItem = () => {
     /**
      * Do state updates based on request status
      */
     updateCreateListItemState({
       started: true,
+      error: null,
+      result: null,
     });
 
     doCreateListItem()
@@ -66,15 +70,17 @@ const SelectList = ({ ids, inline = false }) => {
         updateCreateListItemState({
           started: false,
           result,
+          error: null,
         });
       })
       .catch((error) => {
         updateCreateListItemState({
           started: false,
           error,
+          result: null,
         });
       });
-  });
+  };
 
   return (
     <div>

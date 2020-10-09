@@ -11,7 +11,7 @@ import { gqlFetcherFactory } from "../lib/fetcherFactories";
 const ListDrawerContent = ({ list }) => {
   const { _id } = list;
 
-  const { data, error } = useAuthedSWR(
+  const { data } = useAuthedSWR(
     gql`
       query {
         findListItemsByList(id: "${_id}") {
@@ -78,7 +78,7 @@ const ListDrawer = ({ list, startOpen }) => {
 };
 
 const ListList = ({ openListId }) => {
-  const { data, error, isValidating } = useAuthedSWR(
+  const { data } = useAuthedSWR(
     gql`
       query ListsByUser($userId: String!) {
         listsByUser(userId: $userId) {

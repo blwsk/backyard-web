@@ -8,31 +8,31 @@ const Index = ({ router }) => {
   const [value, updater] = useState("");
   const [focused, updateFocused] = useState(false);
 
-  const onChange = useCallback((e) => {
+  const onChange = (e) => {
     updater(e.target.value);
-  });
+  };
 
-  const onSave = useCallback(() => {
+  const onSave = () => {
     router.push(`/save?url=${encodeURI(value)}`);
-  });
+  };
 
   const isValidUrl = validURL(value);
 
   const inputError = !isValidUrl && value.length > 0 && !focused;
 
-  const onFocus = useCallback(() => {
+  const onFocus = () => {
     updateFocused(true);
-  });
+  };
 
-  const onBlur = useCallback(() => {
+  const onBlur = () => {
     updateFocused(false);
-  });
+  };
 
-  const onKeyDown = useCallback((e) => {
+  const onKeyDown = (e) => {
     if (e.keyCode === 13) {
       onSave();
     }
-  });
+  };
 
   return (
     <div>

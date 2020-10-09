@@ -133,3 +133,90 @@ Call(
   Ref(Collection("Item"), "277289690590085644")
 );
 ```
+
+### Get most recent SMS Verifier Pin Set for user
+
+Or an empty array if no verifier was found
+
+```javascript
+Let(
+  {
+    verifiersMaybe: Paginate(
+      Match(Index("smsVerifiersByUser"), "auth0|5f4a9ce8e9ef5f0067b5aa9f"),
+      { size: 1 }
+    ),
+  },
+  If(
+    IsEmpty(Var("verifiersMaybe")),
+    [],
+    Reduce(
+      Lambda(["acc", "item"], Var("item")),
+      null,
+      Select("data", Var("verifiersMaybe"))
+    )
+  )
+);
+```
+
+### Get UserMetadata for userId, and create one if one does not yet exist
+
+```javascript
+Let(
+  {
+    userMetadataMaybe: Paginate(
+      Match(Index("userMetadataForUser"), "auth0|5f4a9ce8e9ef5f0067b5aa9f"),
+      { size: 1 }
+    ),
+  },
+  If(
+    IsEmpty(Var("userMetadataMaybe")),
+    Create(Collection("UserMetadata"), {
+      data: {
+        userId: "auth0|5f4a9ce8e9ef5f0067b5aa9f",
+      },
+    }),
+    Reduce(
+      Lambda(["acc", "item"], Get(Var("item"))),
+      null,
+      Select("data", Var("userMetadataMaybe"))
+    )
+  )
+);
+```
+
+### Update UserMetadata with verified phone number
+
+`userMetdata: Let({})` function is stolen from above example
+
+```javascript
+Let(
+  {
+    userMetadata: Let(
+      {
+        userMetadataMaybe: Paginate(
+          Match(Index("userMetadataForUser"), "auth0|5f4a9ce8e9ef5f0067b5aa9f"),
+          { size: 1 }
+        ),
+      },
+      If(
+        IsEmpty(Var("userMetadataMaybe")),
+        Create(Collection("UserMetadata"), {
+          data: {
+            userId: "auth0|5f4a9ce8e9ef5f0067b5aa9f",
+          },
+        }),
+        Reduce(
+          Lambda(["acc", "item"], Get(Var("item"))),
+          null,
+          Select("data", Var("userMetadataMaybe"))
+        )
+      )
+    ),
+  },
+  Update(Select("ref", Var("userMetadata")), {
+    data: {
+      number: 9089671305,
+    },
+  })
+);
+```

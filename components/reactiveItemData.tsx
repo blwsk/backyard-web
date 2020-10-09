@@ -109,7 +109,6 @@ const Controls = ({
   showClips,
   content,
   data,
-  url,
   itemId,
 }) => {
   const [showSelectList, updateShowSelectList] = useState(false);
@@ -193,8 +192,8 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
 
   const [showClips, updateShowClips] = useState(false);
 
-  const onShowClips = useCallback(() => updateShowClips(true));
-  const onShowContent = useCallback(() => updateShowClips(false));
+  const onShowClips = () => updateShowClips(true);
+  const onShowContent = () => updateShowClips(false);
 
   const { hostname } = getHostname(url);
 
@@ -212,9 +211,6 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
             url={url}
             data={data}
             content={content}
-            onShowContent={onShowContent}
-            onShowClips={onShowClips}
-            showClips={showClips}
           />
         )}
         <div
@@ -228,8 +224,6 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
         </div>
         {hostname && (
           <Controls
-            hostname={hostname}
-            url={url}
             data={data}
             content={content}
             onShowContent={onShowContent}

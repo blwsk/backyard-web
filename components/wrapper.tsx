@@ -1,6 +1,6 @@
 import React from "react";
 
-const Wrapper = ({ children, align }) => {
+const Wrapper = ({ children, align = undefined }) => {
   return (
     <div
       style={{

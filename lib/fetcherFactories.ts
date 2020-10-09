@@ -16,7 +16,13 @@ const getBaseUrl = () => {
 };
 
 const fetcherBase = (path, options) => {
-  return fetch(`${getBaseUrl()}${path}`, options);
+  return fetch(`${getBaseUrl()}${path}`, options).then((res) => {
+    if (res.status >= 400) {
+      return Promise.reject(res);
+    } else {
+      return res;
+    }
+  });
 };
 
 const absolutePathFetcher = fetch;
@@ -30,7 +36,7 @@ export const jsonFetcherFactory = ({
 }) => (path, options = {}) => {
   const fetcherFn = absolutePath ? absolutePathFetcher : fetcherBase;
 
-  const optionsToPass = {
+  const optionsToPass: any = {
     ...options,
     ...factoryFunctionOptions,
   };
@@ -43,7 +49,7 @@ export const jsonFetcherFactory = ({
           ...(optionsToPass.headers ? optionsToPass.headers : {}),
           Authorization: `Bearer ${token}`,
         },
-      });
+      }).catch((e) => Promise.reject(e));
     })
     .then(jsonParser);
 };

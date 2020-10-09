@@ -5,6 +5,11 @@ const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
+type RequestBody = {
+  itemId?: string;
+  text?: string;
+};
+
 const createTextSelection = authedEndpoint(
   async (req, res, { user, err: userErr }) => {
     if (req.method !== "POST") {
@@ -20,7 +25,7 @@ const createTextSelection = authedEndpoint(
       return;
     }
 
-    let bodyObject = {};
+    let bodyObject: RequestBody = {};
 
     try {
       bodyObject = JSON.parse(req.body);

@@ -1,7 +1,6 @@
 import { withRouter } from "next/router";
 import Header from "../components/header";
 import Data from "../components/data";
-import { validURL } from "../lib/urls";
 import Wrapper from "../components/wrapper";
 
 const Viewer = ({ router }) => {

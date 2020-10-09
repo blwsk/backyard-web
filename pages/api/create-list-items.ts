@@ -6,6 +6,11 @@ const { FAUNADB_SECRET: secret } = process.env;
 
 const client = new faunadb.Client({ secret });
 
+type RequestBody = {
+  ids?: string[];
+  listId?: string;
+};
+
 const createListItems = authedEndpoint(
   async (req, res, { user, err: userErr }) => {
     if (req.method !== "POST") {
@@ -21,7 +26,7 @@ const createListItems = authedEndpoint(
       return;
     }
 
-    let bodyObject = {};
+    let bodyObject: RequestBody = {};
 
     try {
       bodyObject = JSON.parse(req.body);

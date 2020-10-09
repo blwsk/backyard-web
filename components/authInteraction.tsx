@@ -1,10 +1,17 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { withRouter } from "next/router";
+import { withRouter, NextRouter } from "next/router";
 import LogoutButton from "./logoutButton";
 import LoginButton from "./loginButton";
+import Link from "next/link";
 
-const AuthInteraction = ({ className, style, router }) => {
+type Props = {
+  className?: string;
+  style?: CSSProperties;
+  router?: NextRouter;
+};
+
+const AuthInteraction = ({ className, style, router }: Props) => {
   const { user, isAuthenticated } = useAuth0();
 
   return (
@@ -12,10 +19,14 @@ const AuthInteraction = ({ className, style, router }) => {
       {isAuthenticated ? (
         <span className="wrapper">
           <LogoutButton />
-          <small>{user.email}</small>
+          <small>
+            <Link href="/settings">
+              <a className="color-black">{user.email}</a>
+            </Link>
+          </small>
         </span>
       ) : (
-        <LoginButton redirectTo={router.asPath} />
+        <LoginButton />
       )}
       <style jsx>{`
         .wrapper small {

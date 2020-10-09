@@ -1,5 +1,4 @@
 import { mutate } from "swr";
-import { useCallback } from "react";
 import gql from "gql-tag";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { gqlFetcherFactory } from "../lib/fetcherFactories";
@@ -27,11 +26,11 @@ const Data = ({ itemId }) => {
     }
   `;
 
-  const { data, error, isValidating } = useAuthedSWR(query, gqlFetcherFactory);
+  const { data } = useAuthedSWR(query, gqlFetcherFactory);
 
-  const invalidateQuery = useCallback(() => {
+  const invalidateQuery = () => {
     mutate(query);
-  });
+  };
 
   if (!data) {
     return <div>Loading...</div>;
