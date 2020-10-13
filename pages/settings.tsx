@@ -176,7 +176,7 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
           <input
             type="text"
             id="email"
-            style={{ marginTop: 8, marginRight: 8 }}
+            style={{ marginTop: 8, marginRight: 8, width: "100%" }}
             readOnly
             value={emailIngestAddress}
           />

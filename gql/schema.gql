@@ -52,6 +52,10 @@ type SmsVerifierPinSet {
   userId: String!
 }
 
+type ReceivedEmailBlobsV1 {
+  json: String
+}
+
 type Query {
   allItems: [Item!]
 
