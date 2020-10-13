@@ -6,7 +6,27 @@ import { getTweetIdFromUrl } from "../lib/tweetIdFromUrl";
 
 const TCO_PATTERN = /https:\/\/t.co\/[0-9a-zA-Z]\w+/g;
 
-const getTweetData = ({ data, tweetJson }) => {
+interface TwitterUser {
+  id: string;
+  name: string;
+  username: string;
+}
+
+interface Tweet {
+  author_id: string;
+  id: string;
+  created_at: string;
+}
+
+interface TweetData {
+  data: Tweet[];
+  includes: {
+    media: any[];
+    users: TwitterUser[];
+  };
+}
+
+const getTweetData = ({ data, tweetJson }): TweetData => {
   if (tweetJson) {
     return tweetJson;
   }
@@ -31,7 +51,14 @@ const TweetTextWithMedia = ({ tweet, media }) => {
   return <pre className="tweet-text">{joinedWithMedia}</pre>;
 };
 
-const Tweet = ({ data, tweetJson }) => {
+interface Props {
+  data: {
+    tweets: TweetData;
+  };
+  tweetJson: TweetData;
+}
+
+const Tweet = ({ data, tweetJson }: Props) => {
   const {
     data: tweets,
     includes: { media, users },
@@ -40,7 +67,9 @@ const Tweet = ({ data, tweetJson }) => {
   return (
     <div>
       {tweets.map((t) => {
-        const author = users.reduce((acc, u) => u.id === t.author_id);
+        const author: TwitterUser = users.reduce((acc, u: TwitterUser) =>
+          u.id === t.author_id ? u : acc
+        );
 
         return (
           <div key={t.id} className="tweet">
@@ -92,7 +121,7 @@ const TweetEmbed = ({ url, content: persistedTweetData }) => {
     void error;
   }
 
-  const { data, error, isValidating } = useAuthedSWR(() => {
+  const { data } = useAuthedSWR(() => {
     if (tweetJson || !id) {
       throw new Error("purposefully throw to skip fetch");
     }

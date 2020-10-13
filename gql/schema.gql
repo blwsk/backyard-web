@@ -40,6 +40,7 @@ type TextSelectionCount {
 }
 
 type UserMetadata {
+  emailIngestAddress: String
   phoneNumber: String
   userId: String!
 }

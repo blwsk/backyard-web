@@ -6,11 +6,13 @@ import { jsonFetcherFactory, gqlFetcherFactory } from "../lib/fetcherFactories";
 import requireAuth from "../lib/requireAuth";
 import gql from "gql-tag";
 import { mutate } from "swr";
+import { PhoneNumber } from "twilio/lib/interfaces";
 
 const userMetadataQuery = gql`
   query UserMetadataForUser($userId: String!) {
     userMetadataForUser(userId: $userId) {
       phoneNumber
+      emailIngestAddress
     }
   }
 `;
@@ -48,10 +50,6 @@ const ValidatePhoneNumber = () => {
 
   return (
     <div>
-      <label htmlFor="phone">
-        <b>Phone number</b>
-      </label>
-      <br />
       <input
         type="text"
         id="phone"
@@ -123,21 +121,19 @@ const ValidatePhoneNumber = () => {
   );
 };
 
-const SettingsForm = ({ data }) => {
-  const {
-    userMetadataForUser: { phoneNumber },
-  } = data.data;
+type PhoneNumberProps = {
+  phoneNumber: PhoneNumber | null;
+};
 
+const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
   return (
-    <div>
-      {phoneNumber ? (
-        <div>
-          <label htmlFor="phone">
-            <b>Phone number</b>
-            <br />
-            <small>(verified ✅)</small>
-          </label>
-          <br />
+    <div className="well">
+      <label htmlFor="phone">
+        <h4>Save content via SMS</h4>
+        <div>(verified ✅)</div>
+      </label>
+      <div className="p-top-4">
+        {phoneNumber ? (
           <input
             type="text"
             id="phone"
@@ -145,10 +141,66 @@ const SettingsForm = ({ data }) => {
             readOnly
             value={phoneNumber}
           />
+        ) : (
+          <ValidatePhoneNumber />
+        )}
+      </div>
+    </div>
+  );
+};
+
+const CreateEmailIngestAddress = () => {
+  return (
+    <div>
+      <button>Create</button>
+    </div>
+  );
+};
+
+type EmailIngestProps = {
+  emailIngestAddress: string | null;
+};
+
+const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
+  return (
+    <div className="well">
+      <label htmlFor="email">
+        <h4>Add content with email</h4>
+        <div>
+          Create an email address to use when subscribing to newsletters. New
+          posts will automatically be added.
         </div>
-      ) : (
-        <ValidatePhoneNumber />
-      )}
+      </label>
+      <div className="p-top-4">
+        {emailIngestAddress ? (
+          <input
+            type="text"
+            id="email"
+            style={{ marginTop: 8, marginRight: 8 }}
+            readOnly
+            value={emailIngestAddress}
+          />
+        ) : (
+          <CreateEmailIngestAddress />
+        )}
+      </div>
+    </div>
+  );
+};
+
+const SettingsForm = ({ data }) => {
+  const {
+    userMetadataForUser: { phoneNumber, emailIngestAddress },
+  } = data.data;
+
+  return (
+    <div>
+      <div className="m-bottom-6">
+        <PhoneNumberSetting phoneNumber={phoneNumber} />
+      </div>
+      <div className="m-bottom-6">
+        <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
+      </div>
     </div>
   );
 };

@@ -73,7 +73,7 @@ const H3 = ({ data, content }) => {
   if (!contentObj) {
     return <h3>Loading...</h3>;
   }
-  return <h3>{contentObj.metaDescription}</h3>;
+  return <h3 className="line-clamp-3">{contentObj.metaDescription}</h3>;
 };
 
 const Metadata = ({ hostname, url, data, content }) => {

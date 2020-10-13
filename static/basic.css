@@ -244,6 +244,12 @@ article:last-child {
   margin-top: 16px;
   margin-bottom: 16px;
 }
+.m-bottom-4 {
+  margin-bottom: 16px;
+}
+.m-bottom-6 {
+  margin-bottom: 24px;
+}
 .p-all-1 {
   padding: 4px;
 }
@@ -260,6 +266,13 @@ article:last-child {
 .p-y-3 {
   padding-top: 12px;
   padding-bottom: 12px;
+}
+.p-y-4 {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.p-top-4 {
+  padding-top: 16px;
 }
 
 .column {
@@ -358,4 +371,22 @@ h6 {
 .list-item.light,
 .list-item.light a {
   color: var(--white);
+}
+
+.well {
+  background-color: var(--c8);
+  padding: 16px;
+  border-radius: var(--rc);
+  width: 100%;
+}
+
+.well input {
+  background-color: var(--c4);
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

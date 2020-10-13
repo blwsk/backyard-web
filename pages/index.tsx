@@ -72,14 +72,7 @@ const Index = ({ router }) => {
           )}
         </div>
         <br />
-        <div
-          style={{
-            background: "var(--c8)",
-            padding: 16,
-            borderRadius: 8,
-            width: "100%",
-          }}
-        >
+        <div className="well">
           <h3>Other ways to save</h3>
           <ul>
             <li>
