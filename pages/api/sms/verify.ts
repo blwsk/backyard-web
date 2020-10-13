@@ -1,6 +1,7 @@
 import twilio from "twilio";
 import authedEndpoint from "../../../api-utils/authedEndpoint";
 import faunadb, { query as q } from "faunadb";
+import { TWILIO_PHONE_NUMBER } from "../../../lib/twilioConstants";
 
 const {
   TWILIO_ACCOUNT_SID: accountSid,
@@ -93,7 +94,7 @@ const verifyPhoneNumber = authedEndpoint(
     try {
       await twilioClient.messages.create({
         body: `Your pin is ${pin}`,
-        from: "+12109039615",
+        from: `+1${TWILIO_PHONE_NUMBER}`,
         to: `+1${phoneNumber}`,
       });
 

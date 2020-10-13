@@ -7,6 +7,7 @@ import requireAuth from "../lib/requireAuth";
 import gql from "gql-tag";
 import { mutate } from "swr";
 import { PhoneNumber } from "twilio/lib/interfaces";
+import { TWILIO_PHONE_NUMBER } from "../lib/twilioConstants";
 
 const userMetadataQuery = gql`
   query UserMetadataForUser($userId: String!) {
@@ -57,6 +58,7 @@ const ValidatePhoneNumber = () => {
         value={phoneValue}
         onChange={(e) => updatePhoneValue(e.target.value)}
         disabled={hasSentPin || error}
+        placeholder="1234567890"
       />
       <button
         onClick={() => {
@@ -130,7 +132,25 @@ const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
     <div className="well">
       <label htmlFor="phone">
         <h4>Save content via SMS</h4>
-        <div>(verified ✅)</div>
+        {phoneNumber ? (
+          <div>
+            <span>
+              Your phone number is verified ✅. Send messages to the Backyard
+              phone number{", "}
+            </span>
+            <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>
+            <span>{", to add content."}</span>
+          </div>
+        ) : (
+          <div>
+            <span>
+              Verify your phone number, then send messages to the Backyard phone
+              number{", "}
+            </span>
+            <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>
+            <span>{", to add content."}</span>
+          </div>
+        )}
       </label>
       <div className="p-top-4">
         {phoneNumber ? (
