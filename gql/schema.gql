@@ -41,6 +41,7 @@ type TextSelectionCount {
 
 type UserMetadata {
   emailIngestAddress: String
+  emailIngestWebhookId: String
   phoneNumber: String
   userId: String!
 }

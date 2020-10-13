@@ -95,7 +95,7 @@ const ValidatePhoneNumber = () => {
                     /**
                      * Refresh userMetadata query after 2 seconds
                      */
-                    setTimeout(() => mutate(userMetadataQuery), 2000);
+                    setTimeout(() => mutate(userMetadataQuery), 1000);
                   })
                   .catch((err) => {
                     void err;
@@ -150,9 +150,46 @@ const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
 };
 
 const CreateEmailIngestAddress = () => {
+  const [loading, updateLoading] = useState(false);
+  const [success, updateSuccess] = useState(false);
+  const [error, updateError] = useState(false);
+
+  const doCreate = useAuthedCallback(
+    "/api/email/create",
+    {
+      method: "POST",
+    },
+    jsonFetcherFactory
+  );
+
   return (
     <div>
-      <button>Create</button>
+      <button
+        style={{ marginRight: 8 }}
+        onClick={() => {
+          updateLoading(true);
+          doCreate()
+            .then((res) => {
+              updateLoading(false);
+
+              updateSuccess(true);
+
+              setTimeout(() => mutate(userMetadataQuery), 1000);
+            })
+            .catch((err) => {
+              void err;
+
+              updateLoading(false);
+
+              updateError(true);
+            });
+        }}
+      >
+        Create
+      </button>
+      {loading && <span>Loading...</span>}
+      {success && <span>Sucess ✅</span>}
+      {error && <span className="color-red">Error ❌</span>}
     </div>
   );
 };
