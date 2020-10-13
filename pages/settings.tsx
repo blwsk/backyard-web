@@ -6,11 +6,14 @@ import { jsonFetcherFactory, gqlFetcherFactory } from "../lib/fetcherFactories";
 import requireAuth from "../lib/requireAuth";
 import gql from "gql-tag";
 import { mutate } from "swr";
+import { PhoneNumber } from "twilio/lib/interfaces";
+import { TWILIO_PHONE_NUMBER } from "../lib/twilioConstants";
 
 const userMetadataQuery = gql`
   query UserMetadataForUser($userId: String!) {
     userMetadataForUser(userId: $userId) {
       phoneNumber
+      emailIngestAddress
     }
   }
 `;
@@ -48,10 +51,6 @@ const ValidatePhoneNumber = () => {
 
   return (
     <div>
-      <label htmlFor="phone">
-        <b>Phone number</b>
-      </label>
-      <br />
       <input
         type="text"
         id="phone"
@@ -59,6 +58,7 @@ const ValidatePhoneNumber = () => {
         value={phoneValue}
         onChange={(e) => updatePhoneValue(e.target.value)}
         disabled={hasSentPin || error}
+        placeholder="1234567890"
       />
       <button
         onClick={() => {
@@ -97,7 +97,7 @@ const ValidatePhoneNumber = () => {
                     /**
                      * Refresh userMetadata query after 2 seconds
                      */
-                    setTimeout(() => mutate(userMetadataQuery), 2000);
+                    setTimeout(() => mutate(userMetadataQuery), 1000);
                   })
                   .catch((err) => {
                     void err;
@@ -123,21 +123,37 @@ const ValidatePhoneNumber = () => {
   );
 };
 
-const SettingsForm = ({ data }) => {
-  const {
-    userMetadataForUser: { phoneNumber },
-  } = data.data;
+type PhoneNumberProps = {
+  phoneNumber: PhoneNumber | null;
+};
 
+const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
   return (
-    <div>
-      {phoneNumber ? (
-        <div>
-          <label htmlFor="phone">
-            <b>Phone number</b>
-            <br />
-            <small>(verified ✅)</small>
-          </label>
-          <br />
+    <div className="well">
+      <label htmlFor="phone">
+        <h4>Save content via SMS</h4>
+        {phoneNumber ? (
+          <div>
+            <span>
+              Your phone number is verified ✅. Send messages to the Backyard
+              phone number{", "}
+            </span>
+            <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>
+            <span>{", to add content."}</span>
+          </div>
+        ) : (
+          <div>
+            <span>
+              Verify your phone number, then send messages to the Backyard phone
+              number{", "}
+            </span>
+            <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>
+            <span>{", to add content."}</span>
+          </div>
+        )}
+      </label>
+      <div className="p-top-4">
+        {phoneNumber ? (
           <input
             type="text"
             id="phone"
@@ -145,10 +161,103 @@ const SettingsForm = ({ data }) => {
             readOnly
             value={phoneNumber}
           />
+        ) : (
+          <ValidatePhoneNumber />
+        )}
+      </div>
+    </div>
+  );
+};
+
+const CreateEmailIngestAddress = () => {
+  const [loading, updateLoading] = useState(false);
+  const [success, updateSuccess] = useState(false);
+  const [error, updateError] = useState(false);
+
+  const doCreate = useAuthedCallback(
+    "/api/email/create",
+    {
+      method: "POST",
+    },
+    jsonFetcherFactory
+  );
+
+  return (
+    <div>
+      <button
+        style={{ marginRight: 8 }}
+        onClick={() => {
+          updateLoading(true);
+          doCreate()
+            .then((res) => {
+              updateLoading(false);
+
+              updateSuccess(true);
+
+              setTimeout(() => mutate(userMetadataQuery), 1000);
+            })
+            .catch((err) => {
+              void err;
+
+              updateLoading(false);
+
+              updateError(true);
+            });
+        }}
+      >
+        Create
+      </button>
+      {loading && <span>Loading...</span>}
+      {success && <span>Sucess ✅</span>}
+      {error && <span className="color-red">Error ❌</span>}
+    </div>
+  );
+};
+
+type EmailIngestProps = {
+  emailIngestAddress: string | null;
+};
+
+const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
+  return (
+    <div className="well">
+      <label htmlFor="email">
+        <h4>Add content with email</h4>
+        <div>
+          Create an email address to use when subscribing to newsletters. New
+          posts will automatically be added.
         </div>
-      ) : (
-        <ValidatePhoneNumber />
-      )}
+      </label>
+      <div className="p-top-4">
+        {emailIngestAddress ? (
+          <input
+            type="text"
+            id="email"
+            style={{ marginTop: 8, marginRight: 8, width: "100%" }}
+            readOnly
+            value={emailIngestAddress}
+          />
+        ) : (
+          <CreateEmailIngestAddress />
+        )}
+      </div>
+    </div>
+  );
+};
+
+const SettingsForm = ({ data }) => {
+  const {
+    userMetadataForUser: { phoneNumber, emailIngestAddress },
+  } = data.data;
+
+  return (
+    <div>
+      <div className="m-bottom-6">
+        <PhoneNumberSetting phoneNumber={phoneNumber} />
+      </div>
+      <div className="m-bottom-6">
+        <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
+      </div>
     </div>
   );
 };

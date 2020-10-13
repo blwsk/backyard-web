@@ -1,5 +1,6 @@
 import authedEndpoint from "../../../api-utils/authedEndpoint";
 import faunadb, { query as q } from "faunadb";
+import { UserMetadataUpdate } from "../../../api-utils/updateUserMetadata";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
@@ -101,6 +102,10 @@ const confirmPin = authedEndpoint(async (req, res, { user, err: userErr }) => {
    * Woohoo! We've validated the phone number. Time to record it in our DB as "verified".
    */
 
+  const userMetadataUpdate: UserMetadataUpdate = {
+    phoneNumber,
+  };
+
   let updateUserMetadataResult;
   let updateUserMetadataError;
   try {
@@ -130,9 +135,7 @@ const confirmPin = authedEndpoint(async (req, res, { user, err: userErr }) => {
           ),
         },
         q.Update(q.Select("ref", q.Var("userMetadata")), {
-          data: {
-            phoneNumber,
-          },
+          data: userMetadataUpdate,
         })
       )
     );

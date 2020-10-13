@@ -1,12 +1,16 @@
 import { useRef, useEffect, useState, MutableRefObject } from "react";
 import { debounce } from "../lib/debounce";
 
-const getVideoIdFromUrl = (url) => {
+const getVideoIdFromUrl = (url: string): string => {
   const urlObj = new URL(url);
   return urlObj.searchParams.get("v");
 };
 
-const YouTubeEmbed = ({ url }) => {
+type Props = {
+  url: string;
+};
+
+const YouTubeEmbed = ({ url }: Props) => {
   const ref: MutableRefObject<any> = useRef({ offsetWidth: undefined });
   const videoId = getVideoIdFromUrl(url);
   const [height, updateHeight] = useState(null);

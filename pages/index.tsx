@@ -3,6 +3,7 @@ import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import { withRouter } from "next/router";
 import { validURL } from "../lib/urls";
+import { TWILIO_PHONE_NUMBER } from "../lib/twilioConstants";
 
 const Index = ({ router }) => {
   const [value, updater] = useState("");
@@ -72,14 +73,7 @@ const Index = ({ router }) => {
           )}
         </div>
         <br />
-        <div
-          style={{
-            background: "var(--c8)",
-            padding: 16,
-            borderRadius: 8,
-            width: "100%",
-          }}
-        >
+        <div className="well">
           <h3>Other ways to save</h3>
           <ul>
             <li>
@@ -98,7 +92,8 @@ const Index = ({ router }) => {
             </li>
             <li>
               Send links, images, files, and text to{" "}
-              <a href="tel:9089671305">9089671305</a> via SMS 🔜
+              <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>{" "}
+              via SMS 🔜
             </li>
             <li>Drag-and-drop a file to upload it 🆕</li>
           </ul>

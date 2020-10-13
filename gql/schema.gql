@@ -40,6 +40,8 @@ type TextSelectionCount {
 }
 
 type UserMetadata {
+  emailIngestAddress: String
+  emailIngestWebhookId: String
   phoneNumber: String
   userId: String!
 }
@@ -49,6 +51,10 @@ type SmsVerifierPinSet {
   number: Int!
   pin: String!
   userId: String!
+}
+
+type ReceivedEmailBlobsV1 {
+  json: String
 }
 
 type Query {

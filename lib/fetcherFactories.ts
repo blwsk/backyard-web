@@ -12,10 +12,11 @@ const getBaseUrl = () => {
     isProcessDev || isBrowserDev
       ? `${window.location.protocol}//${window.location.host}`
       : "https://backyard.vercel.app";
+
   return baseUrl;
 };
 
-const fetcherBase = (path, options) => {
+const fetcherBase = (path: string, options: object): Promise<Response> => {
   return fetch(`${getBaseUrl()}${path}`, options).then((res) => {
     if (res.status >= 400) {
       return Promise.reject(res);
@@ -25,15 +26,32 @@ const fetcherBase = (path, options) => {
   });
 };
 
-const absolutePathFetcher = fetch;
+const absolutePathFetcher = (
+  path: string,
+  options: object
+): Promise<Response> => {
+  return fetch(path, options).then((res) => {
+    if (res.status >= 400) {
+      return Promise.reject(res);
+    } else {
+      return res;
+    }
+  });
+};
 
-const jsonParser = (res) => res.json();
+const jsonParser = (res: Response): Promise<object> => res.json();
+
+interface JsonFetcherFactoryProps {
+  getAccessTokenSilently: Function;
+  absolutePath: boolean;
+  options?: object;
+}
 
 export const jsonFetcherFactory = ({
   getAccessTokenSilently,
   absolutePath = false,
   options: factoryFunctionOptions = {},
-}) => (path, options = {}) => {
+}: JsonFetcherFactoryProps) => (path, options = {}) => {
   const fetcherFn = absolutePath ? absolutePathFetcher : fetcherBase;
 
   const optionsToPass: any = {
@@ -42,40 +60,55 @@ export const jsonFetcherFactory = ({
   };
 
   return getAccessTokenSilently()
-    .then((token) => {
-      return fetcherFn(path, {
-        ...optionsToPass,
-        headers: {
-          ...(optionsToPass.headers ? optionsToPass.headers : {}),
-          Authorization: `Bearer ${token}`,
-        },
-      }).catch((e) => Promise.reject(e));
-    })
+    .then(
+      (token: string): Promise<Response> => {
+        return fetcherFn(path, {
+          ...optionsToPass,
+          headers: {
+            ...(optionsToPass.headers ? optionsToPass.headers : {}),
+            Authorization: `Bearer ${token}`,
+          },
+        }).catch((e) => Promise.reject(e));
+      }
+    )
     .then(jsonParser);
 };
+
+interface GqlResponseJson {
+  data: object;
+  errors?: object[];
+}
 
 export const gqlFetcherFactory = ({ getAccessTokenSilently, options = {} }) => (
   query
 ) => {
   return getAccessTokenSilently()
-    .then((token) => {
-      return fetch(`${getBaseUrl()}/api/graphql`, {
-        ...options,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          query,
-        }),
-      });
-    })
-    .then(jsonParser)
-    .then((res) => {
-      if (res && res.errors && res.errors.length > 0) {
-        return Promise.reject(res);
+    .then(
+      (token: string): Promise<Response> => {
+        return fetch(`${getBaseUrl()}/api/graphql`, {
+          ...options,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            query,
+          }),
+        });
       }
-      return res;
-    });
+    )
+    .then(jsonParser)
+    .then(
+      (gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
+        if (
+          gqlResponse &&
+          gqlResponse.errors &&
+          gqlResponse.errors.length > 0
+        ) {
+          return Promise.reject(gqlResponse);
+        }
+        return Promise.resolve(gqlResponse);
+      }
+    );
 };
