@@ -14,7 +14,7 @@ export const useAuthedSWR = (key, fetcherFactory, options = {}) => {
   const result = useSWR(
     key,
     fetcherFactory({ getAccessTokenSilently, options }),
-    { revalidateOnFocus: false }
+    { revalidateOnFocus: false, refreshInterval: 60 * 60 * 1000 }
   );
 
   return result;
