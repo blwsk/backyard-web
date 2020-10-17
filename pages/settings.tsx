@@ -262,6 +262,34 @@ const SettingsForm = ({ data }) => {
   );
 };
 
+const Guide = () => (
+  <div className="well">
+    <h3>Other ways to save</h3>
+    <ul>
+      <li>
+        <span style={{ marginRight: 8 }}>
+          Drag this bookmarklet onto your bookmark bar:
+        </span>
+        <span
+          dangerouslySetInnerHTML={{
+            __html: `
+        <a  href="javascript:(function hey(){ window.open('https://backyard-web.blwsk.vercel.app/save?url=' + encodeURIComponent(window.location.href), '_blank'); })()">
+          <pre style="display:inline;">Save</pre>
+        </a>
+      `,
+          }}
+        />
+      </li>
+      <li>
+        Send links, images, files, and text to{" "}
+        <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a> via SMS
+        🔜
+      </li>
+      <li>Drag-and-drop a file to upload it 🆕</li>
+    </ul>
+  </div>
+);
+
 const Settings = () => {
   const { data, error, isValidating } = useAuthedSWR(
     userMetadataQuery,
@@ -276,6 +304,7 @@ const Settings = () => {
       <Wrapper>
         <h1>Settings</h1>
         {data && <SettingsForm data={data} />}
+        <Guide />
       </Wrapper>
     </div>
   );

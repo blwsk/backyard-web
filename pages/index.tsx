@@ -1,11 +1,13 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useState } from "react";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import { withRouter } from "next/router";
 import { validURL } from "../lib/urls";
-import { TWILIO_PHONE_NUMBER } from "../lib/twilioConstants";
+import requireAuth from "../lib/requireAuth";
 
-const Index = ({ router }) => {
+const NoAuthComponent = () => null;
+
+const SaveBar = withRouter(({ router }) => {
   const [value, updater] = useState("");
   const [focused, updateFocused] = useState(false);
 
@@ -36,71 +38,56 @@ const Index = ({ router }) => {
   };
 
   return (
+    <div
+      style={{
+        width: "100%",
+        textAlign: "center",
+      }}
+    >
+      <input
+        className={inputError ? "error" : ""}
+        style={{
+          width: `100%`,
+          marginBottom: 16,
+        }}
+        type="text"
+        placeholder="https://url-you-want-to-save.com"
+        value={value}
+        onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
+      />
+      {(value || focused) && (
+        <button
+          style={{ margin: 0 }}
+          onClick={onSave}
+          disabled={!isValidUrl}
+          title={inputError ? "URL is invalid" : undefined}
+        >
+          Save
+        </button>
+      )}
+    </div>
+  );
+});
+
+const RecentContent = requireAuth(() => {
+  return null;
+}, NoAuthComponent);
+
+const Index = () => {
+  return (
     <div>
       <Header />
       <Wrapper align="center">
         <h1>Backyard</h1>
         <br />
-        <div
-          style={{
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          <input
-            className={inputError ? "error" : ""}
-            style={{
-              width: `100%`,
-              marginBottom: 16,
-            }}
-            type="text"
-            placeholder="https://url-you-want-to-save.com"
-            value={value}
-            onChange={onChange}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            onKeyDown={onKeyDown}
-          />
-          {(value || focused) && (
-            <button
-              style={{ margin: 0 }}
-              onClick={onSave}
-              disabled={!isValidUrl}
-              title={inputError ? "URL is invalid" : undefined}
-            >
-              Save
-            </button>
-          )}
-        </div>
-        <br />
-        <div className="well">
-          <h3>Other ways to save</h3>
-          <ul>
-            <li>
-              <span style={{ marginRight: 8 }}>
-                Drag this bookmarklet onto your bookmark bar:
-              </span>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: `
-                  <a  href="javascript:(function hey(){ window.open('https://backyard-web.blwsk.vercel.app/save?url=' + encodeURIComponent(window.location.href), '_blank'); })()">
-                    <pre style="display:inline;">Save</pre>
-                  </a>
-                `,
-                }}
-              />
-            </li>
-            <li>
-              Send links, images, files, and text to{" "}
-              <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>{" "}
-              via SMS 🔜
-            </li>
-            <li>Drag-and-drop a file to upload it 🆕</li>
-          </ul>
-        </div>
+        <SaveBar />
+        <RecentContent />
       </Wrapper>
     </div>
   );
 };
 
-export default withRouter(Index);
+export default Index;
