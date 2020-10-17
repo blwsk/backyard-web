@@ -1,80 +1,47 @@
-import React, { useState } from "react";
+import React from "react";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
-import { withRouter } from "next/router";
-import { validURL } from "../lib/urls";
 import requireAuth from "../lib/requireAuth";
+import {
+  usePaginatedContentList,
+  getResultObject,
+} from "../lib/usePaginatedContentList";
+import { SaveBar } from "../components/saveBar";
+import ContentPageItem from "../components/contentPageItem";
 
-const NoAuthComponent = () => null;
+const MOST_RECENT_ITEM_LIMIT = 5;
 
-const SaveBar = withRouter(({ router }) => {
-  const [value, updater] = useState("");
-  const [focused, updateFocused] = useState(false);
+const RecentContent = () => {
+  const { data } = usePaginatedContentList({ cursor: null });
 
-  const onChange = (e) => {
-    updater(e.target.value);
-  };
+  if (!data) {
+    return null;
+  }
 
-  const onSave = () => {
-    router.push(`/save?url=${encodeURI(value)}`);
-  };
+  const resultObject = getResultObject(data.data);
 
-  const isValidUrl = validURL(value);
-
-  const inputError = !isValidUrl && value.length > 0 && !focused;
-
-  const onFocus = () => {
-    updateFocused(true);
-  };
-
-  const onBlur = () => {
-    updateFocused(false);
-  };
-
-  const onKeyDown = (e) => {
-    if (e.keyCode === 13) {
-      onSave();
-    }
-  };
+  const mostRecentContentItems = resultObject.data.slice(
+    0,
+    MOST_RECENT_ITEM_LIMIT
+  );
 
   return (
-    <div
-      style={{
-        width: "100%",
-        textAlign: "center",
-      }}
-    >
-      <input
-        className={inputError ? "error" : ""}
-        style={{
-          width: `100%`,
-          marginBottom: 16,
-        }}
-        type="text"
-        placeholder="https://url-you-want-to-save.com"
-        value={value}
-        onChange={onChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onKeyDown={onKeyDown}
-      />
-      {(value || focused) && (
-        <button
-          style={{ margin: 0 }}
-          onClick={onSave}
-          disabled={!isValidUrl}
-          title={inputError ? "URL is invalid" : undefined}
-        >
-          Save
-        </button>
+    <div>
+      <h3>Recent content</h3>
+      {mostRecentContentItems.length > 0 ? (
+        mostRecentContentItems.map((item) => {
+          return <ContentPageItem key={item._id} item={item} />;
+        })
+      ) : (
+        <div>None! Save some content.</div>
       )}
     </div>
   );
-});
+};
 
-const RecentContent = requireAuth(() => {
-  return null;
-}, NoAuthComponent);
+const NoAuthComponent = () => null;
+
+const RecentContentWithAuth = requireAuth(RecentContent, NoAuthComponent);
 
 const Index = () => {
   return (
@@ -84,7 +51,9 @@ const Index = () => {
         <h1>Backyard</h1>
         <br />
         <SaveBar />
-        <RecentContent />
+      </Wrapper>
+      <Wrapper>
+        <RecentContentWithAuth />
       </Wrapper>
     </div>
   );
