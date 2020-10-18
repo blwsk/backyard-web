@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import Header from "../components/header";
-import Wrapper from "../components/wrapper";
 import { withRouter } from "next/router";
 import { validURL } from "../lib/urls";
-import requireAuth from "../lib/requireAuth";
 
 export const SaveBar = withRouter(({ router }) => {
   const [value, updater] = useState("");
@@ -36,36 +33,44 @@ export const SaveBar = withRouter(({ router }) => {
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        textAlign: "center",
-      }}
-    >
-      <input
-        className={inputError ? "error" : ""}
-        style={{
-          width: `100%`,
-          marginBottom: 16,
-        }}
-        type="text"
-        placeholder="https://url-you-want-to-save.com"
-        value={value}
-        onChange={onChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onKeyDown={onKeyDown}
-      />
-      {(value || focused) && (
-        <button
-          style={{ margin: 0 }}
-          onClick={onSave}
-          disabled={!isValidUrl}
-          title={inputError ? "URL is invalid" : undefined}
-        >
-          Save
-        </button>
-      )}
-    </div>
+    <>
+      <div className="save-bar">
+        <input
+          className={inputError ? "error" : ""}
+          style={{
+            width: `100%`,
+            marginBottom: 16,
+          }}
+          type="text"
+          placeholder="https://url-you-want-to-save.com"
+          value={value}
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onKeyDown={onKeyDown}
+        />
+        {(value || focused) && (
+          <button
+            style={{ margin: 0 }}
+            onClick={onSave}
+            disabled={!isValidUrl}
+            title={inputError ? "URL is invalid" : undefined}
+          >
+            Save
+          </button>
+        )}
+      </div>
+      <style jsx>{`
+        .save-bar {
+          width: 100%;
+          textalign: center;
+          height: 100px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+      `}</style>
+    </>
   );
 });

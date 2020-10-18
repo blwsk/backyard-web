@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import jwks, { JwksClient } from "jwks-rsa";
+import { NextApiRequest, NextApiResponse } from "next";
 
 const KEY_SET_URI = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/.well-known/jwks.json`;
 
@@ -7,6 +8,15 @@ const jwksClient: JwksClient = jwks({
   jwksUri: KEY_SET_URI,
   cache: true,
 });
+
+interface Auth0User {
+  sub: string;
+}
+
+interface UserBrief {
+  user?: Auth0User;
+  err?: Error;
+}
 
 const getTokenFromHeaderValue = (str) => {
   try {
@@ -21,7 +31,13 @@ const getTokenFromHeaderValue = (str) => {
   return;
 };
 
-const authedEndpoint = (endpointFn) => async (req, res) => {
+const authedEndpoint = (
+  endpointFn: (
+    req: NextApiRequest,
+    res: NextApiResponse,
+    userBrief: UserBrief
+  ) => void
+) => async (req, res) => {
   const { authorization: Authorization } = req.headers;
 
   const token = getTokenFromHeaderValue(Authorization);
@@ -54,7 +70,7 @@ const authedEndpoint = (endpointFn) => async (req, res) => {
     err = e;
   }
 
-  const user = await userinfoRes.json();
+  const user: Auth0User = await userinfoRes.json();
 
   return endpointFn(req, res, { user, err });
 };

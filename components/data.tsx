@@ -36,6 +36,16 @@ const Data = ({ itemId }) => {
     return <div>Loading...</div>;
   }
 
+  // 404
+  if (!data.data.findItemByID) {
+    return (
+      <div>
+        <h1>404</h1>
+        <p>{`We looked for item #${itemId}, but couldn't find it.`}</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <ReactiveItemData

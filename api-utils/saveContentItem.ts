@@ -48,7 +48,7 @@ const createItem = async (
   client: Client,
   url: string,
   contentJson: ContentJson,
-  user
+  userId
 ): Promise<CreatedItem> => {
   /**
    * - fetchTextContent returns `{ body, title, metaTitle, metaDescription }`
@@ -85,7 +85,7 @@ const createItem = async (
       q.Create(q.Collection("Item"), {
         data: {
           url,
-          createdBy: user.sub,
+          createdBy: userId,
           createdAt: Date.now(),
           content: itemContentResult.ref,
         },
@@ -126,7 +126,7 @@ interface SavedItemMetadata {
 export const saveContentItem = async (
   client: Client,
   url: string,
-  user: object
+  userId: string
 ): Promise<SavedItemMetadata> => {
   /**
    * If item exists, return it
@@ -173,7 +173,7 @@ export const saveContentItem = async (
     client,
     url,
     contentJson,
-    user
+    userId
   );
 
   if (itemError) {

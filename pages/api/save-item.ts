@@ -46,7 +46,7 @@ const saveItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
     return;
   }
 
-  const saveItemResultMetadata = await saveContentItem(client, url, user);
+  const saveItemResultMetadata = await saveContentItem(client, url, user.sub);
 
   const { message, result, error, alreadySaved } = saveItemResultMetadata;
 
