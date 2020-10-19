@@ -59,9 +59,17 @@ const receiveSms = async (req, res) => {
     )
   );
 
-  console.log(req.body);
-
   const url = validURL(Body) ? Body : null;
+
+  /**
+   *
+   * Next, we'll have to add env variables to tell Twilio which webhook to send the message to:
+   *
+   * Prod: backyard.wtf
+   * Staging: ...
+   * Dev: ngrok.io url
+   *
+   */
 
   if (url) {
     const { message, result } = await saveContentItem(faunaClient, url, userId);

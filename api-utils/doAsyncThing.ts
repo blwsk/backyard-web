@@ -1,6 +1,6 @@
 export const doAsyncThing = async (
   fn: Function
-): Promise<[any, Error, string]> => {
+): Promise<[any, Error | null, string]> => {
   let result = null;
   let error = null;
   let errorMessage = "";
