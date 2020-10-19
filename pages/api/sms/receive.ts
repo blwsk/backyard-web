@@ -69,6 +69,8 @@ const receiveSms = async (req, res) => {
    * Staging: ...
    * Dev: ngrok.io url
    *
+   * See https://github.com/blwsk/backyard-web/issues/34
+   *
    */
 
   if (url) {
