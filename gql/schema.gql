@@ -54,7 +54,13 @@ type SmsVerifierPinSet {
 }
 
 type ReceivedEmailBlobsV1 {
-  json: String
+  json: String!
+  userId: String!
+}
+
+type ReceivedSMSBlobsV1 {
+  json: String!
+  userId: String!
 }
 
 type Query {

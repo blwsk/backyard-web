@@ -1,4 +1,8 @@
-export const getTweetIdFromUrl = (url) => {
+interface TweetIdBrief {
+  id?: string;
+}
+
+export const getTweetIdFromUrl = (url: string): TweetIdBrief => {
   const urlObj = new URL(url);
   const pathname = urlObj.pathname;
   const pathnameParts = pathname.split("/");
@@ -8,5 +12,5 @@ export const getTweetIdFromUrl = (url) => {
     return { id: pathnameParts[statusIndex + 1] };
   }
 
-  return null;
+  return {};
 };

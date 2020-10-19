@@ -68,7 +68,7 @@ const DragAndDrop = ({ style = {}, children }: Props) => {
         onDragStart={onDragStart}
         onDragOver={onDragOver}
       >
-        <div className={isHovering ? "droppable" : undefined}>{children}</div>
+        <div className={isHovering ? "blur" : undefined}>{children}</div>
         {isHovering && (
           <>
             <div className="bg drop"></div>
@@ -91,11 +91,6 @@ const DragAndDrop = ({ style = {}, children }: Props) => {
         )}
       </div>
       <style jsx>{`
-        .droppable {
-          height: 100%;
-          filter: blur(4px);
-          position: relative;
-        }
         .drop {
           position: absolute;
           left: 0;
@@ -105,6 +100,11 @@ const DragAndDrop = ({ style = {}, children }: Props) => {
           display: flex;
           justify-content: center;
           align-items: center;
+        }
+        .blur {
+          height: 100%;
+          filter: blur(4px);
+          position: relative;
         }
         .bg {
           background: var(--c3);
