@@ -1,13 +1,9 @@
-import { query as q } from "faunadb";
+import { query as q, Client } from "faunadb";
 import { doAsyncThing } from "./doAsyncThing";
 
 interface UserMetadataInfo {
   emailIngestAddress?: string;
   phoneNumber?: string;
-}
-
-interface Auth0User {
-  sub: string; // userId
 }
 
 const _getMatcher = (metadataInfo: UserMetadataInfo) => {
@@ -18,14 +14,20 @@ const _getMatcher = (metadataInfo: UserMetadataInfo) => {
     );
   }
 
-  return q.Match(
-    q.Index("userMetadataByPhoneNumber"),
-    metadataInfo.phoneNumber
+  if (metadataInfo.phoneNumber) {
+    return q.Match(
+      q.Index("userMetadataByPhoneNumber"),
+      metadataInfo.phoneNumber
+    );
+  }
+
+  throw new Error(
+    "metadataInfo must include an indentifiable value defined in UserMetadataInfo"
   );
 };
 
 export const getUserByMetadata = (
-  faunaClient: any,
+  faunaClient: Client,
   metadataInfo: UserMetadataInfo
 ) =>
   doAsyncThing(() =>
