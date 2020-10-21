@@ -5,34 +5,24 @@ const ENDPOINT_BASE =
     ? `http://localhost:3001`
     : "https://backyard-data.vercel.app";
 
-const ENDPOINT_PATH = "/api/index";
+const ENDPOINT_PATH = "/api/emailparser";
 
 const REQUEST_URI = `${ENDPOINT_BASE}${ENDPOINT_PATH}`;
 
-/*
-"url": url,
-"body": returnable_main_content,
-"title": title,
-"metaTitle": meta_title,
-"metaDescription": meta_description,
-*/
-
-export const fetchTextContent = async ({
-  url,
-}): Promise<{ result: TextContentData; error: Error }> => {
+export const parseEmailBody = async (
+  emailBody: string
+): Promise<[TextContentData, Error]> => {
   let result;
   let error;
   try {
     const res = await fetch(REQUEST_URI, {
       method: "PUT",
-      body: JSON.stringify({
-        url,
-      }),
+      body: emailBody,
     });
     result = await res.json();
   } catch (err) {
     error = err;
   }
 
-  return { result, error };
+  return [result, error];
 };
