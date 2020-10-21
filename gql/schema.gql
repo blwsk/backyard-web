@@ -56,7 +56,6 @@ type SmsVerifierPinSet {
 type ReceivedEmailBlobsV1 {
   json: String!
   userId: String!
-  generatedTextContent: String
 }
 
 type ReceivedSMSBlobsV1 {

@@ -1,13 +1,7 @@
-import { TextContentData } from "./TextContentDataTypes";
-
-const ENDPOINT_BASE =
+const REQUEST_URI =
   process.env.NODE_ENV === "development"
-    ? `http://localhost:3001`
-    : "https://backyard-data.vercel.app";
-
-const ENDPOINT_PATH = "/api/index";
-
-const REQUEST_URI = `${ENDPOINT_BASE}${ENDPOINT_PATH}`;
+    ? `http://localhost:3001/api/index`
+    : "https://backyard-data.vercel.app/api/index";
 
 /*
 "url": url,
@@ -17,9 +11,7 @@ const REQUEST_URI = `${ENDPOINT_BASE}${ENDPOINT_PATH}`;
 "metaDescription": meta_description,
 */
 
-export const fetchTextContent = async ({
-  url,
-}): Promise<{ result: TextContentData; error: Error }> => {
+export const fetchTextContent = async ({ url }) => {
   let result;
   let error;
   try {
