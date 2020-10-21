@@ -3,7 +3,6 @@ import { MailSlurp } from "mailslurp-client";
 
 import { getUserByMetadata } from "../../../api-utils/getUserByMetadata";
 import { doAsyncThing } from "../../../api-utils/doAsyncThing";
-import { parseEmailBody } from "../../../api-utils/parseEmailBody";
 
 const { FAUNADB_SECRET: secret, MAILSLURP_API_KEY: apiKey } = process.env;
 
@@ -64,11 +63,6 @@ const createEmailInbox = async (req, res) => {
     return;
   }
 
-  const [
-    generatedTextContent,
-    generatedTextContentError,
-  ] = await parseEmailBody(emailContent.body);
-
   let createResult;
   let createError;
   try {
@@ -77,7 +71,6 @@ const createEmailInbox = async (req, res) => {
         data: {
           json: emailContent,
           userId: userMetadata.data.userId,
-          generatedTextContent,
         },
       })
     );

@@ -273,7 +273,7 @@ const Guide = () => (
         <span
           dangerouslySetInnerHTML={{
             __html: `
-        <a  href="javascript:(function hey(){ window.open('https://backyard.wtf/save?url=' + encodeURIComponent(window.location.href), '_blank'); })()">
+        <a  href="javascript:(function hey(){ window.open('https://backyard-web.blwsk.vercel.app/save?url=' + encodeURIComponent(window.location.href), '_blank'); })()">
           <pre style="display:inline;">Save</pre>
         </a>
       `,
