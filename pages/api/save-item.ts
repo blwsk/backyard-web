@@ -8,6 +8,7 @@ import {
   AlreadySaved,
   CreateItemError,
 } from "../../api-utils/saveContentItem";
+import { MANUAL } from "../../types/ItemTypes";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
@@ -46,7 +47,12 @@ const saveItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
     return;
   }
 
-  const saveItemResultMetadata = await saveContentItem(client, url, user.sub);
+  const saveItemResultMetadata = await saveContentItem(
+    client,
+    url,
+    user.sub,
+    MANUAL
+  );
 
   const { message, result, error, alreadySaved } = saveItemResultMetadata;
 

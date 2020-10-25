@@ -39,7 +39,9 @@ export const fetchTweet = async (idString) => {
   return tweetJson;
 };
 
-export const fetchTweetByUrl = async ({ url }) => {
+export const fetchTweetByUrl = async ({
+  url,
+}): Promise<{ result?: { json: any }; error?: Error }> => {
   const { id } = getTweetIdFromUrl(url);
 
   let result;

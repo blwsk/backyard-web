@@ -1,12 +1,13 @@
 import { query as q, Client } from "faunadb";
 import { fetchContent } from "./fetchContent";
+import { Item, ItemSource } from "../types/ItemTypes";
 
 interface FaunaObject {
   ref: {
     id: string;
   };
   ts: number;
-  data: object;
+  data: Item;
 }
 
 interface ExistingItem {
@@ -48,7 +49,8 @@ const createItem = async (
   client: Client,
   url: string,
   contentJson: ContentJson,
-  userId
+  userId: string,
+  source?: ItemSource
 ): Promise<CreatedItem> => {
   /**
    * - fetchTextContent returns `{ body, title, metaTitle, metaDescription }`
@@ -111,22 +113,46 @@ export type SavedItemMessage =
   | "Error while fetching content for url"
   | "Error while creating item";
 
-interface SavedItemMetadata {
+export interface SavedItemDataWrapper {
+  id: string;
+  ts: number;
+  data: Item;
+}
+
+export interface SavedItemMetadata {
   message: SavedItemMessage;
-  result?: {
-    id: string;
-    ts: number;
-    data: object;
-  };
+  result?: SavedItemDataWrapper;
   alreadySaved: boolean;
   error?: Error;
   url?: string;
 }
 
+export const getResponseFromMessage = (
+  message: SavedItemMessage,
+  result?: SavedItemDataWrapper
+): string => {
+  switch (message) {
+    case FindExistingItemError:
+    case FetchContentError:
+    case CreateItemError:
+      return message;
+
+    case Saved:
+      return `✅ Saved. Check it out: https://backyard.wtf/viewer?id=${result.id}`;
+
+    case AlreadySaved:
+      return `☑️ Already saved. Check it out: https://backyard.wtf/viewer?id=${result.id}`;
+
+    default:
+      return "😱 Wow. We are in an unexpected state. Time to fix it and write some tests.";
+  }
+};
+
 export const saveContentItem = async (
   client: Client,
   url: string,
-  userId: string
+  userId: string,
+  source?: ItemSource
 ): Promise<SavedItemMetadata> => {
   /**
    * If item exists, return it
@@ -173,7 +199,8 @@ export const saveContentItem = async (
     client,
     url,
     contentJson,
-    userId
+    userId,
+    source
   );
 
   if (itemError) {

@@ -1,4 +1,4 @@
-import { TextContentData } from "./TextContentDataTypes";
+import { TextContentData } from "../types/TextContentDataTypes";
 
 const ENDPOINT_BASE =
   process.env.NODE_ENV === "development"
