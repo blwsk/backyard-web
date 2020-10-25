@@ -4,6 +4,13 @@ import { MailSlurp } from "mailslurp-client";
 import { getUserByMetadata } from "../../../api-utils/getUserByMetadata";
 import { doAsyncThing } from "../../../api-utils/doAsyncThing";
 import { parseEmailBody } from "../../../api-utils/parseEmailBody";
+import { validURL } from "../../../lib/urls";
+import {
+  saveContentItem,
+  getResponseFromMessage,
+} from "../../../api-utils/saveContentItem";
+import { EMAIL } from "../../../types/ItemTypes";
+import { sendSms } from "../../../api-utils/sendSms";
 
 const { FAUNADB_SECRET: secret, MAILSLURP_API_KEY: apiKey } = process.env;
 
@@ -13,31 +20,48 @@ const mailslurp = new MailSlurp({ apiKey });
 
 const makeEmailAddressFromId = (id) => `${id}@mailslurp.com`;
 
-const createEmailInbox = async (req, res) => {
+interface EmailWebhookBody {
+  inboxId: string;
+  emailId: string;
+  createdAt: string;
+  to: string[];
+  from: string;
+  cc: string[];
+  bcc: string[];
+  subject: string;
+  attachmentMetaDatas: [];
+}
+
+const receiveEmail = async (req, res) => {
   if (req.method !== "POST") {
     res.status(400).send(null);
     return;
   }
 
-  const body = req.body;
+  const body: EmailWebhookBody = req.body;
 
-  const { inboxId, emailId } = body;
+  const { inboxId, emailId, subject } = body;
 
   const emailIngestAddress = makeEmailAddressFromId(inboxId);
 
-  const [userMetadata, userMetadataError] = await getUserByMetadata(
+  const [userMetadataWrapper, userMetadataError] = await getUserByMetadata(
     faunaClient,
     {
       emailIngestAddress,
     }
   );
 
-  if (
-    userMetadataError ||
-    !userMetadata ||
-    !userMetadata.data ||
-    !userMetadata.data.userId
-  ) {
+  const userId =
+    userMetadataWrapper &&
+    userMetadataWrapper.data &&
+    userMetadataWrapper.data.userId;
+
+  const phoneNumber =
+    userMetadataWrapper &&
+    userMetadataWrapper.data &&
+    userMetadataWrapper.data.phoneNumber;
+
+  if (userMetadataError || !userId) {
     res.status(500).send({
       message: "Could not find a user with the provided emailIngestAddress",
       error: userMetadataError ? userMetadataError.message : null,
@@ -76,7 +100,7 @@ const createEmailInbox = async (req, res) => {
       q.Create(q.Collection("ReceivedEmailBlobsV1"), {
         data: {
           json: emailContent,
-          userId: userMetadata.data.userId,
+          userId,
           generatedTextContent,
         },
       })
@@ -92,6 +116,28 @@ const createEmailInbox = async (req, res) => {
     return;
   }
 
+  const url = generatedTextContent.canonicalUrl || generatedTextContent.url;
+
+  if (validURL(url)) {
+    const { message, result, error } = await saveContentItem(
+      faunaClient,
+      url,
+      userId,
+      EMAIL
+    );
+
+    if (phoneNumber) {
+      const saveContentMessage = getResponseFromMessage(message, result);
+
+      /**
+       *
+       */
+      const messageResponse = `✉️ Received an email, "${subject}".\n${saveContentMessage}`;
+
+      await sendSms(messageResponse, phoneNumber);
+    }
+  }
+
   res.status(200).send({
     message: "Email received",
     body,
@@ -99,4 +145,4 @@ const createEmailInbox = async (req, res) => {
   });
 };
 
-export default createEmailInbox;
+export default receiveEmail;

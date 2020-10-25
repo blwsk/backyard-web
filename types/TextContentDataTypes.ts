@@ -4,5 +4,5 @@ export interface TextContentData {
   title?: string;
   metaTitle?: string;
   metaDescription?: string;
-  canonicalUrl: string;
+  canonicalUrl?: string;
 }

@@ -1,16 +1,14 @@
-import twilio, { twiml } from "twilio";
+import { twiml } from "twilio";
 import faunadb, { query as q } from "faunadb";
 import { doAsyncThing } from "../../../api-utils/doAsyncThing";
 import { getUserByMetadata } from "../../../api-utils/getUserByMetadata";
 import { validURL } from "../../../lib/urls";
 import {
   saveContentItem,
-  FindExistingItemError,
-  FetchContentError,
-  CreateItemError,
-  Saved,
-  AlreadySaved,
+  SavedItemMetadata,
+  getResponseFromMessage,
 } from "../../../api-utils/saveContentItem";
+import { SMS } from "../../../types/ItemTypes";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
@@ -74,30 +72,16 @@ const receiveSms = async (req, res) => {
    */
 
   if (url) {
-    const { message, result } = await saveContentItem(faunaClient, url, userId);
+    const { message, result }: SavedItemMetadata = await saveContentItem(
+      faunaClient,
+      url,
+      userId,
+      SMS
+    );
 
     const twiml = new MessagingResponse();
 
-    let messageResponse;
-
-    switch (message) {
-      case FindExistingItemError:
-      case FetchContentError:
-      case CreateItemError:
-        messageResponse = message;
-        break;
-
-      case Saved:
-        messageResponse = `Saved. Check it out: https://backyard.wtf/viewer?id=${result.id}`;
-        break;
-      case AlreadySaved:
-        messageResponse = `Already saved. Check it out: https://backyard.wtf/viewer?id=${result.id}`;
-        break;
-
-      default:
-        messageResponse =
-          "Wow. We are in an unexpected state. Time to fix it and write some tests.";
-    }
+    let messageResponse = getResponseFromMessage(message, result);
 
     twiml.message(messageResponse);
 

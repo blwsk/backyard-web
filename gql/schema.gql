@@ -11,6 +11,7 @@ type Item {
   createdBy: String!
   createdAt: Long!
   content: ItemContent
+  source: String
 }
 
 type List {

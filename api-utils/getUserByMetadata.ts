@@ -1,12 +1,13 @@
 import { query as q, Client } from "faunadb";
 import { doAsyncThing } from "./doAsyncThing";
+import { UserMetadata } from "../types/UserMetadataTypes";
 
-interface UserMetadataInfo {
+interface UserMetadataLookupArgs {
   emailIngestAddress?: string;
   phoneNumber?: string;
 }
 
-const _getMatcher = (metadataInfo: UserMetadataInfo) => {
+const _getMatcher = (metadataInfo: UserMetadataLookupArgs) => {
   if (metadataInfo.emailIngestAddress) {
     return q.Match(
       q.Index("userMetadataByEmailIngest"),
@@ -28,8 +29,8 @@ const _getMatcher = (metadataInfo: UserMetadataInfo) => {
 
 export const getUserByMetadata = (
   faunaClient: Client,
-  metadataInfo: UserMetadataInfo
-) =>
+  metadataInfo: UserMetadataLookupArgs
+): Promise<[{ data: UserMetadata }, Error, string]> =>
   doAsyncThing(() =>
     faunaClient.query(
       q.Let(

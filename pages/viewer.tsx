@@ -2,6 +2,7 @@ import { withRouter } from "next/router";
 import Header from "../components/header";
 import Data from "../components/data";
 import Wrapper from "../components/wrapper";
+import requireAuth from "../lib/requireAuth";
 
 const Viewer = ({ router }) => {
   const { id: itemId } = router.query;
@@ -16,4 +17,4 @@ const Viewer = ({ router }) => {
   );
 };
 
-export default withRouter(Viewer);
+export default requireAuth(withRouter(Viewer));
