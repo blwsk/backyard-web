@@ -258,6 +258,7 @@ const SettingsForm = ({ data }) => {
       <div className="m-bottom-6">
         <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
       </div>
+      <Guide />
     </div>
   );
 };
@@ -303,8 +304,11 @@ const Settings = () => {
       <Header />
       <Wrapper>
         <h1>Settings</h1>
-        {data && <SettingsForm data={data} />}
-        <Guide />
+        {data ? (
+          <SettingsForm data={data} />
+        ) : (
+          <div className="well">Loading...</div>
+        )}
       </Wrapper>
     </div>
   );
