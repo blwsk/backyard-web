@@ -14,6 +14,7 @@ import {
   usePaginatedContentList,
 } from "../lib/usePaginatedContentList";
 import ContentPageItem from "../components/contentPageItem";
+import SearchInput from "../components/searchInput";
 
 const LoadingItem = () => (
   <ContentPageItem
@@ -445,7 +446,12 @@ const MyContent = ({ sortOrder }) => {
   );
 };
 
-const ListControls = ({ sortOrder, onChangeSortOrder }) => {
+const ListControls = ({
+  sortOrder,
+  onChangeSortOrder,
+  onSearch,
+  onSearchToggle,
+}) => {
   return (
     <div>
       <span className="control">
@@ -457,14 +463,16 @@ const ListControls = ({ sortOrder, onChangeSortOrder }) => {
           ))}
         </select>
       </span>
-      <span className="control">
-        <select id="filter" onChange={onChangeSortOrder} value={sortOrder}>
-          {Object.keys(sortOrderEnum).map((key) => (
-            <option key={key} value={key}>
-              {capitalize(key)}
-            </option>
-          ))}
-        </select>
+      <span className="search">
+        <SearchInput
+          onSearch={onSearch}
+          onFocus={() => {
+            onSearchToggle(true);
+          }}
+          onBlur={() => {
+            onSearchToggle(false);
+          }}
+        />
       </span>
       <style jsx>{`
         .control {
@@ -478,7 +486,14 @@ const ListControls = ({ sortOrder, onChangeSortOrder }) => {
   );
 };
 
+const SearchResults = ({ results }) => {
+  return <div>{JSON.stringify(results)}</div>;
+};
+
 const WrappedMyContent = ({ router }) => {
+  const [isSearching, updateIsSearching] = useState(false);
+  const [searchResults, updateSearchResults] = useState(null);
+
   const sortOrder = router.query.sort || sortOrderEnum.descending;
 
   const onChangeSortOrder = (e) => {
@@ -501,9 +516,17 @@ const WrappedMyContent = ({ router }) => {
           <ListControls
             sortOrder={sortOrder}
             onChangeSortOrder={onChangeSortOrder}
+            onSearch={(results) => {
+              updateSearchResults(results);
+            }}
+            onSearchToggle={(isSearching) => updateIsSearching(isSearching)}
           />
         </div>
-        <MyContent key={sortOrder} sortOrder={sortOrder} />
+        {isSearching ? (
+          <SearchResults results={searchResults} />
+        ) : (
+          <MyContent key={sortOrder} sortOrder={sortOrder} />
+        )}
       </Wrapper>
     </div>
   );

@@ -250,6 +250,12 @@ article:last-child {
 .m-bottom-6 {
   margin-bottom: 24px;
 }
+.m-left-2 {
+  margin-left: 8px;
+}
+.m-right-2 {
+  margin-right: 8px;
+}
 .p-all-1 {
   padding: 4px;
 }

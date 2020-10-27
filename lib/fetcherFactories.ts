@@ -41,10 +41,17 @@ const absolutePathFetcher = (
 
 const jsonParser = (res: Response): Promise<object> => res.json();
 
+type Method = "GET" | "PUT" | "POST" | "DELETE";
+
+export interface JsonFetcherFactoryOptions {
+  method?: Method;
+  body?: string;
+}
+
 interface JsonFetcherFactoryProps {
   getAccessTokenSilently: Function;
   absolutePath: boolean;
-  options?: object;
+  options?: JsonFetcherFactoryOptions;
 }
 
 export const jsonFetcherFactory = ({
