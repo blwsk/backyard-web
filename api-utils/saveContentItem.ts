@@ -1,6 +1,17 @@
 import { query as q, Client } from "faunadb";
+import algoliasearch from "algoliasearch";
+
 import { fetchContent } from "./fetchContent";
 import { Item, ItemSource } from "../types/ItemTypes";
+import { doAsyncThing } from "./doAsyncThing";
+
+const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
+
+const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
+
+const INDEX_NAME = "backyard_test";
+
+const index = algoliaClient.initIndex(INDEX_NAME);
 
 interface FaunaObject {
   ref: {
@@ -105,13 +116,15 @@ export const AlreadySaved = "Already saved";
 export const FindExistingItemError = "Error while finding existing item";
 export const FetchContentError = "Error while fetching content for url";
 export const CreateItemError = "Error while creating item";
+export const IndexingError = "Error while adding to search index";
 
 export type SavedItemMessage =
   | "Saved"
   | "Already saved"
   | "Error while finding existing item"
   | "Error while fetching content for url"
-  | "Error while creating item";
+  | "Error while creating item"
+  | "Error while adding to search index";
 
 export interface SavedItemDataWrapper {
   id: string;
@@ -135,6 +148,7 @@ export const getResponseFromMessage = (
     case FindExistingItemError:
     case FetchContentError:
     case CreateItemError:
+    case IndexingError:
       return message;
 
     case Saved:
@@ -208,6 +222,38 @@ export const saveContentItem = async (
       message: CreateItemError,
       url,
       error: itemError,
+      alreadySaved: false,
+    };
+  }
+
+  const [indexForSearchResult, indexForSearchError] = await doAsyncThing(() =>
+    index.saveObject(
+      {
+        objectID: itemResult.ref.id,
+        _id: itemResult.ref.id,
+        _ts: itemResult.ts,
+        url,
+        content: contentJson
+          ? {
+              title: contentJson.title,
+              metaTitle: contentJson.metaTitle,
+              metaDescription: contentJson.metaDescription,
+            }
+          : null,
+      },
+      {
+        autoGenerateObjectIDIfNotExist: true,
+      }
+    )
+  );
+
+  void indexForSearchResult;
+
+  if (indexForSearchError) {
+    return {
+      message: IndexingError,
+      url,
+      error: indexForSearchError,
       alreadySaved: false,
     };
   }

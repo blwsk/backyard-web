@@ -7,6 +7,7 @@ import {
   Saved,
   AlreadySaved,
   CreateItemError,
+  IndexingError,
 } from "../../api-utils/saveContentItem";
 import { MANUAL } from "../../types/ItemTypes";
 
@@ -60,6 +61,7 @@ const saveItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
     case FindExistingItemError:
     case FetchContentError:
     case CreateItemError:
+    case IndexingError:
       res.status(400).send({
         message,
         result,
