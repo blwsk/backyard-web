@@ -41,7 +41,7 @@ export const fetchTweet = async (idString) => {
 
 export const fetchTweetByUrl = async ({
   url,
-}): Promise<{ result?: { json: any }; error?: Error }> => {
+}): Promise<{ result: any; error: Error }> => {
   const { id } = getTweetIdFromUrl(url);
 
   let result;

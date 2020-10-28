@@ -9,17 +9,9 @@ const ENDPOINT_PATH = "/api/index";
 
 const REQUEST_URI = `${ENDPOINT_BASE}${ENDPOINT_PATH}`;
 
-/*
-"url": url,
-"body": returnable_main_content,
-"title": title,
-"metaTitle": meta_title,
-"metaDescription": meta_description,
-*/
-
 export const fetchTextContent = async ({
   url,
-}): Promise<{ result: TextContentData; error: Error }> => {
+}): Promise<{ result: any; error: Error }> => {
   let result;
   let error;
   try {

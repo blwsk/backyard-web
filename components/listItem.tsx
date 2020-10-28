@@ -1,8 +1,22 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { stripParams } from "../lib/urls";
 import Link from "next/link";
 
-const ListItem = ({ item, light = false }) => {
+export interface ListItemProps {
+  _id: string;
+  _ts: number;
+  url: string;
+  content?: {
+    title?: string;
+  };
+}
+
+interface Props {
+  item: ListItemProps;
+  light?: boolean;
+}
+
+const ListItem: FunctionComponent<Props> = ({ item, light = false }) => {
   const { _id, _ts, url, content } = item;
 
   const withParamsStripped = stripParams(url);

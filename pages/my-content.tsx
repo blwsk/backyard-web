@@ -1,7 +1,7 @@
 import { mutate } from "swr";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FunctionComponent } from "react";
 import { withRouter } from "next/router";
 import SelectList, { listQuery } from "../components/selectList";
 import { capitalize } from "../lib/capitalize";
@@ -14,6 +14,8 @@ import {
   usePaginatedContentList,
 } from "../lib/usePaginatedContentList";
 import ContentPageItem from "../components/contentPageItem";
+import SearchInput from "../components/searchInput";
+import { ListItemProps } from "../components/listItem";
 
 const LoadingItem = () => (
   <ContentPageItem
@@ -445,26 +447,52 @@ const MyContent = ({ sortOrder }) => {
   );
 };
 
-const ListControls = ({ sortOrder, onChangeSortOrder }) => {
+const ListControls = ({
+  sortOrder,
+  onChangeSortOrder,
+  onSearch,
+  onSearchToggle,
+  onClear,
+  isSearchMode,
+}) => {
   return (
     <div>
       <span className="control">
-        <select id="sort" onChange={onChangeSortOrder} value={sortOrder}>
-          {Object.keys(sortOrderEnum).map((key) => (
-            <option key={key} value={key}>
-              {capitalize(key)}
+        <select
+          id="sort"
+          onChange={onChangeSortOrder}
+          value={isSearchMode ? "relevancy" : sortOrder}
+          disabled={isSearchMode}
+          title={
+            isSearchMode
+              ? "Search results are ordered by relevancy."
+              : undefined
+          }
+        >
+          {isSearchMode ? (
+            <option key={"relevancy"} value={"relevancy"}>
+              {capitalize("relevancy")}
             </option>
-          ))}
+          ) : (
+            Object.keys(sortOrderEnum).map((key) => (
+              <option key={key} value={key}>
+                {capitalize(key)}
+              </option>
+            ))
+          )}
         </select>
       </span>
       <span className="control">
-        <select id="filter" onChange={onChangeSortOrder} value={sortOrder}>
-          {Object.keys(sortOrderEnum).map((key) => (
-            <option key={key} value={key}>
-              {capitalize(key)}
-            </option>
-          ))}
-        </select>
+        <SearchInput
+          onSearch={onSearch}
+          onFocus={() => {
+            onSearchToggle(true);
+          }}
+          onBlur={() => {
+            onSearchToggle(false);
+          }}
+          onClear={onClear}
+        />
       </span>
       <style jsx>{`
         .control {
@@ -473,17 +501,53 @@ const ListControls = ({ sortOrder, onChangeSortOrder }) => {
         .control:last-of-type {
           margin-right: 0;
         }
+        @media (max-width: 600px) {
+          .control {
+            width: 100%;
+            display: flex;
+            margin-right: 0;
+            margin-bottom: 8px;
+          }
+          .control select {
+            flex-grow: 1;
+          }
+        }
       `}</style>
     </div>
   );
 };
 
+const SearchResults: FunctionComponent<{ results: ListItemProps[] }> = ({
+  results,
+}) => {
+  if (!results) {
+    return <div>Enter a search term.</div>;
+  }
+
+  if (results.length === 0) {
+    return <div>No results.</div>;
+  }
+
+  return (
+    <div>
+      {results.map((result) => {
+        return <ContentPageItem key={result._id} item={result} />;
+      })}
+    </div>
+  );
+};
+
 const WrappedMyContent = ({ router }) => {
+  const [isSearching, updateIsSearching] = useState(false);
+  const [searchResults, updateSearchResults] = useState(null);
+
   const sortOrder = router.query.sort || sortOrderEnum.descending;
 
   const onChangeSortOrder = (e) => {
     router.push(`/my-content?sort=${e.target.value}`);
   };
+
+  const isSearchMode = isSearching || searchResults;
 
   return (
     <div>
@@ -501,9 +565,21 @@ const WrappedMyContent = ({ router }) => {
           <ListControls
             sortOrder={sortOrder}
             onChangeSortOrder={onChangeSortOrder}
+            onSearch={(results) => {
+              updateSearchResults(results);
+            }}
+            onSearchToggle={(isSearching) => updateIsSearching(isSearching)}
+            onClear={() => {
+              updateSearchResults(null);
+            }}
+            isSearchMode={isSearchMode}
           />
         </div>
-        <MyContent key={sortOrder} sortOrder={sortOrder} />
+        {isSearchMode ? (
+          <SearchResults results={searchResults} />
+        ) : (
+          <MyContent key={sortOrder} sortOrder={sortOrder} />
+        )}
       </Wrapper>
     </div>
   );

@@ -11,13 +11,17 @@ const getFn = (url) => {
   }
 };
 
-export const fetchContent = async ({ url }) => {
+export const fetchContent = async ({
+  url,
+}): Promise<{ result: any; error: Error }> => {
   const fn = getFn(url);
 
   /**
    * `{ result, error }`
    */
-  const asyncResultPair = await fn({ url });
+  const asyncResultPair = await fn({
+    url,
+  });
 
   return asyncResultPair;
 };

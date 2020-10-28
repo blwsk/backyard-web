@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useCallback } from "react";
+import { JsonFetcherFactoryOptions } from "./fetcherFactories";
 
 export const useAuthedSWR = (key, fetcherFactory, options = {}) => {
   const { getAccessTokenSilently: _getAccessTokenSilently } = useAuth0();
@@ -20,7 +21,11 @@ export const useAuthedSWR = (key, fetcherFactory, options = {}) => {
   return result;
 };
 
-export const useAuthedCallback = (key, options, fetcherFactory) => {
+export const useAuthedCallback = (
+  key: string,
+  options: JsonFetcherFactoryOptions,
+  fetcherFactory: Function
+) => {
   const { getAccessTokenSilently: _getAccessTokenSilently } = useAuth0();
 
   const getAccessTokenSilently = () =>
@@ -29,9 +34,15 @@ export const useAuthedCallback = (key, options, fetcherFactory) => {
       scope: "openid profile offline_access",
     });
 
-  const callback = useCallback(() => {
-    return fetcherFactory({ getAccessTokenSilently })(key, options);
-  }, [key, options]);
+  const callback = useCallback(
+    (overrides = {}) => {
+      return fetcherFactory({ getAccessTokenSilently })(key, {
+        ...options,
+        ...overrides,
+      });
+    },
+    [key, options]
+  );
 
   return callback;
 };
