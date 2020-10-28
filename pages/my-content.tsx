@@ -1,7 +1,7 @@
 import { mutate } from "swr";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FunctionComponent } from "react";
 import { withRouter } from "next/router";
 import SelectList, { listQuery } from "../components/selectList";
 import { capitalize } from "../lib/capitalize";
@@ -15,6 +15,7 @@ import {
 } from "../lib/usePaginatedContentList";
 import ContentPageItem from "../components/contentPageItem";
 import SearchInput from "../components/searchInput";
+import { ListItemProps } from "../components/listItem";
 
 const LoadingItem = () => (
   <ContentPageItem
@@ -451,19 +452,37 @@ const ListControls = ({
   onChangeSortOrder,
   onSearch,
   onSearchToggle,
+  onClear,
+  isSearchMode,
 }) => {
   return (
     <div>
       <span className="control">
-        <select id="sort" onChange={onChangeSortOrder} value={sortOrder}>
-          {Object.keys(sortOrderEnum).map((key) => (
-            <option key={key} value={key}>
-              {capitalize(key)}
+        <select
+          id="sort"
+          onChange={onChangeSortOrder}
+          value={isSearchMode ? "relevancy" : sortOrder}
+          disabled={isSearchMode}
+          title={
+            isSearchMode
+              ? "Search results are ordered by relevancy."
+              : undefined
+          }
+        >
+          {isSearchMode ? (
+            <option key={"relevancy"} value={"relevancy"}>
+              {capitalize("relevancy")}
             </option>
-          ))}
+          ) : (
+            Object.keys(sortOrderEnum).map((key) => (
+              <option key={key} value={key}>
+                {capitalize(key)}
+              </option>
+            ))
+          )}
         </select>
       </span>
-      <span className="search">
+      <span className="control">
         <SearchInput
           onSearch={onSearch}
           onFocus={() => {
@@ -472,6 +491,7 @@ const ListControls = ({
           onBlur={() => {
             onSearchToggle(false);
           }}
+          onClear={onClear}
         />
       </span>
       <style jsx>{`
@@ -481,13 +501,40 @@ const ListControls = ({
         .control:last-of-type {
           margin-right: 0;
         }
+        @media (max-width: 600px) {
+          .control {
+            width: 100%;
+            display: flex;
+            margin-right: 0;
+            margin-bottom: 8px;
+          }
+          .control select {
+            flex-grow: 1;
+          }
+        }
       `}</style>
     </div>
   );
 };
 
-const SearchResults = ({ results }) => {
-  return <div>{JSON.stringify(results)}</div>;
+const SearchResults: FunctionComponent<{ results: ListItemProps[] }> = ({
+  results,
+}) => {
+  if (!results) {
+    return <div>Enter a search term.</div>;
+  }
+
+  if (results.length === 0) {
+    return <div>No results.</div>;
+  }
+
+  return (
+    <div>
+      {results.map((result) => {
+        return <ContentPageItem key={result._id} item={result} />;
+      })}
+    </div>
+  );
 };
 
 const WrappedMyContent = ({ router }) => {
@@ -499,6 +546,8 @@ const WrappedMyContent = ({ router }) => {
   const onChangeSortOrder = (e) => {
     router.push(`/my-content?sort=${e.target.value}`);
   };
+
+  const isSearchMode = isSearching || searchResults;
 
   return (
     <div>
@@ -520,9 +569,13 @@ const WrappedMyContent = ({ router }) => {
               updateSearchResults(results);
             }}
             onSearchToggle={(isSearching) => updateIsSearching(isSearching)}
+            onClear={() => {
+              updateSearchResults(null);
+            }}
+            isSearchMode={isSearchMode}
           />
         </div>
-        {isSearching ? (
+        {isSearchMode ? (
           <SearchResults results={searchResults} />
         ) : (
           <MyContent key={sortOrder} sortOrder={sortOrder} />

@@ -10,9 +10,10 @@ import { throttle } from "../lib/throttle";
 
 type Props = {
   onSearch(results: any[]): void;
-  onFocus?(): void;
-  onBlur?(): void;
+  onFocus?(e): void;
+  onBlur?(e): void;
   onError?(error: Error): void;
+  onClear?(): void;
 };
 
 const SearchInput: FunctionComponent<Props> = ({
@@ -20,6 +21,7 @@ const SearchInput: FunctionComponent<Props> = ({
   onFocus,
   onBlur,
   onError,
+  onClear,
 }) => {
   const [query, updateQuery] = useState("");
 
@@ -74,15 +76,51 @@ const SearchInput: FunctionComponent<Props> = ({
 
   return (
     <>
-      <input
-        type="text"
-        placeholder="search"
-        value={query}
-        onChange={(e) => updateQuery(e.target.value)}
-        onFocus={onFocus}
-        onBlur={onBlur}
-      />
+      <span className="wrapper">
+        <input
+          type="text"
+          placeholder="search"
+          value={query}
+          onChange={(e) => updateQuery(e.target.value)}
+          onFocus={onFocus}
+          onBlur={(e) => {
+            onBlur(e);
+            if (query === "") {
+              updateResults(null);
+              updateError(null);
+
+              if (onClear) {
+                onClear();
+              }
+            }
+          }}
+        />
+        {query && results && (
+          <button
+            onClick={() => {
+              updateQuery("");
+              updateResults(null);
+              updateError(null);
+              if (onClear) {
+                onClear();
+              }
+            }}
+          >
+            Clear
+          </button>
+        )}
+      </span>
       {error && !onError && <span className="m-left-2">{"❌ Error"}</span>}
+      <style jsx>{`
+        .wrapper {
+          width: 400px;
+          max-width: 100%;
+          display: inherit;
+        }
+        .wrapper input {
+          flex-grow: 1;
+        }
+      `}</style>
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import ListItem from "./listItem";
+import ListItem, { ListItemProps } from "./listItem";
 import { getHostname } from "../lib/urls";
 
 const colors = [
@@ -37,14 +37,7 @@ const getColorFromString = (str) => {
 };
 
 type ContentPageItemProps = {
-  item: {
-    _id: string;
-    _ts: number;
-    url: string;
-    content: {
-      title: string;
-    };
-  };
+  item: ListItemProps;
   backgroundColor?: string;
   renderCheckbox?: () => ReactNode;
 };
