@@ -2,7 +2,17 @@ import gql from "gql-tag";
 import { makeGqlRequest } from "../../../api-utils/makeGqlRequest";
 import { doAsyncThing } from "../../../api-utils/doAsyncThing";
 
-interface Result {}
+interface Result {
+  _id: string;
+  _ts: string;
+  url: string;
+  content?: {
+    title?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+  };
+  objectID: string;
+}
 
 const query = gql`
   query {
@@ -33,7 +43,10 @@ const exportTextContent = async (req, res) => {
     return;
   }
 
-  const results: Result[] = allItems.data.allItems.data;
+  const results: Result[] = allItems.data.allItems.data.map((r) => ({
+    ...r,
+    objectID: r._id,
+  }));
 
   res.status(200).send(results);
 };
