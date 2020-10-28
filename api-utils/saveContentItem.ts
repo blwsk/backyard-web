@@ -226,26 +226,44 @@ export const saveContentItem = async (
     };
   }
 
-  const [indexForSearchResult, indexForSearchError] = await doAsyncThing(() =>
-    index.saveObject(
-      {
-        objectID: itemResult.ref.id,
-        _id: itemResult.ref.id,
-        _ts: itemResult.ts,
-        url,
-        content: contentJson
-          ? {
-              title: contentJson.title,
-              metaTitle: contentJson.metaTitle,
-              metaDescription: contentJson.metaDescription,
-            }
-          : null,
-      },
-      {
-        autoGenerateObjectIDIfNotExist: true,
-      }
-    )
-  );
+  const [indexForSearchResult, indexForSearchError] = await doAsyncThing(() => {
+    const fullObject = {
+      objectID: itemResult.ref.id,
+      _id: itemResult.ref.id,
+      _ts: itemResult.ts,
+      url,
+      content: contentJson
+        ? {
+            title: contentJson.title,
+            metaTitle: contentJson.metaTitle,
+            metaDescription: contentJson.metaDescription,
+            body: contentJson.body,
+          }
+        : null,
+    };
+
+    const trimmedObject = {
+      objectID: itemResult.ref.id,
+      _id: itemResult.ref.id,
+      _ts: itemResult.ts,
+      url,
+      content: contentJson
+        ? {
+            title: contentJson.title,
+            metaTitle: contentJson.metaTitle,
+          }
+        : null,
+    };
+
+    const objectToIndex =
+      Buffer.byteLength(JSON.stringify(fullObject)) >= 100000 /* bytes */
+        ? trimmedObject
+        : fullObject;
+
+    return index.saveObject(objectToIndex, {
+      autoGenerateObjectIDIfNotExist: true,
+    });
+  });
 
   void indexForSearchResult;
 

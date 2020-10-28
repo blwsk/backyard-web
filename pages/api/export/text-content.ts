@@ -10,6 +10,7 @@ interface Result {
     title?: string;
     metaTitle?: string;
     metaDescription?: string;
+    body?: string;
   };
   objectID: string;
 }
@@ -25,6 +26,7 @@ const query = gql`
           title
           metaTitle
           metaDescription
+          body
         }
       }
     }
@@ -43,7 +45,29 @@ const exportTextContent = async (req, res) => {
     return;
   }
 
-  const results: Result[] = allItems.data.allItems.data.map((r) => ({
+  const allItemObjects = allItems.data.allItems.data;
+
+  const cleanedObjects = allItemObjects.map((r) => {
+    /**
+     * Strip too-large bodies
+     *
+     * See https://www.algolia.com/doc/faq/basics/is-there-a-size-limit-for-my-index-records/
+     */
+    if (Buffer.byteLength(JSON.stringify(r)) >= 100000 /* bytes */) {
+      return {
+        ...r,
+        content: {
+          ...r.content,
+          body: null,
+          metaDescription: null,
+        },
+      };
+    }
+
+    return r;
+  });
+
+  const results: Result[] = cleanedObjects.map((r) => ({
     ...r,
     objectID: r._id,
   }));
