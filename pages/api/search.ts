@@ -1,16 +1,27 @@
 import algoliasearch from "algoliasearch";
 import authedEndpoint from "../../api-utils/authedEndpoint";
 import { doAsyncThing } from "../../api-utils/doAsyncThing";
+import { indexes } from "../../types/SearchIndexTypes";
 
 const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
 
 const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
 
-const INDEX_NAME = "backyard_test";
-
-const index = algoliaClient.initIndex(INDEX_NAME);
-
 const search = authedEndpoint(async (req, res) => {
+  const indexName: string | string[] = req.query.index;
+
+  if (
+    !indexName ||
+    typeof indexName !== "string" ||
+    indexes.indexOf(indexName) === -1
+  ) {
+    res.status(400).send({
+      message:
+        "Expected query parameter, ?index=<index name string>, but none was provided.",
+    });
+    return;
+  }
+
   let searchQuery;
 
   try {
@@ -28,11 +39,13 @@ const search = authedEndpoint(async (req, res) => {
     return;
   }
 
-  const [searchResult, searchError] = await doAsyncThing(() =>
-    index.search(searchQuery, {
+  const [searchResult, searchError] = await doAsyncThing(() => {
+    const index = algoliaClient.initIndex(indexName);
+
+    return index.search(searchQuery, {
       hitsPerPage: 50,
-    })
-  );
+    });
+  });
 
   if (searchError) {
     res.status(500).send({

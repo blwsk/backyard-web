@@ -16,6 +16,7 @@ import {
 import ContentPageItem from "../components/contentPageItem";
 import SearchInput from "../components/searchInput";
 import { ListItemProps } from "../components/listItem";
+import { ITEMS } from "../types/SearchIndexTypes";
 
 const LoadingItem = () => (
   <ContentPageItem
@@ -484,6 +485,7 @@ const ListControls = ({
       </span>
       <span className="control">
         <SearchInput
+          index={ITEMS}
           onSearch={onSearch}
           onFocus={() => {
             onSearchToggle(true);

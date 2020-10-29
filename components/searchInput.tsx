@@ -7,8 +7,10 @@ import React, {
 import { useAuthedCallback } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { throttle } from "../lib/throttle";
+import { SearchIndex } from "../types/SearchIndexTypes";
 
 type Props = {
+  index: SearchIndex;
   onSearch(results: any[]): void;
   onFocus?(e): void;
   onBlur?(e): void;
@@ -17,6 +19,7 @@ type Props = {
 };
 
 const SearchInput: FunctionComponent<Props> = ({
+  index,
   onSearch,
   onFocus,
   onBlur,
@@ -26,7 +29,7 @@ const SearchInput: FunctionComponent<Props> = ({
   const [query, updateQuery] = useState("");
 
   const doSearch = useAuthedCallback(
-    "/api/search",
+    `/api/search?index=${index}`,
     {
       method: "PUT",
     },
