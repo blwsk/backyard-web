@@ -1,11 +1,9 @@
 import useSWR from "swr";
 import { getHostname } from "../lib/urls";
-import { isTwitter, isYouTube } from "../lib/contentTypes";
-import { useCallback, useState } from "react";
-import TweetEmbed from "./tweetEmbed";
-import YouTubeEmbed from "./youTubeEmbed";
+import { useState } from "react";
 import Selection from "./selection";
 import SelectList from "./selectList";
+import ItemContent from "./itemContent";
 
 const ClipsList = ({ clips }) => {
   return (
@@ -34,30 +32,6 @@ const ClipsList = ({ clips }) => {
   );
 };
 
-const Content = ({ hostname, data, url, content }) => {
-  if (isTwitter(url)) {
-    return <TweetEmbed url={url} content={content} />;
-  }
-
-  if (isYouTube(url)) {
-    return <YouTubeEmbed url={url} />;
-  }
-
-  const body =
-    (data && data.content && data.content.body) || (content && content.body);
-
-  if (!body) {
-    return <p>Loading...</p>;
-  }
-
-  return (
-    <div
-      className="rendered-html-body"
-      dangerouslySetInnerHTML={{ __html: body }}
-    />
-  );
-};
-
 const H2 = ({ data, content }) => {
   const contentObj = (data && data.content && data.content) || content;
 
@@ -76,9 +50,7 @@ const H3 = ({ data, content }) => {
   return <h3 className="line-clamp-3">{contentObj.metaDescription}</h3>;
 };
 
-const Metadata = ({ hostname, url, data, content }) => {
-  const loaded = data || content;
-
+const Metadata = ({ hostname, url }) => {
   return (
     <>
       <span
@@ -205,20 +177,8 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
         </div>
       )}
       <div>
-        {hostname && (
-          <Metadata
-            hostname={hostname}
-            url={url}
-            data={data}
-            content={content}
-          />
-        )}
-        <div
-          style={{
-            marginTop: 24,
-            marginBottom: 24,
-          }}
-        >
+        {hostname && <Metadata hostname={hostname} url={url} />}
+        <div className="m-y-6">
           <H2 data={data} content={content} />
           <H3 data={data} content={content} />
         </div>
@@ -235,12 +195,7 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
         <br />
         {!showClips ? (
           <>
-            <Content
-              data={data}
-              content={content}
-              hostname={hostname}
-              url={url}
-            />
+            <ItemContent data={data} content={content} url={url} />
             <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
           </>
         ) : (
