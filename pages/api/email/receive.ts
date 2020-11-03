@@ -100,6 +100,10 @@ const receiveEmail = async (req, res) => {
   } = parseEmailResult;
 
   if (parseEmailError) {
+    console.log({
+      message: "Email parsing error",
+      error: parseEmailError,
+    });
     res.status(500).send({
       message: "Email parsing error",
       error: parseEmailError,
@@ -128,7 +132,12 @@ const receiveEmail = async (req, res) => {
   }
 
   if (createError) {
+    console.log({
+      message: "ReceivedEmail create error",
+      error: createError,
+    });
     res.status(500).send({
+      message: "ReceivedEmail create error",
       error: createError,
     });
     return;
@@ -156,8 +165,19 @@ const receiveEmail = async (req, res) => {
 
       await sendSms(messageResponse, phoneNumber);
     }
+  } else {
+    console.log({
+      message: "Invalid URL",
+      url: generatedTextContent.url,
+      canonicalUrl: generatedTextContent.canonicalUrl,
+    });
   }
 
+  console.log({
+    message: "Email received",
+    body,
+    createResult,
+  });
   res.status(200).send({
     message: "Email received",
     body,
