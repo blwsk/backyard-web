@@ -46,6 +46,18 @@ const getAnchors = (document: Document): object => {
   return links;
 };
 
+const getFirstAnchorHref = (document: Document): string => {
+  const links = getAnchors(document);
+
+  const keys = Object.keys(links);
+
+  if (keys.length > 0) {
+    return links[keys[0]];
+  }
+
+  return null;
+};
+
 const getViewInBrowserUrl = (document: Document): string => {
   const links = getAnchors(document);
   const keys = Object.keys(links);
@@ -91,9 +103,17 @@ export const getEndPageUrl = async (
 
   const subjectLinkMatch = getSubjectLinkMatch(document, subject);
 
-  const url = viewInBrowserUrl || subjectLinkMatch;
+  const firstAnchorHref = getFirstAnchorHref(document);
+
+  const url = viewInBrowserUrl || subjectLinkMatch || firstAnchorHref;
 
   const endPageUrl = url ? await findEndPageUrl(url) : null;
+
+  console.log("End page URL", {
+    viewInBrowserUrl,
+    subjectLinkMatch,
+    firstAnchorHref,
+  });
 
   return endPageUrl;
 };
