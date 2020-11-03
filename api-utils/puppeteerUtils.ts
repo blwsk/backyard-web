@@ -1,9 +1,9 @@
-import { chromium } from "playwright";
+import { launchChromium } from "playwright-aws-lambda";
 
 const { NODE_ENV } = process.env;
 
 export const findEndPageUrl = async (startUrl) => {
-  const browser = await chromium.launch({
+  const browser = await launchChromium({
     headless: NODE_ENV === "development" ? false : true,
   });
 
