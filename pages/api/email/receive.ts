@@ -3,7 +3,7 @@ import { MailSlurp } from "mailslurp-client";
 
 import { getUserByMetadata } from "../../../api-utils/getUserByMetadata";
 import { doAsyncThing } from "../../../api-utils/doAsyncThing";
-import { parseEmailBody } from "../../../api-utils/parseEmailBody";
+import { parseEmail } from "../../../api-utils/parseEmail";
 import { validURL } from "../../../lib/urls";
 import {
   saveContentItem,
@@ -88,10 +88,24 @@ const receiveEmail = async (req, res) => {
     return;
   }
 
-  const [
-    generatedTextContent,
-    generatedTextContentError,
-  ] = await parseEmailBody(emailContent.body);
+  const {
+    isArticleParseable,
+    readerView,
+    emailReaderView,
+    error: parseEmailError,
+  } = await parseEmail(emailContent.body, subject);
+
+  if (parseEmailError) {
+    res.status(500).send({
+      message: "Email parsing error",
+      error: parseEmailError,
+    });
+    return;
+  }
+
+  const generatedTextContent = isArticleParseable
+    ? readerView
+    : emailReaderView;
 
   let createResult;
   let createError;
@@ -117,6 +131,11 @@ const receiveEmail = async (req, res) => {
   }
 
   const url = generatedTextContent.canonicalUrl || generatedTextContent.url;
+
+  const parsedEmailBody =
+    generatedTextContent.parsedEmail && generatedTextContent.parsedEmail.body;
+
+  console.log(parsedEmailBody);
 
   if (validURL(url)) {
     const { message, result, error } = await saveContentItem(

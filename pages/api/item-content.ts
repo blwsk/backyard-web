@@ -1,9 +1,6 @@
 import fetch from "isomorphic-unfetch";
-
-const REQUEST_URI =
-  process.env.NODE_ENV === "development"
-    ? `http://localhost:3001/api/index`
-    : "https://backyard-data.vercel.app/api/index";
+import { doAsyncThing } from "../../api-utils/doAsyncThing";
+import { reader } from "../../api-utils/reader";
 
 const itemContent = async (req, res) => {
   if (req.method !== "PUT") {
@@ -33,19 +30,34 @@ const itemContent = async (req, res) => {
     return;
   }
 
-  const contentResponse = await fetch(REQUEST_URI, {
-    method: "PUT",
-    body: JSON.stringify({
-      url,
-      id,
-    }),
-  });
+  const [urlHtml, urlHtmlError] = await doAsyncThing(() =>
+    fetch(url, {
+      headers: {
+        /**
+         * HACK!!!
+         */
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+        "Cache-Control": "no-cache",
+        Accept: "*/*",
+        Connection: "keep-alive",
+      },
+    }).then((r) => r.text())
+  );
 
-  const contentJson = await contentResponse.json();
+  if (!urlHtml || urlHtmlError) {
+    res.status(500).send({
+      message: "Error while fetching URL content",
+      error: urlHtmlError,
+    });
+    return;
+  }
+
+  const readerView = reader(urlHtml, url);
 
   res.status(200).send({
     message: `Success.`,
-    content: contentJson,
+    content: readerView,
   });
 };
 

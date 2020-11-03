@@ -6,7 +6,8 @@ export const doAsyncThing = async (
   let errorMessage = "";
 
   try {
-    result = await fn();
+    const promise = fn();
+    result = await promise;
   } catch (e) {
     error = e;
     errorMessage = e.message;

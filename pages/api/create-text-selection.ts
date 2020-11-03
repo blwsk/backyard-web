@@ -1,7 +1,19 @@
+import algoliasearch from "algoliasearch";
 import faunadb, { query as q } from "faunadb";
 import authedEndpoint from "../../api-utils/authedEndpoint";
+import { doAsyncThing } from "../../api-utils/doAsyncThing";
+import { CLIPS } from "../../types/SearchIndexTypes";
+import { ClipExportData } from "../../types/ExportTypes";
 
-const { FAUNADB_SECRET: secret } = process.env;
+const {
+  ALGOLIA_APP_ID,
+  ALGOLIA_ADMIN_API_KEY,
+  FAUNADB_SECRET: secret,
+} = process.env;
+
+const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
+
+const index = algoliaClient.initIndex(CLIPS);
 
 const client = new faunadb.Client({ secret });
 
@@ -79,6 +91,55 @@ const createTextSelection = authedEndpoint(
     if (error) {
       res.status(500).send({
         error,
+      });
+      return;
+    }
+
+    const [textSelectionResult, clipCountIncrementResult] = result;
+
+    void clipCountIncrementResult;
+
+    const [
+      textSelectionResultId,
+      textSelectionResultIdError,
+    ] = await doAsyncThing(() =>
+      client.query(q.Select(["ref", "id"], q.Get(textSelectionResult.ref)))
+    );
+
+    if (textSelectionResultIdError) {
+      res.status(500).send({
+        error: textSelectionResultIdError,
+      });
+      return;
+    }
+
+    const [indexForSearchResult, indexForSearchError] = await doAsyncThing(
+      () => {
+        const {
+          data: { text: selectionText, createdBy, createdAt },
+        } = textSelectionResult;
+
+        const clipObject: ClipExportData = {
+          objectID: textSelectionResultId,
+          _id: textSelectionResultId,
+          itemId,
+          text: selectionText,
+          createdAt,
+          createdBy,
+        };
+
+        return index.saveObject(clipObject, {
+          autoGenerateObjectIDIfNotExist: true,
+        });
+      }
+    );
+
+    void indexForSearchResult;
+
+    if (indexForSearchError) {
+      console.log(indexForSearchError);
+      res.status(500).send({
+        error: indexForSearchError,
       });
       return;
     }

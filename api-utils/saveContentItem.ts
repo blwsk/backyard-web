@@ -4,14 +4,13 @@ import algoliasearch from "algoliasearch";
 import { fetchContent } from "./fetchContent";
 import { Item, ItemSource } from "../types/ItemTypes";
 import { doAsyncThing } from "./doAsyncThing";
+import { ITEMS } from "../types/SearchIndexTypes";
 
 const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
 
 const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
 
-const INDEX_NAME = "backyard_test";
-
-const index = algoliaClient.initIndex(INDEX_NAME);
+const index = algoliaClient.initIndex(ITEMS);
 
 interface FaunaObject {
   ref: {

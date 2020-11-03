@@ -8,6 +8,7 @@ import {
 } from "../lib/usePaginatedContentList";
 import { SaveBar } from "../components/saveBar";
 import ContentPageItem from "../components/contentPageItem";
+import Link from "next/link";
 
 const MOST_RECENT_ITEM_LIMIT = 5;
 
@@ -27,7 +28,14 @@ const RecentContent = () => {
 
   return (
     <div>
-      <h3>Recent content</h3>
+      <h3>
+        <span>Recent content</span>
+        <Link href="/my-content">
+          <a>
+            <small>View All</small>
+          </a>
+        </Link>
+      </h3>
       {mostRecentContentItems.length > 0 ? (
         mostRecentContentItems.map((item) => {
           return <ContentPageItem key={item._id} item={item} />;
@@ -35,6 +43,17 @@ const RecentContent = () => {
       ) : (
         <div>None! Save some content.</div>
       )}
+      <style jsx>{`
+        h3 {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        h3 a {
+          font-weight: 500;
+          color: var(--c1);
+        }
+      `}</style>
     </div>
   );
 };
