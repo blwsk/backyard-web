@@ -40,7 +40,15 @@ const receiveEmail = async (req, res) => {
 
   const body: EmailWebhookBody = req.body;
 
-  const { inboxId, emailId, subject } = body;
+  const { inboxId, emailId, subject, from, to } = body;
+
+  console.log("Received Email", {
+    inboxId,
+    emailId,
+    subject,
+    from,
+    to,
+  });
 
   const emailIngestAddress = makeEmailAddressFromId(inboxId);
 

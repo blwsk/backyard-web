@@ -18,7 +18,14 @@ const { MessagingResponse } = twiml;
 
 const receiveSms = async (req, res) => {
   const { From, To, Body, MessageSid, AccountSid } = req.body;
-  void To, Body, MessageSid, AccountSid;
+
+  console.log("Received SMS", {
+    From,
+    To,
+    Body,
+    MessageSid,
+    AccountSid,
+  });
 
   const fromPhoneNumber = From.replace("+1", "");
 
