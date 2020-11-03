@@ -58,23 +58,6 @@ const getFirstAnchorHref = (document: Document): string => {
   return null;
 };
 
-const getViewInBrowserUrl = (document: Document): string => {
-  const links = getAnchors(document);
-  const keys = Object.keys(links);
-
-  const searchableSet = FuzzySet(keys);
-
-  const match = searchableSet.get("view in browser");
-
-  if (match) {
-    const key = match[0][1];
-
-    return links[key];
-  }
-
-  return null;
-};
-
 const getSubjectLinkMatch = (document: Document, subject: string): string => {
   const links = getAnchors(document);
 
@@ -84,7 +67,26 @@ const getSubjectLinkMatch = (document: Document, subject: string): string => {
 
   const match = searchableSet.get(subject);
 
-  if (match) {
+  if (match && match[0] && match[0][0] > 0.75) {
+    console.log("Subject link match", match[0]);
+    const key = match[0][1];
+
+    return links[key];
+  }
+
+  return null;
+};
+
+const getViewInBrowserUrl = (document: Document): string => {
+  const links = getAnchors(document);
+  const keys = Object.keys(links);
+
+  const searchableSet = FuzzySet(keys);
+
+  const match = searchableSet.get("view in browser");
+
+  if (match && match[0] && match[0][0] > 0.75) {
+    console.log("View in browser match", match[0]);
     const key = match[0][1];
 
     return links[key];
@@ -99,19 +101,19 @@ export const getEndPageUrl = async (
 ): Promise<string> => {
   const document = getDom(html);
 
-  const viewInBrowserUrl = getViewInBrowserUrl(document);
-
   const subjectLinkMatch = getSubjectLinkMatch(document, subject);
+
+  const viewInBrowserUrl = getViewInBrowserUrl(document);
 
   const firstAnchorHref = getFirstAnchorHref(document);
 
-  const url = viewInBrowserUrl || subjectLinkMatch || firstAnchorHref;
+  const url = subjectLinkMatch || viewInBrowserUrl || firstAnchorHref;
 
   const endPageUrl = url ? await findEndPageUrl(url) : null;
 
   console.log("End page URL", {
-    viewInBrowserUrl,
     subjectLinkMatch,
+    viewInBrowserUrl,
     firstAnchorHref,
   });
 
