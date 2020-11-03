@@ -4,6 +4,7 @@ const { NODE_ENV } = process.env;
 
 export const findEndPageUrl = async (startUrl) => {
   const browser = await puppeteer.launch({
+    product: "chrome",
     headless: NODE_ENV === "development" ? false : true,
   });
 
