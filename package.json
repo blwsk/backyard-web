@@ -19,6 +19,7 @@
     "jwks-rsa": "^1.10.1",
     "mailslurp-client": "^8.7.8",
     "next": "^9.4.4",
+    "playwright": "^1.5.2",
     "puppeteer": "^5.4.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
