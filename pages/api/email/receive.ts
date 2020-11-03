@@ -79,6 +79,11 @@ const receiveEmail = async (req, res) => {
     !emailContent ||
     typeof emailContent.body !== "string"
   ) {
+    console.log("No email body found", {
+      error: emailContentError ? emailContentError.message : null,
+      emailIngestAddress,
+      emailContent,
+    });
     res.status(500).send({
       message: "No email body found",
       error: emailContentError ? emailContentError.message : null,
@@ -90,8 +95,6 @@ const receiveEmail = async (req, res) => {
 
   const parseEmailResult = await parseEmail(emailContent.body, subject);
 
-  console.log(parseEmailResult);
-
   const {
     isArticleParseable,
     readerView,
@@ -100,8 +103,7 @@ const receiveEmail = async (req, res) => {
   } = parseEmailResult;
 
   if (parseEmailError) {
-    console.log({
-      message: "Email parsing error",
+    console.log("Email parsing error", {
       error: parseEmailError,
     });
     res.status(500).send({
@@ -132,8 +134,7 @@ const receiveEmail = async (req, res) => {
   }
 
   if (createError) {
-    console.log({
-      message: "ReceivedEmail create error",
+    console.log("ReceivedEmail create error", {
       error: createError,
     });
     res.status(500).send({
@@ -166,18 +167,12 @@ const receiveEmail = async (req, res) => {
       await sendSms(messageResponse, phoneNumber);
     }
   } else {
-    console.log({
-      message: "Invalid URL",
+    console.log("Invalid URL", {
       url: generatedTextContent.url,
       canonicalUrl: generatedTextContent.canonicalUrl,
     });
   }
 
-  console.log({
-    message: "Email received",
-    body,
-    createResult,
-  });
   res.status(200).send({
     message: "Email received",
     body,

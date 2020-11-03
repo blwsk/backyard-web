@@ -37,12 +37,17 @@ export const getMetaProperties = (
   };
 };
 
-const getViewInBrowserUrl = (document: Document): string => {
+const getAnchors = (document: Document): object => {
   let links = {};
   document.querySelectorAll("a").forEach((el) => {
-    links[el.text] = el.href;
+    const key = el.text ? el.text.trim() : el.text;
+    links[key] = el.href;
   });
+  return links;
+};
 
+const getViewInBrowserUrl = (document: Document): string => {
+  const links = getAnchors(document);
   const keys = Object.keys(links);
 
   const searchableSet = FuzzySet(keys);
@@ -59,10 +64,7 @@ const getViewInBrowserUrl = (document: Document): string => {
 };
 
 const getSubjectLinkMatch = (document: Document, subject: string): string => {
-  let links = {};
-  document.querySelectorAll("a").forEach((el) => {
-    links[el.text] = el.href;
-  });
+  const links = getAnchors(document);
 
   const keys = Object.keys(links);
 
