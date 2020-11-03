@@ -1,4 +1,4 @@
-import { reader, getEndPageUrl } from "./reader";
+import { reader, getEndPageUrl, ReaderView } from "./reader";
 import { doAsyncThing } from "./doAsyncThing";
 
 export const parseEmail = async (
@@ -6,8 +6,8 @@ export const parseEmail = async (
   subject: string
 ): Promise<{
   isArticleParseable?: boolean;
-  readerView?: any;
-  emailReaderView?: any;
+  readerView?: ReaderView;
+  emailReaderView?: ReaderView;
   error?: Error;
 }> => {
   const endPageUrl = await getEndPageUrl(emailBody, subject);

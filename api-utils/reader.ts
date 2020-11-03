@@ -96,10 +96,7 @@ export const getEndPageUrl = async (
   return endPageUrl;
 };
 
-export const reader = (
-  html: string,
-  url?: string
-): {
+export interface ReaderView {
   title?: string;
   url?: string;
   metaTitle?: string;
@@ -109,7 +106,9 @@ export const reader = (
   textContent?: string;
   length?: number;
   siteName?: string;
-} => {
+}
+
+export const reader = (html: string, url?: string): ReaderView => {
   const document = getDom(html, url);
 
   const properties = getMetaProperties(document);

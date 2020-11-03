@@ -88,12 +88,16 @@ const receiveEmail = async (req, res) => {
     return;
   }
 
+  const parseEmailResult = await parseEmail(emailContent.body, subject);
+
+  console.log(parseEmailResult);
+
   const {
     isArticleParseable,
     readerView,
     emailReaderView,
     error: parseEmailError,
-  } = await parseEmail(emailContent.body, subject);
+  } = parseEmailResult;
 
   if (parseEmailError) {
     res.status(500).send({
@@ -132,10 +136,7 @@ const receiveEmail = async (req, res) => {
 
   const url = generatedTextContent.canonicalUrl || generatedTextContent.url;
 
-  const parsedEmailBody =
-    generatedTextContent.parsedEmail && generatedTextContent.parsedEmail.body;
-
-  console.log(parsedEmailBody);
+  const parsedEmailBody = generatedTextContent.body;
 
   if (validURL(url)) {
     const { message, result, error } = await saveContentItem(
