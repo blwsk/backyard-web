@@ -139,6 +139,10 @@ export const reader = (html: string, url?: string): ReaderView => {
 
   const parsed = reader ? reader.parse() : null;
 
+  console.log("Reader", {
+    properties,
+  });
+
   return {
     // from document tags
     title: properties.title,
@@ -147,7 +151,7 @@ export const reader = (html: string, url?: string): ReaderView => {
     canonicalUrl: properties.canonicalUrl,
 
     // from readability parse result
-    url: parsed.url || properties.url || url,
+    url: (parsed && parsed.url) || properties.url || url,
     body: parsed.content,
     textContent: parsed.textContent,
     length: parsed.length,
