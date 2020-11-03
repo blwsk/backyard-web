@@ -109,12 +109,20 @@ export const getEndPageUrl = async (
 
   const url = subjectLinkMatch || viewInBrowserUrl || firstAnchorHref;
 
-  const endPageUrl = url ? await findEndPageUrl(url) : null;
+  let endPageUrl, endPageUrlError;
+
+  try {
+    endPageUrl = url ? await findEndPageUrl(url) : null;
+  } catch (error) {
+    console.error(error);
+    endPageUrlError;
+  }
 
   console.log("End page URL", {
     subjectLinkMatch,
     viewInBrowserUrl,
     firstAnchorHref,
+    endPageUrl,
   });
 
   return endPageUrl;
