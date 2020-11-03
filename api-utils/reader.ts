@@ -143,6 +143,8 @@ export const reader = (html: string, url?: string): ReaderView => {
     properties,
   });
 
+  const urlToPass = (parsed && parsed.url) || properties.url || url;
+
   return {
     // from document tags
     title: properties.title,
@@ -151,10 +153,12 @@ export const reader = (html: string, url?: string): ReaderView => {
     canonicalUrl: properties.canonicalUrl,
 
     // from readability parse result
-    url: (parsed && parsed.url) || properties.url || url,
-    body: parsed.content,
-    textContent: parsed.textContent,
-    length: parsed.length,
-    siteName: parsed.siteName,
+    url: urlToPass,
+    ...(parsed && {
+      body: parsed.content,
+      textContent: parsed.textContent,
+      length: parsed.length,
+      siteName: parsed.siteName,
+    }),
   };
 };
