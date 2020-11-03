@@ -5,4 +5,7 @@ export interface TextContentData {
   metaTitle?: string;
   metaDescription?: string;
   canonicalUrl?: string;
+  parsedEmail?: {
+    body?: string;
+  };
 }

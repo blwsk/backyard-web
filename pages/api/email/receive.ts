@@ -93,6 +93,10 @@ const receiveEmail = async (req, res) => {
     generatedTextContentError,
   ] = await parseEmailBody(emailContent.body);
 
+  if (generatedTextContentError) {
+    console.log(generatedTextContentError);
+  }
+
   let createResult;
   let createError;
   try {
@@ -117,6 +121,11 @@ const receiveEmail = async (req, res) => {
   }
 
   const url = generatedTextContent.canonicalUrl || generatedTextContent.url;
+
+  const parsedEmailBody =
+    generatedTextContent.parsedEmail && generatedTextContent.parsedEmail.body;
+
+  console.log(parsedEmailBody);
 
   if (validURL(url)) {
     const { message, result, error } = await saveContentItem(
