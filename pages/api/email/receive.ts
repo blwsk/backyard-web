@@ -83,6 +83,7 @@ const receiveEmail = async (req, res) => {
       error: emailContentError ? emailContentError.message : null,
       emailIngestAddress,
       emailContent,
+      emailMetadata: { inboxId, emailId },
     });
     res.status(500).send({
       message: "No email body found",
@@ -105,6 +106,7 @@ const receiveEmail = async (req, res) => {
   if (parseEmailError) {
     console.log("Email parsing error", {
       error: parseEmailError,
+      emailMetadata: { inboxId, emailId },
     });
     res.status(500).send({
       message: "Email parsing error",
@@ -136,6 +138,7 @@ const receiveEmail = async (req, res) => {
   if (createError) {
     console.log("ReceivedEmail create error", {
       error: createError,
+      emailMetadata: { inboxId, emailId },
     });
     res.status(500).send({
       message: "ReceivedEmail create error",
@@ -170,6 +173,7 @@ const receiveEmail = async (req, res) => {
     console.log("Invalid URL", {
       url: generatedTextContent.url,
       canonicalUrl: generatedTextContent.canonicalUrl,
+      emailMetadata: { inboxId, emailId },
     });
   }
 
