@@ -1,6 +1,5 @@
 import React, { CSSProperties } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { withRouter, NextRouter } from "next/router";
 import LogoutButton from "./logoutButton";
 import LoginButton from "./loginButton";
 import Link from "next/link";
@@ -8,10 +7,9 @@ import Link from "next/link";
 type Props = {
   className?: string;
   style?: CSSProperties;
-  router?: NextRouter;
 };
 
-const AuthInteraction = ({ className, style, router }: Props) => {
+const AuthInteraction = ({ className, style }: Props) => {
   const { user, isAuthenticated } = useAuth0();
 
   return (
@@ -44,4 +42,4 @@ const AuthInteraction = ({ className, style, router }: Props) => {
   );
 };
 
-export default withRouter(AuthInteraction);
+export default AuthInteraction;

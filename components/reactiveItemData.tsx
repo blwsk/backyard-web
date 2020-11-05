@@ -183,16 +183,17 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
           <H3 data={data} content={content} />
         </div>
         {hostname && (
-          <Controls
-            data={data}
-            content={content}
-            onShowContent={onShowContent}
-            onShowClips={onShowClips}
-            showClips={showClips}
-            itemId={itemId}
-          />
+          <div className="m-y-6">
+            <Controls
+              data={data}
+              content={content}
+              onShowContent={onShowContent}
+              onShowClips={onShowClips}
+              showClips={showClips}
+              itemId={itemId}
+            />
+          </div>
         )}
-        <br />
         {!showClips ? (
           <>
             <ItemContent data={data} content={content} url={url} />

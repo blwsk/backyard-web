@@ -233,6 +233,13 @@ article:last-child {
   margin-right: 0;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.m-all-0 {
+  margin: 0;
+}
 .m-all-2 {
   margin: 8px;
 }
@@ -246,6 +253,9 @@ article:last-child {
 .m-y-6 {
   margin-top: 24px;
   margin-bottom: 24px;
+}
+.m-bottom-2 {
+  margin-bottom: 8px;
 }
 .m-bottom-4 {
   margin-bottom: 16px;
@@ -284,11 +294,20 @@ article:last-child {
   padding-top: 16px;
 }
 
+.width-100 {
+  width: 100%;
+}
+
 .column {
   width: 100%;
   max-width: 1200px;
   display: flex;
   justify-content: center;
+}
+
+a.link-black {
+  font-weight: 500;
+  color: var(--c1);
 }
 
 .color-black {

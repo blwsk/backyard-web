@@ -114,19 +114,16 @@ const SelectionList = () => {
       <div style={{ height: 100 }}>
         {data ? (
           hasMore ? (
-            <div>
-              <br />
+            <div className="m-y-4">
               <button onClick={onLoadMoreClick}>Load more</button>
             </div>
           ) : (
-            <div>
-              <br />
+            <div className="m-y-4">
               <div>All caught up.</div>
             </div>
           )
         ) : (
-          <div>
-            <br />
+          <div className="m-y-4">
             <div>Loading...</div>
           </div>
         )}
