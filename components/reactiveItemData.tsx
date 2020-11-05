@@ -53,12 +53,7 @@ const H3 = ({ data, content }) => {
 const Metadata = ({ hostname, url }) => {
   return (
     <>
-      <span
-        style={{
-          marginBottom: 24,
-          opacity: 0.8,
-        }}
-      >
+      <span>
         <a href={`//${hostname}`}>{hostname}</a>
         <a href={url}>Original</a>
       </span>
