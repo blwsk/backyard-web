@@ -161,7 +161,7 @@ const Selection = ({ itemId, invalidateQuery }) => {
                 }),
           }}
         >
-          <div className="p-all-1">
+          <div className="p-1">
             <small>
               <b>{selection.text.length}</b> characters
             </small>

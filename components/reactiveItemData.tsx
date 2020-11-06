@@ -110,7 +110,7 @@ const Controls = ({
         </button>
       </div>
       {showSelectList && (
-        <div className="p-y-2">
+        <div className="py-2">
           <SelectList inline ids={[itemId]} />
         </div>
       )}
@@ -173,12 +173,12 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
       )}
       <div>
         {hostname && <Metadata hostname={hostname} url={url} />}
-        <div className="m-y-6">
+        <div className="my-4">
           <H2 data={data} content={content} />
           <H3 data={data} content={content} />
         </div>
         {hostname && (
-          <div className="m-y-6">
+          <div className="my-4">
             <Controls
               data={data}
               content={content}

@@ -71,7 +71,7 @@ const SaveUrl = ({ urlString, router }) => {
 
   return (
     <>
-      <section
+      <div
         style={{
           alignItems: "center",
           justifyContent: "center",
@@ -79,7 +79,7 @@ const SaveUrl = ({ urlString, router }) => {
         }}
       >
         {saveState.message && <h1>{saveState.message}</h1>}
-      </section>
+      </div>
       {isValid ? (
         <>
           {saveState.loading && <div>Loading...</div>}

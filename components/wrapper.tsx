@@ -1,18 +1,9 @@
 import React from "react";
 
-const Wrapper = ({ children, align = undefined }) => {
+const Wrapper = ({ children, className = "" }) => {
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        padding: 16,
-        wordBreak: "break-word",
-        width: "100%",
-        maxWidth: "760px",
-        margin: "0 auto",
-        alignItems: align ? align : "inherit",
-      }}
+      className={`flex flex-col mx-auto w-full max-w-3xl break-words p-4 ${className}`}
     >
       {children}
     </div>

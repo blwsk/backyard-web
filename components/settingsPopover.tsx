@@ -8,26 +8,25 @@ const SettingsPopover = ({ onClose }: { onClose: MouseEventHandler }) => {
 
   return (
     <>
-      <span className="popover-body p-all-4">
+      <span className="popover-body absolute p-4">
         <div>
           <a className="link-black cursor-pointer" onClick={onClose}>
             Close
           </a>
         </div>
-        <hr />
-        <div className="m-bottom-2">
+        <hr className="my-3" />
+        <div className="mb-2">
           <small>
             <i>Welcome, {user.email}</i>
           </small>
         </div>
         <Link href="/settings">
-          <a className="link-black m-bottom-4">Settings</a>
+          <a className="link-black mb-4">Settings</a>
         </Link>
         <LogoutButton />
       </span>
       <style jsx>{`
         .popover-body {
-          position: absolute;
           top: 8px;
           left: 16px;
           right: 16px;
