@@ -28,9 +28,9 @@ const IndexWithAuth = () => {
 
   return (
     <>
-      <Wrapper align="center">
+      <Wrapper className="align-center">
         <h1>Backyard</h1>
-        <div className="m-y-4 width-100">
+        <div className="my-4 w-full">
           <SaveBar />
         </div>
       </Wrapper>
@@ -71,11 +71,11 @@ const IndexWithAuth = () => {
 const NoAuthIndex = () => {
   return (
     <>
-      <Wrapper align="center">
+      <Wrapper className="align-center">
         <h1>Backyard</h1>
       </Wrapper>
       <Wrapper>
-        <div className="well m-bottom-4">
+        <div className="well mb-4">
           <h3>Save content easily</h3>
           <p>
             Subscribe to newsletters with a free email address. Get notified via
@@ -83,20 +83,20 @@ const NoAuthIndex = () => {
             save them. Drag and drop files anywhere to save them.
           </p>
         </div>
-        <div className="well m-bottom-4">
+        <div className="well mb-4">
           <h3>Highlight and annotate quickly</h3>
           <p>
             Keep track of the most important parts of an article. Record your
             thoughts on an article with inline annotations.
           </p>
         </div>
-        <div className="well m-bottom-4">
+        <div className="well mb-4">
           <h3>Search everything</h3>
           <p>
             Search across full article text and metadata, highlights, and notes.
           </p>
         </div>
-        <div className="well m-bottom-4">
+        <div className="well mb-4">
           <h3>Organize your content into queues.</h3>
           <p>
             Don't worry about forgetting what you want to read next. Find a

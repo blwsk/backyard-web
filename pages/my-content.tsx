@@ -311,7 +311,7 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
           </footer>
         )}
         {deletionState.pending && (
-          <div className="pending-modal p-all-4">
+          <div className="pending-modal p-4">
             <h2>
               Are you sure you want to delete <span>{numSelected}</span>{" "}
               <span>{numSelected === 1 ? "item" : "items"}</span>?
@@ -332,7 +332,7 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
           </div>
         )}
         {addToListState.pending && (
-          <div className="pending-modal p-all-4">
+          <div className="pending-modal p-4">
             <h2>
               Add <span>{numSelected}</span>{" "}
               <span>{numSelected === 1 ? "item" : "items"}</span> to list

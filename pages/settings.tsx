@@ -152,7 +152,7 @@ const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
           </div>
         )}
       </label>
-      <div className="p-top-4">
+      <div className="pt-4">
         {phoneNumber ? (
           <input
             type="text"
@@ -228,7 +228,7 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
           posts will automatically be added.
         </div>
       </label>
-      <div className="p-top-4">
+      <div className="pt-4">
         {emailIngestAddress ? (
           <input
             type="text"
@@ -252,10 +252,10 @@ const SettingsForm = ({ data }) => {
 
   return (
     <div>
-      <div className="m-bottom-6">
+      <div className="mb-6">
         <PhoneNumberSetting phoneNumber={phoneNumber} />
       </div>
-      <div className="m-bottom-6">
+      <div className="mb-6">
         <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
       </div>
       <Guide />

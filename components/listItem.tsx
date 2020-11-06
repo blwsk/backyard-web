@@ -28,7 +28,7 @@ const ListItem: FunctionComponent<Props> = ({ item, light = false }) => {
   const timeString = date.toLocaleTimeString();
 
   return (
-    <div className={`list-item ${light ? "light" : ""} p-y-3`}>
+    <div className={`list-item ${light ? "light" : ""} py-3`}>
       <div>
         <b>
           <Link href={{ pathname: "/viewer", query: { id: _id } }}>
