@@ -32,8 +32,8 @@ const SettingsPopover = ({ onClose }: { onClose: MouseEventHandler }) => {
           left: 16px;
           right: 16px;
           width: calc(100% - 32px);
-          background: white;
-          box-shadow: rgba(50, 50, 93, 0.1) 0px 8px 20px 0px;
+          background: var(--c3);
+          box-shadow: var(--ghost) 0px 8px 20px 0px;
           display: flex;
           flex-direction: column;
           align-items: flex-end;
