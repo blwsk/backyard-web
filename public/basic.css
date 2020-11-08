@@ -17,7 +17,9 @@
 
   --c6: rgb(255, 0, 0);
   --c7: rgb(0, 255, 0);
-  --c8: aliceblue;
+  --c8: rgb(231, 231, 231);
+  --c9: rgba(0, 0, 0, 0.25);
+
   --m1: 8px;
   --rc: 8px;
   --white: #fff;
@@ -33,6 +35,7 @@
     --c5: #fff;
 
     --c8: #1f1f1f;
+    --c9: rgba(255, 255, 255, 0.05);
 
     --ghost: rgba(255, 255, 255, 0.05);
   }
@@ -298,6 +301,13 @@ h6 {
 .well {
   background-color: var(--c8);
   padding: 16px;
+  border-radius: var(--rc);
+  width: 100%;
+}
+
+.well-trim {
+  background-color: var(--c8);
+  padding: 0;
   border-radius: var(--rc);
   width: 100%;
 }

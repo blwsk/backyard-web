@@ -29,7 +29,7 @@ const IndexWithAuth = () => {
   return (
     <>
       <Wrapper className="align-center">
-        <h1>Backyard</h1>
+        <h1 className="text-center">Backyard</h1>
         <div className="my-4 w-full">
           <SaveBar />
         </div>
@@ -72,7 +72,7 @@ const NoAuthIndex = () => {
   return (
     <>
       <Wrapper className="align-center">
-        <h1>Backyard</h1>
+        <h1 className="text-center">Backyard</h1>
       </Wrapper>
       <Wrapper>
         <div className="well mb-4">

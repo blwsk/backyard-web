@@ -3,23 +3,26 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "./logoutButton";
 import Link from "next/link";
 
-const SettingsPopover = ({ onClose }: { onClose: MouseEventHandler }) => {
+const SettingsPopover = () => {
   const { user } = useAuth0();
 
   return (
     <>
       <span className="popover-body absolute p-4">
-        <div>
-          <a className="link-black cursor-pointer" onClick={onClose}>
-            Close
-          </a>
-        </div>
-        <hr className="my-3" />
-        <div className="mb-2">
+        <div className="mb-4">
           <small>
             <i>Welcome, {user.email}</i>
           </small>
         </div>
+
+        <Link href="/lists">
+          <a className="link-black mb-4">Lists</a>
+        </Link>
+
+        <Link href="/clips">
+          <a className="link-black mb-4">Clips</a>
+        </Link>
+
         <Link href="/settings">
           <a className="link-black mb-4">Settings</a>
         </Link>
@@ -27,31 +30,29 @@ const SettingsPopover = ({ onClose }: { onClose: MouseEventHandler }) => {
       </span>
       <style jsx>{`
         .popover-body {
-          top: 8px;
-          left: 16px;
-          right: 16px;
-          width: calc(100% - 32px);
-          background: var(--c3);
-          box-shadow: var(--ghost) 0px 8px 20px 0px;
+          top: 24px;
+          left: -16px;
+          right: 0;
+          width: 200px;
           display: flex;
           flex-direction: column;
-          align-items: flex-end;
+          align-items: flex-start;
+          background: var(--c3);
+          box-shadow: var(--ghost) 0px 8px 20px 0px;
           border-radius: var(--rc);
+          opacity: 0.99;
+          z-index: 100;
         }
 
-        hr {
-          border-color: var(--c4);
-          height: 1px;
-          width: 100%;
-        }
-
-        @media (min-width: 600px) {
+        @media (max-width: 600px) {
           .popover-body {
-            top: 12px;
-            left: auto;
-            right: auto;
-            width: 200px;
-            align-items: flex-start;
+            top: 52px;
+            left: 0;
+            right: 0;
+            align-items: flex-end;
+            border-top: 1px solid var(--c4);
+            width: 100%;
+            border-radius: 0;
           }
         }
       `}</style>

@@ -4,12 +4,13 @@ import LogoutButton from "./logoutButton";
 import LoginButton from "./loginButton";
 import Link from "next/link";
 
-type Props = {
+const AuthInteraction = ({
+  className,
+  style,
+}: {
   className?: string;
   style?: CSSProperties;
-};
-
-const AuthInteraction = ({ className, style }: Props) => {
+}) => {
   const { user, isAuthenticated } = useAuth0();
 
   return (

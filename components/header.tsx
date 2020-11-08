@@ -1,8 +1,8 @@
 import Link from "next/link";
 import AuthInteraction from "./authInteraction";
 import requireAuth from "../lib/requireAuth";
-import { useState } from "react";
-import SettingsPopover from "./settingsPopover";
+import { useState, ReactChild } from "react";
+import MenuPopover from "./MenuPopover";
 
 const popover = (Closed, Opened) => {
   const [open, updateOpen] = useState(false);
@@ -14,18 +14,11 @@ const popover = (Closed, Opened) => {
   return <Closed onOpen={() => updateOpen(true)} />;
 };
 
-const GenericHeader = ({ children }) => {
+const GenericHeader = ({ children }: { children: ReactChild }) => {
   return (
-    <div>
-      <header>{children}</header>
-      <style jsx>{`
-        header {
-          padding: 16px;
-          display: flex;
-          align-items: center;
-        }
-      `}</style>
-    </div>
+    <header className="flex items-center justify-between md:justify-start p-4">
+      {children}
+    </header>
   );
 };
 
@@ -33,48 +26,31 @@ const AuthenticatedHeader = () => {
   return (
     <GenericHeader>
       <>
-        <span
-          className="logo"
-          style={{
-            marginRight: 24,
-          }}
-        >
-          <Link href="/">
-            <a className="link-black">🏕</a>
-          </Link>
-        </span>
-        <span style={{ marginRight: 20 }}>
+        <Link href="/">
+          <a className="link-black mr-6">🏕</a>
+        </Link>
+        <div className="space-x-6">
           <Link href="/my-content">
             <a className="link-black">Saved</a>
           </Link>
-        </span>
-        <span style={{ marginRight: 20 }}>
-          <Link href="/lists">
-            <a className="link-black">Lists</a>
-          </Link>
-        </span>
-        <span style={{ marginRight: 20 }}>
-          <Link href="/clips">
-            <a className="link-black">Clips</a>
-          </Link>
-        </span>
-        <span style={{ marginRight: 20 }}>
-          {popover(
-            ({ onOpen }) => (
-              <a className="link-black cursor-pointer" onClick={onOpen}>
-                Menu
-              </a>
-            ),
-            ({ onClose }) => (
-              <SettingsPopover onClose={onClose} />
-            )
-          )}
-        </span>
-        <style jsx>{`
-          .logo {
-            font-size: 30px;
-          }
-        `}</style>
+          <span>
+            {popover(
+              ({ onOpen }) => (
+                <a className="link-black cursor-pointer" onClick={onOpen}>
+                  Menu
+                </a>
+              ),
+              ({ onClose }) => (
+                <span className="md:relative">
+                  <a className="link-black cursor-pointer" onClick={onClose}>
+                    Close
+                  </a>
+                  <MenuPopover />
+                </span>
+              )
+            )}
+          </span>
+        </div>
       </>
     </GenericHeader>
   );
@@ -83,34 +59,12 @@ const AuthenticatedHeader = () => {
 const NoAuthHeader = () => {
   return (
     <GenericHeader>
-      <div className="wrapper">
-        <span className="logo">
-          <Link href="/">
-            <a className="link-black">🏕</a>
-          </Link>
-        </span>
-        <span>
-          <AuthInteraction />
-        </span>
+      <div className="w-full space-x-6 flex justify-between">
+        <Link href="/">
+          <a className="link-black">🏕</a>
+        </Link>
+        <AuthInteraction />
       </div>
-      <style jsx>{`
-        .wrapper {
-          width: 100%;
-          display: inline-grid;
-          grid-template-columns: repeat(2, 50% [col-start]);
-        }
-        .wrapper span {
-          display: flex;
-          justify-content: flex-start;
-          align-items: center;
-        }
-        .wrapper span:last-child {
-          justify-content: flex-end;
-        }
-        .logo {
-          font-size: 30px;
-        }
-      `}</style>
     </GenericHeader>
   );
 };

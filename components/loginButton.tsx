@@ -1,14 +1,22 @@
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { isiOs } from "../lib/isiOs";
 
 const LoginButton = () => {
-  const { loginWithRedirect } = useAuth0();
+  const { loginWithRedirect, loginWithPopup } = useAuth0();
 
   return (
     <button
-      className="small"
+      className="small m-0"
       onClick={() => {
-        loginWithRedirect({
+        if (isiOs()) {
+          loginWithRedirect({
+            redirectUri: window.location.origin,
+          });
+          return;
+        }
+
+        loginWithPopup({
           redirectUri: window.location.origin,
         });
       }}

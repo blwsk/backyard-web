@@ -1,4 +1,5 @@
 import formatRelative from "date-fns/formatRelative";
+import sanitize from "sanitize-html";
 import { capitalize } from "../lib/capitalize";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
@@ -34,21 +35,17 @@ const getTweetData = ({ data, tweetJson }): TweetData => {
   return data.tweets;
 };
 
-const TweetTextWithMedia = ({ tweet, media }) => {
+const getTweetTextWithMedia = ({ tweet, media }) => {
   const splitOnTco = tweet.text.split(TCO_PATTERN);
   const joinedWithMedia = splitOnTco.reduce((acc, part, i) => {
     if (i === splitOnTco.length - 1) {
-      return [...acc, <span key={i}>{part}</span>];
+      return [...acc, part];
     }
     const mediaContent = "😀";
-    return [
-      ...acc,
-      <span key={i}>{part}</span>,
-      <span key={`${i}.media`}>{mediaContent}</span>,
-    ];
+    return [...acc, part, mediaContent];
   }, []);
 
-  return <pre className="tweet-text">{joinedWithMedia}</pre>;
+  return joinedWithMedia.join("");
 };
 
 interface Props {
@@ -72,37 +69,48 @@ const Tweet = ({ data, tweetJson }: Props) => {
         );
 
         return (
-          <div key={t.id} className="tweet">
-            <TweetTextWithMedia tweet={t} media={media} />
+          <div key={t.id} className="tweet well-trim p-0">
             {author && (
-              <div className="tweet-footer">
-                {author.name}{" "}
-                <a href={`https://twitter.com/${author.username}`}>
-                  {`@${author.username}`}
-                </a>
-                {" ・ "}
-                <a
-                  href={`https://twitter.com/${author.username}/status/${t.id}`}
-                >
-                  {capitalize(
-                    formatRelative(new Date(t.created_at), new Date())
-                  )}
-                </a>
-              </div>
+              <>
+                <div className="p-4 flex justify-between">
+                  <span>
+                    <span className="font-semibold mr-2">{author.name}</span>
+                    <a href={`https://twitter.com/${author.username}`}>
+                      {`@${author.username}`}
+                    </a>
+                  </span>
+                  <a
+                    href={`https://twitter.com/${author.username}/status/${t.id}`}
+                  >
+                    {capitalize(
+                      formatRelative(new Date(t.created_at), new Date())
+                    )}
+                  </a>
+                </div>
+                <hr />
+              </>
             )}
+            <pre
+              className="tweet-text p-4"
+              dangerouslySetInnerHTML={{
+                __html: sanitize(getTweetTextWithMedia({ tweet: t, media })),
+              }}
+            />
           </div>
         );
       })}
-      <style jsx global>
+      <style jsx>
         {`
+          .tweet hr {
+            border-color: var(--c9);
+          }
+          .tweet a {
+            color: var(--c1);
+            text-decoration: underline;
+          }
           pre.tweet-text {
             font: var(--sans);
             white-space: pre-line;
-            background-color: var(--ghost);
-            padding: 16px;
-          }
-          .tweet-footer {
-            padding: 0 16px;
           }
         `}
       </style>

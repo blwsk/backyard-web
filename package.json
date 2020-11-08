@@ -24,6 +24,7 @@
     "playwright-core": "^1.5.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "sanitize-html": "^2.1.2",
     "swr": "^0.2.3",
     "twilio": "^3.49.4",
     "unfetch": "^4.1.0"
