@@ -72,8 +72,8 @@ const Tweet = ({ data, tweetJson }: Props) => {
           <div key={t.id} className="tweet well-trim p-0">
             {author && (
               <>
-                <div className="p-4 flex justify-between">
-                  <span>
+                <div className="p-4 flex justify-between items-end">
+                  <span className="flex flex-col md:block">
                     <span className="font-semibold mr-2">{author.name}</span>
                     <a href={`https://twitter.com/${author.username}`}>
                       {`@${author.username}`}

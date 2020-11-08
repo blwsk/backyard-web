@@ -2,8 +2,8 @@ import useSWR from "swr";
 import { getHostname } from "../lib/urls";
 import { useState } from "react";
 import Selection from "./selection";
-import SelectList from "./selectList";
 import ItemContent from "./itemContent";
+import ItemControls from "./itemControls";
 
 const ClipsList = ({ clips }) => {
   return (
@@ -70,64 +70,6 @@ const Metadata = ({ hostname, url }) => {
   );
 };
 
-const Controls = ({
-  onShowContent,
-  onShowClips,
-  showClips,
-  content,
-  data,
-  itemId,
-}) => {
-  const [showSelectList, updateShowSelectList] = useState(false);
-  const loaded = data || content;
-
-  return (
-    <>
-      <div
-        style={{
-          marginTop: 16,
-        }}
-      >
-        <button
-          className={`small secondary ${!showClips ? "current" : ""}`}
-          onClick={loaded ? onShowContent : undefined}
-        >
-          Content
-        </button>
-        <button
-          className={`small secondary ${showClips ? "current" : ""}`}
-          onClick={loaded ? onShowClips : undefined}
-        >
-          Clips
-        </button>
-        <button
-          className={`small secondary ${showSelectList ? "current" : ""}`}
-          onClick={() => {
-            updateShowSelectList(!showSelectList);
-          }}
-        >
-          More
-        </button>
-      </div>
-      {showSelectList && (
-        <div className="py-2">
-          <SelectList inline ids={[itemId]} />
-        </div>
-      )}
-      <style jsx>{`
-        div {
-          display: flex;
-          flex-direction: row;
-        }
-        button {
-          margin: 0;
-          margin-right: 8px;
-        }
-      `}</style>
-    </>
-  );
-};
-
 const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
   const { data, error } = useSWR(
     /**
@@ -179,9 +121,7 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
         </div>
         {hostname && (
           <div className="my-4">
-            <Controls
-              data={data}
-              content={content}
+            <ItemControls
               onShowContent={onShowContent}
               onShowClips={onShowClips}
               showClips={showClips}
