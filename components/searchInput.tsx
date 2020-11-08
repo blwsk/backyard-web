@@ -81,6 +81,7 @@ const SearchInput: FunctionComponent<Props> = ({
     <>
       <span className="wrapper">
         <input
+          className="form-input"
           type="text"
           placeholder="search"
           value={query}

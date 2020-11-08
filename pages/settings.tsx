@@ -52,6 +52,7 @@ const ValidatePhoneNumber = () => {
   return (
     <div>
       <input
+        className="form-input"
         type="text"
         id="phone"
         style={{ marginTop: 8, marginRight: 8 }}
@@ -82,6 +83,7 @@ const ValidatePhoneNumber = () => {
           <>
             <br />
             <input
+              className="form-input"
               type="text"
               style={{ marginTop: 8, marginRight: 8 }}
               value={pinValue}
@@ -155,6 +157,7 @@ const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
       <div className="pt-4">
         {phoneNumber ? (
           <input
+            className="form-input"
             type="text"
             id="phone"
             style={{ marginTop: 8, marginRight: 8 }}
@@ -231,6 +234,7 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
       <div className="pt-4">
         {emailIngestAddress ? (
           <input
+            className="form-input"
             type="text"
             id="email"
             style={{ marginTop: 8, marginRight: 8, width: "100%" }}

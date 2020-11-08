@@ -57,6 +57,7 @@ const ContentPage = ({
             key={_id}
             renderCheckbox={() => (
               <input
+                className="form-checkbox"
                 type="checkbox"
                 checked={checked}
                 onChange={(e) => {
@@ -114,6 +115,7 @@ const CreateList = () => {
     <div>
       {createState.started === false ? (
         <input
+          className="form-input"
           type="text"
           value={listName}
           placeholder="List name"
@@ -460,6 +462,7 @@ const ListControls = ({
     <div>
       <span className="control">
         <select
+          className="form-select"
           id="sort"
           onChange={onChangeSortOrder}
           value={isSearchMode ? "relevancy" : sortOrder}

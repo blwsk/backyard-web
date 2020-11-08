@@ -85,6 +85,7 @@ const SelectList = ({ ids, inline = false }) => {
   return (
     <div>
       <select
+        className="form-select"
         style={{ width: 200 }}
         value={selectedListId}
         onChange={onSelectList}
