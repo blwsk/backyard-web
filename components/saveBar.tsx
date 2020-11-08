@@ -36,7 +36,7 @@ export const SaveBar = withRouter(({ router }) => {
     <>
       <div className="save-bar">
         <input
-          className={inputError ? "error" : ""}
+          className={`form-input ${inputError ? "error" : ""}`}
           style={{
             width: `100%`,
             marginBottom: 16,
