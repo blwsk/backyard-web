@@ -83,7 +83,7 @@ const SearchInput: FunctionComponent<Props> = ({
         <input
           className="form-input"
           type="text"
-          placeholder="search"
+          placeholder="Search"
           value={query}
           onChange={(e) => updateQuery(e.target.value)}
           onFocus={onFocus}
