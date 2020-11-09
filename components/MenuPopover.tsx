@@ -38,7 +38,7 @@ const SettingsPopover = () => {
           flex-direction: column;
           align-items: flex-start;
           background: var(--c3);
-          box-shadow: var(--ghost) 0px 8px 20px 0px;
+          box-shadow: var(--ghost) 0px 16px 16px 8px;
           border-radius: var(--rc);
           opacity: 0.99;
           z-index: 100;

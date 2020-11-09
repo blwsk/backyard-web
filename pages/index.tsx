@@ -34,36 +34,38 @@ const IndexWithAuth = () => {
           <SaveBar />
         </div>
       </Wrapper>
-      <Wrapper>
+      <Wrapper className="pb-0">
+        <h3>
+          <span>Recent content</span>
+          <Link href="/my-content">
+            <a>
+              <small>View All</small>
+            </a>
+          </Link>
+        </h3>
+      </Wrapper>
+      <Wrapper className="pt-0" flush>
         <div>
-          <h3>
-            <span>Recent content</span>
-            <Link href="/my-content">
-              <a>
-                <small>View All</small>
-              </a>
-            </Link>
-          </h3>
           {mostRecentContentItems.length > 0 ? (
             mostRecentContentItems.map((item) => {
               return <ContentPageItem key={item._id} item={item} />;
             })
           ) : (
-            <div>None! Save some content.</div>
+            <div className="px-4">None! Save some content.</div>
           )}
-          <style jsx>{`
-            h3 {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            }
-            h3 a {
-              font-weight: 500;
-              color: var(--c1);
-            }
-          `}</style>
         </div>
       </Wrapper>
+      <style jsx>{`
+        h3 {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        h3 a {
+          font-weight: 500;
+          color: var(--c1);
+        }
+      `}</style>
     </>
   );
 };

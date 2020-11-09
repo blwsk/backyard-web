@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import ListItem, { ListItemProps } from "./listItem";
 import { getHostname } from "../lib/urls";
 
@@ -36,52 +36,32 @@ const getColorFromString = (str) => {
   return `#${selectedColor}`;
 };
 
-type ContentPageItemProps = {
-  item: ListItemProps;
-  backgroundColor?: string;
-  renderCheckbox?: () => ReactNode;
-};
-
 const ContentPageItem = ({
   item,
   backgroundColor = undefined,
   renderCheckbox = () => null,
-}: ContentPageItemProps) => {
+}: {
+  item: ListItemProps;
+  backgroundColor?: string;
+  renderCheckbox?: () => ReactNode;
+}) => {
   const { _id, url } = item;
 
+  const checkboxNode = useMemo(() => renderCheckbox(), [renderCheckbox]);
+
   return (
-    <>
-      <div
-        className="content-item"
-        key={_id}
-        style={{
-          backgroundColor:
-            backgroundColor ||
-            getColorFromString(getHostname(url).hostname.replace("www.", "")),
-        }}
-      >
-        <ListItem item={item} light />
-        {renderCheckbox()}
-      </div>
-      <style jsx>
-        {`
-          .content-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            padding: 16px;
-          }
-          .content-item input[type="checkbox"] {
-            height: 20px;
-            width: 20px;
-            cursor: pointer;
-            margin-left: 16px;
-          }
-        `}
-      </style>
-    </>
+    <div
+      className="content-item flex justify-between items-center p-4 mb-2 md:rounded-md"
+      key={_id}
+      style={{
+        backgroundColor:
+          backgroundColor ||
+          getColorFromString(getHostname(url).hostname.replace("www.", "")),
+      }}
+    >
+      <ListItem item={item} light />
+      {checkboxNode && <div className="ml-4">{checkboxNode}</div>}
+    </div>
   );
 };
 

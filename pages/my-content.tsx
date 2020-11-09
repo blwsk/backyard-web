@@ -57,7 +57,7 @@ const ContentPage = ({
             key={_id}
             renderCheckbox={() => (
               <input
-                className="form-checkbox"
+                className="form-checkbox cursor-pointer"
                 type="checkbox"
                 checked={checked}
                 onChange={(e) => {
@@ -557,29 +557,22 @@ const WrappedMyContent = ({ router }) => {
   return (
     <div>
       <Header />
-      <Wrapper>
-        <div
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 24,
-            wordBreak: "break-word",
+      <Wrapper className="pb-0">
+        <h1>Saved</h1>
+        <ListControls
+          sortOrder={sortOrder}
+          onChangeSortOrder={onChangeSortOrder}
+          onSearch={(results) => {
+            updateSearchResults(results);
           }}
-        >
-          <h1>Saved</h1>
-          <ListControls
-            sortOrder={sortOrder}
-            onChangeSortOrder={onChangeSortOrder}
-            onSearch={(results) => {
-              updateSearchResults(results);
-            }}
-            onSearchToggle={(isSearching) => updateIsSearching(isSearching)}
-            onClear={() => {
-              updateSearchResults(null);
-            }}
-            isSearchMode={isSearchMode}
-          />
-        </div>
+          onSearchToggle={(isSearching) => updateIsSearching(isSearching)}
+          onClear={() => {
+            updateSearchResults(null);
+          }}
+          isSearchMode={isSearchMode}
+        />
+      </Wrapper>
+      <Wrapper flush>
         {isSearchMode ? (
           <SearchResults results={searchResults} />
         ) : (

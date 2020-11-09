@@ -312,10 +312,17 @@ h6 {
   width: 100%;
 }
 
-.well input {
-  background-color: var(--c4);
+.well input,
+.well textarea {
+  background-color: var(--ghost);
 }
 
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;

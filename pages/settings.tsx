@@ -233,9 +233,8 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
       </label>
       <div className="pt-4">
         {emailIngestAddress ? (
-          <input
+          <textarea
             className="form-input"
-            type="text"
             id="email"
             style={{ marginTop: 8, marginRight: 8, width: "100%" }}
             readOnly

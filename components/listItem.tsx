@@ -1,6 +1,8 @@
-import React, { FunctionComponent } from "react";
+import React from "react";
 import { stripParams } from "../lib/urls";
 import Link from "next/link";
+import { isTwitter } from "../lib/contentTypes";
+import { TweetPreview } from "./tweetEmbed";
 
 export interface ListItemProps {
   _id: string;
@@ -8,20 +10,56 @@ export interface ListItemProps {
   url: string;
   content?: {
     title?: string;
+    json?: string;
   };
 }
 
-interface Props {
-  item: ListItemProps;
-  light?: boolean;
-}
+const getTweetJson = (str) => {
+  try {
+    return JSON.parse(str);
+  } catch (error) {
+    void error;
+    return null;
+  }
+};
 
-const ListItem: FunctionComponent<Props> = ({ item, light = false }) => {
-  const { _id, _ts, url, content } = item;
+const ListItemPreview = ({ id, url, content }) => {
+  const tweetJson = getTweetJson(content.json);
 
   const withParamsStripped = stripParams(url);
 
   const title = content && content.title ? content.title : withParamsStripped;
+
+  return (
+    <>
+      <Link href={{ pathname: "/viewer", query: { id } }}>
+        {isTwitter(url) && tweetJson ? (
+          <a>
+            <div className="bg-ghost p-4 -ml-4 md:ml-0 rounded-r-md md:rounded-l-md">
+              <TweetPreview tweetJson={tweetJson} />
+            </div>
+          </a>
+        ) : (
+          <a>{title}</a>
+        )}
+      </Link>
+      <style jsx>{`
+        .bg-ghost {
+          background-color: var(--ghost);
+        }
+      `}</style>
+    </>
+  );
+};
+
+const ListItem = ({
+  item,
+  light = false,
+}: {
+  item: ListItemProps;
+  light?: boolean;
+}) => {
+  const { _id, _ts, url, content } = item;
 
   const date = new Date(_ts / 1000);
   const dateString = date.toDateString();
@@ -31,9 +69,7 @@ const ListItem: FunctionComponent<Props> = ({ item, light = false }) => {
     <div className={`list-item ${light ? "light" : ""} py-3`}>
       <div>
         <b>
-          <Link href={{ pathname: "/viewer", query: { id: _id } }}>
-            <a>{title}</a>
-          </Link>
+          <ListItemPreview id={_id} url={url} content={content} />
         </b>
         <div>
           <small>

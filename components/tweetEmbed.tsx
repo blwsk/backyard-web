@@ -27,7 +27,15 @@ interface TweetData {
   };
 }
 
-const getTweetData = ({ data, tweetJson }): TweetData => {
+const getTweetData = ({
+  data,
+  tweetJson,
+}: {
+  data?: {
+    tweets: TweetData;
+  };
+  tweetJson?: TweetData;
+}): TweetData => {
   if (tweetJson) {
     return tweetJson;
   }
@@ -45,17 +53,78 @@ const getTweetTextWithMedia = ({ tweet, media }) => {
     return [...acc, part, mediaContent];
   }, []);
 
-  return joinedWithMedia.join("");
+  return sanitize(joinedWithMedia.join(""));
 };
 
-interface Props {
-  data: {
+export const TweetPreview = ({
+  data,
+  tweetJson,
+}: {
+  data?: {
     tweets: TweetData;
   };
-  tweetJson: TweetData;
-}
+  tweetJson?: TweetData;
+}) => {
+  const {
+    data: tweets,
+    includes: { media, users },
+  } = getTweetData({ data, tweetJson });
 
-const Tweet = ({ data, tweetJson }: Props) => {
+  return (
+    <div>
+      {tweets.map((t) => {
+        const author: TwitterUser = users.reduce((acc, u: TwitterUser) =>
+          u.id === t.author_id ? u : acc
+        );
+
+        return (
+          <div key={t.id} className="p-0">
+            {author && (
+              <div className="flex md:justify-between md:items-end">
+                <span className="flex md:block">
+                  <span className="font-semibold mr-2">{author.name}</span>
+                  <span className="font-normal">{`@${author.username}`}</span>
+                </span>
+                <span className="font-normal">
+                  {capitalize(
+                    formatRelative(new Date(t.created_at), new Date())
+                  )}
+                </span>
+              </div>
+            )}
+            <pre
+              className="tweet-text line-clamp-2"
+              dangerouslySetInnerHTML={{
+                __html: getTweetTextWithMedia({ tweet: t, media }),
+              }}
+            />
+          </div>
+        );
+      })}
+      <style jsx>
+        {`
+          .tweet hr {
+            border-color: var(--c9);
+          }
+          pre.tweet-text {
+            font: var(--sans);
+            white-space: pre-line;
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+
+export const Tweet = ({
+  data,
+  tweetJson,
+}: {
+  data?: {
+    tweets: TweetData;
+  };
+  tweetJson?: TweetData;
+}) => {
   const {
     data: tweets,
     includes: { media, users },
@@ -93,7 +162,7 @@ const Tweet = ({ data, tweetJson }: Props) => {
             <pre
               className="tweet-text p-4"
               dangerouslySetInnerHTML={{
-                __html: sanitize(getTweetTextWithMedia({ tweet: t, media })),
+                __html: getTweetTextWithMedia({ tweet: t, media }),
               }}
             />
           </div>

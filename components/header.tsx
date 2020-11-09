@@ -4,6 +4,12 @@ import requireAuth from "../lib/requireAuth";
 import { useState, ReactChild } from "react";
 import MenuPopover from "./MenuPopover";
 
+const LogoLink = () => (
+  <Link href="/">
+    <a className="link-black text-3xl">🏕</a>
+  </Link>
+);
+
 const popover = (Closed, Opened) => {
   const [open, updateOpen] = useState(false);
 
@@ -26,9 +32,9 @@ const AuthenticatedHeader = () => {
   return (
     <GenericHeader>
       <>
-        <Link href="/">
-          <a className="link-black mr-6">🏕</a>
-        </Link>
+        <span className="mr-6">
+          <LogoLink />
+        </span>
         <div className="space-x-6">
           <Link href="/my-content">
             <a className="link-black">Saved</a>
@@ -60,9 +66,9 @@ const NoAuthHeader = () => {
   return (
     <GenericHeader>
       <div className="w-full space-x-6 flex justify-between">
-        <Link href="/">
-          <a className="link-black">🏕</a>
-        </Link>
+        <span>
+          <LogoLink />
+        </span>
         <AuthInteraction />
       </div>
     </GenericHeader>

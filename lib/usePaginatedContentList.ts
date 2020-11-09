@@ -62,6 +62,7 @@ export const buildQuery = ({ cursorValue, sortOrder }) => {
                 _ts
                 content {
                   title
+                  json
                 }
               }
               before
