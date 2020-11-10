@@ -1,5 +1,5 @@
 import React from "react";
-import { stripParams } from "../lib/urls";
+import { stripParams, getHostname } from "../lib/urls";
 import Link from "next/link";
 import { isTwitter } from "../lib/contentTypes";
 import { TweetPreview } from "./tweetEmbed";
@@ -75,6 +75,7 @@ const ListItem = ({
   const date = new Date(_ts / 1000);
   const dateString = date.toDateString();
   const timeString = date.toLocaleTimeString();
+  const hostname = url && getHostname(url).hostname.replace("www.", "");
 
   return (
     <div className={`list-item ${light ? "light" : ""} py-3`}>
@@ -82,11 +83,28 @@ const ListItem = ({
         <b>
           <ListItemPreview id={_id} url={url} content={content} />
         </b>
-        <div>
-          <small>
-            <span>{dateString}</span>
-            <span>・</span>
-            <span>{timeString}</span>
+        <div className="mt-3">
+          <small className="flex flex-col md:flex-row">
+            <span>
+              <span>{dateString}</span>
+              <span>・</span>
+              <span>{timeString}</span>
+            </span>
+            {hostname && (
+              <>
+                <span className="hidden md:block">・</span>
+                <Link
+                  href={{
+                    href: "/my-content",
+                    query: {
+                      search: encodeURIComponent(hostname),
+                    },
+                  }}
+                >
+                  <a className="font-semibold">{hostname}</a>
+                </Link>
+              </>
+            )}
           </small>
         </div>
       </div>

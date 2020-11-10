@@ -10,21 +10,23 @@ import { throttle } from "../lib/throttle";
 import { SearchIndex } from "../types/SearchIndexTypes";
 
 type Props = {
+  defaultQuery?: string;
   index: SearchIndex;
-  onSearch(results: any[]): void;
-  onFocus?(e): void;
   onBlur?(e): void;
-  onError?(error: Error): void;
   onClear?(): void;
+  onError?(error: Error): void;
+  onFocus?(e): void;
+  onSearch(results: any[]): void;
 };
 
 const SearchInput: FunctionComponent<Props> = ({
+  defaultQuery,
   index,
-  onSearch,
-  onFocus,
   onBlur,
-  onError,
   onClear,
+  onError,
+  onFocus,
+  onSearch,
 }) => {
   const [query, updateQuery] = useState("");
 
@@ -54,6 +56,12 @@ const SearchInput: FunctionComponent<Props> = ({
   const doThrottledSearch = useCallback(throttle(wrappedDoSearch, 1000), []);
 
   useEffect(() => {
+    if (defaultQuery && query === "") {
+      updateQuery(defaultQuery);
+    }
+  }, [defaultQuery]);
+
+  useEffect(() => {
     if (query.length > 2) {
       doThrottledSearch({
         body: JSON.stringify({
@@ -78,10 +86,10 @@ const SearchInput: FunctionComponent<Props> = ({
   }, [error]);
 
   return (
-    <>
-      <span className="wrapper">
+    <div className="w-full">
+      <span className="flex items-center">
         <input
-          className="form-input"
+          className="form-input flex-grow"
           type="text"
           placeholder="Search"
           value={query}
@@ -101,6 +109,7 @@ const SearchInput: FunctionComponent<Props> = ({
         />
         {query && results && (
           <button
+            className="m-0 ml-1 text-md px-4"
             onClick={() => {
               updateQuery("");
               updateResults(null);
@@ -110,22 +119,12 @@ const SearchInput: FunctionComponent<Props> = ({
               }
             }}
           >
-            Clear
+            ✕
           </button>
         )}
       </span>
       {error && !onError && <span className="m-left-2">{"❌ Error"}</span>}
-      <style jsx>{`
-        .wrapper {
-          width: 400px;
-          max-width: 100%;
-          display: inherit;
-        }
-        .wrapper input {
-          flex-grow: 1;
-        }
-      `}</style>
-    </>
+    </div>
   );
 };
 

@@ -457,6 +457,7 @@ const ListControls = ({
   onSearchToggle,
   onClear,
   isSearchMode,
+  searchQuery,
 }) => {
   return (
     <div>
@@ -497,6 +498,7 @@ const ListControls = ({
             onSearchToggle(false);
           }}
           onClear={onClear}
+          defaultQuery={searchQuery}
         />
       </span>
       <style jsx>{`
@@ -546,7 +548,13 @@ const WrappedMyContent = ({ router }) => {
   const [isSearching, updateIsSearching] = useState(false);
   const [searchResults, updateSearchResults] = useState(null);
 
-  const sortOrder = router.query.sort || sortOrderEnum.descending;
+  const {
+    query: { sort, search },
+  } = router;
+
+  const sortOrder = sort || sortOrderEnum.descending;
+
+  const searchQuery = search || "";
 
   const onChangeSortOrder = (e) => {
     router.push(`/my-content?sort=${e.target.value}`);
@@ -570,6 +578,7 @@ const WrappedMyContent = ({ router }) => {
             updateSearchResults(null);
           }}
           isSearchMode={isSearchMode}
+          searchQuery={searchQuery}
         />
       </Wrapper>
       <Wrapper flush>
