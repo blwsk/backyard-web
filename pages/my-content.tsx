@@ -460,66 +460,41 @@ const ListControls = ({
   searchQuery,
 }) => {
   return (
-    <div>
-      <span className="control">
-        <select
-          className="form-select"
-          id="sort"
-          onChange={onChangeSortOrder}
-          value={isSearchMode ? "relevancy" : sortOrder}
-          disabled={isSearchMode}
-          title={
-            isSearchMode
-              ? "Search results are ordered by relevancy."
-              : undefined
-          }
-        >
-          {isSearchMode ? (
-            <option key={"relevancy"} value={"relevancy"}>
-              {capitalize("relevancy")}
+    <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+      <select
+        className="form-select"
+        id="sort"
+        onChange={onChangeSortOrder}
+        value={isSearchMode ? "relevancy" : sortOrder}
+        disabled={isSearchMode}
+        title={
+          isSearchMode ? "Search results are ordered by relevancy." : undefined
+        }
+      >
+        {isSearchMode ? (
+          <option key={"relevancy"} value={"relevancy"}>
+            {capitalize("relevancy")}
+          </option>
+        ) : (
+          Object.keys(sortOrderEnum).map((key) => (
+            <option key={key} value={key}>
+              {capitalize(key)}
             </option>
-          ) : (
-            Object.keys(sortOrderEnum).map((key) => (
-              <option key={key} value={key}>
-                {capitalize(key)}
-              </option>
-            ))
-          )}
-        </select>
-      </span>
-      <span className="control">
-        <SearchInput
-          index={ITEMS}
-          onSearch={onSearch}
-          onFocus={() => {
-            onSearchToggle(true);
-          }}
-          onBlur={() => {
-            onSearchToggle(false);
-          }}
-          onClear={onClear}
-          defaultQuery={searchQuery}
-        />
-      </span>
-      <style jsx>{`
-        .control {
-          margin-right: 16px;
-        }
-        .control:last-of-type {
-          margin-right: 0;
-        }
-        @media (max-width: 600px) {
-          .control {
-            width: 100%;
-            display: flex;
-            margin-right: 0;
-            margin-bottom: 8px;
-          }
-          .control select {
-            flex-grow: 1;
-          }
-        }
-      `}</style>
+          ))
+        )}
+      </select>
+      <SearchInput
+        index={ITEMS}
+        onSearch={onSearch}
+        onFocus={() => {
+          onSearchToggle(true);
+        }}
+        onBlur={() => {
+          onSearchToggle(false);
+        }}
+        onClear={onClear}
+        defaultQuery={searchQuery}
+      />
     </div>
   );
 };
@@ -528,11 +503,19 @@ const SearchResults: FunctionComponent<{ results: ListItemProps[] }> = ({
   results,
 }) => {
   if (!results) {
-    return <div>Enter a search term.</div>;
+    return (
+      <div className="flex justify-center items-center">
+        <h4 className="font-semibold">Enter a search term.</h4>
+      </div>
+    );
   }
 
   if (results.length === 0) {
-    return <div>No results.</div>;
+    return (
+      <div className="flex justify-center items-center">
+        <h4 className="font-semibold">No results.</h4>
+      </div>
+    );
   }
 
   return (

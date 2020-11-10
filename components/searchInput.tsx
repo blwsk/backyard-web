@@ -109,7 +109,7 @@ const SearchInput: FunctionComponent<Props> = ({
         />
         {query && results && (
           <button
-            className="m-0 ml-1 text-md px-4"
+            className="m-0 ml-2 text-md px-4"
             onClick={() => {
               updateQuery("");
               updateResults(null);

@@ -80,16 +80,16 @@ export const TweetPreview = ({
         return (
           <div key={t.id} className="p-0">
             {author && (
-              <div className="flex md:justify-between md:items-end">
-                <span className="flex md:block">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <span className="flex">
                   <span className="font-semibold mr-2">{author.name}</span>
                   <span className="font-normal">{`@${author.username}`}</span>
                 </span>
-                <span className="font-normal">
+                <small className="font-normal">
                   {capitalize(
                     formatRelative(new Date(t.created_at), new Date())
                   )}
-                </span>
+                </small>
               </div>
             )}
             <pre
@@ -141,20 +141,16 @@ export const Tweet = ({
           <div key={t.id} className="tweet well-trim p-0">
             {author && (
               <>
-                <div className="p-4 flex justify-between items-end">
-                  <span className="flex flex-col md:block">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between px-4 py-3">
+                  <span className="flex">
                     <span className="font-semibold mr-2">{author.name}</span>
-                    <a href={`https://twitter.com/${author.username}`}>
-                      {`@${author.username}`}
-                    </a>
+                    <span className="font-normal">{`@${author.username}`}</span>
                   </span>
-                  <a
-                    href={`https://twitter.com/${author.username}/status/${t.id}`}
-                  >
+                  <small className="font-normal">
                     {capitalize(
                       formatRelative(new Date(t.created_at), new Date())
                     )}
-                  </a>
+                  </small>
                 </div>
                 <hr />
               </>
