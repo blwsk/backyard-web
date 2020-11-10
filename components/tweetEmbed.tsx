@@ -175,7 +175,6 @@ export const Tweet = ({
           }
           .tweet a {
             color: var(--c1);
-            text-decoration: underline;
           }
           pre.tweet-text {
             font: var(--sans);

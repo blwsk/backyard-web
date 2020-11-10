@@ -173,7 +173,7 @@ const receiveEmail = async (req, res) => {
       /**
        *
        */
-      const messageResponse = `✉️ Received an email, "${subject}".\n${saveContentMessage}`;
+      const messageResponse = `✉️ Received an email, "${subject}", from ${from}.\n${saveContentMessage}`;
 
       await sendSms(messageResponse, phoneNumber);
     }

@@ -23,8 +23,19 @@ const getTweetJson = (str) => {
   }
 };
 
-const ListItemPreview = ({ id, url, content }) => {
-  const tweetJson = getTweetJson(content.json);
+const ListItemPreview = ({
+  id,
+  url,
+  content,
+}: {
+  id: string;
+  url: string;
+  content?: {
+    title?: string;
+    json?: string;
+  };
+}) => {
+  const tweetJson = content && getTweetJson(content.json);
 
   const withParamsStripped = stripParams(url);
 
