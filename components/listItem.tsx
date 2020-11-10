@@ -39,8 +39,6 @@ const ListItemPreview = ({
 
   const withParamsStripped = stripParams(url);
 
-  const title = content && content.title ? content.title : withParamsStripped;
-
   return (
     <>
       <Link href={{ pathname: "/viewer", query: { id } }}>
@@ -50,8 +48,10 @@ const ListItemPreview = ({
               <TweetPreview tweetJson={tweetJson} />
             </div>
           </a>
+        ) : content && content.title ? (
+          <a className="break-words">{content.title}</a>
         ) : (
-          <a className="break-all">{title}</a>
+          <a className="break-all">{withParamsStripped}</a>
         )}
       </Link>
       <style jsx>{`
