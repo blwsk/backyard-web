@@ -51,7 +51,7 @@ const ListItemPreview = ({
             </div>
           </a>
         ) : (
-          <a>{title}</a>
+          <a className="break-all">{title}</a>
         )}
       </Link>
       <style jsx>{`
