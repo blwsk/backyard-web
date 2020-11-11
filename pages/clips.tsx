@@ -84,9 +84,9 @@ const SelectionList = () => {
     cursorValue,
   });
 
-  const onLoadMoreClick = useCallback(() => {
+  const onLoadMoreClick = () => {
     updateCursor(getResultObject(data.data).after);
-  }, []);
+  };
 
   useEffect(() => {
     if (data && getResultObject(data.data).before === null) {

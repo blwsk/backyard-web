@@ -95,7 +95,7 @@ const ListItem = ({
                 <span className="hidden md:block">・</span>
                 <Link
                   href={{
-                    href: "/my-content",
+                    pathname: "/my-content",
                     query: {
                       search: encodeURIComponent(hostname),
                     },
