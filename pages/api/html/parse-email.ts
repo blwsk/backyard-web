@@ -1,4 +1,5 @@
 import { parseEmail as parseEmailUtil } from "../../../api-utils/parseEmail";
+import localEndpoint from "../../../api-utils/localEndpoint";
 
 const parseEmail = async (req, res) => {
   const { subject } = req.query;
@@ -41,4 +42,4 @@ const parseEmail = async (req, res) => {
   });
 };
 
-export default parseEmail;
+export default localEndpoint(parseEmail);

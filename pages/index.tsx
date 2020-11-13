@@ -9,16 +9,11 @@ import {
 import { SaveBar } from "../components/saveBar";
 import ContentPageItem from "../components/contentPageItem";
 import Link from "next/link";
+import LoadingItem from "../components/loading/LoadingItem";
 
 const MOST_RECENT_ITEM_LIMIT = 5;
 
-const IndexWithAuth = () => {
-  const { data } = usePaginatedContentList({ cursor: null });
-
-  if (!data) {
-    return null;
-  }
-
+const PreviewContentList = ({ data }) => {
   const resultObject = getResultObject(data.data);
 
   const mostRecentContentItems = resultObject.data.slice(
@@ -27,15 +22,25 @@ const IndexWithAuth = () => {
   );
 
   return (
+    <div>
+      {mostRecentContentItems.length > 0 ? (
+        mostRecentContentItems.map((item) => {
+          return <ContentPageItem key={item._id} item={item} />;
+        })
+      ) : (
+        <div className="px-4">None! Save some content.</div>
+      )}
+    </div>
+  );
+};
+
+const IndexPreviewContent = () => {
+  const { data } = usePaginatedContentList({ cursor: null });
+
+  return (
     <>
-      <Wrapper className="align-center">
-        <h1 className="text-center">Backyard</h1>
-        <div className="my-4 w-full">
-          <SaveBar />
-        </div>
-      </Wrapper>
       <Wrapper className="pb-0">
-        <h3>
+        <h3 className="flex justify-between items-center">
           <span>Recent content</span>
           <Link href="/my-content">
             <a>
@@ -45,27 +50,28 @@ const IndexWithAuth = () => {
         </h3>
       </Wrapper>
       <Wrapper className="pt-0" flush>
-        <div>
-          {mostRecentContentItems.length > 0 ? (
-            mostRecentContentItems.map((item) => {
-              return <ContentPageItem key={item._id} item={item} />;
-            })
-          ) : (
-            <div className="px-4">None! Save some content.</div>
-          )}
-        </div>
+        {data ? <PreviewContentList data={data} /> : <LoadingItem />}
       </Wrapper>
       <style jsx>{`
-        h3 {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
         h3 a {
           font-weight: 500;
           color: var(--c1);
         }
       `}</style>
+    </>
+  );
+};
+
+const IndexWithAuth = () => {
+  return (
+    <>
+      <Wrapper className="align-center">
+        <h1 className="text-center">Backyard</h1>
+        <div className="my-4 w-full">
+          <SaveBar />
+        </div>
+      </Wrapper>
+      <IndexPreviewContent />
     </>
   );
 };

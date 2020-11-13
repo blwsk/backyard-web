@@ -114,7 +114,7 @@ export const getEndPageUrl = async (
   try {
     endPageUrl = url ? await findEndPageUrl(url) : null;
   } catch (error) {
-    console.error(error);
+    console.error("End page URL error", { error });
     endPageUrlError;
   }
 
