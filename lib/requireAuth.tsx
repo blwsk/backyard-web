@@ -1,10 +1,10 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import AuthInteraction from "../components/authInteraction";
 
-const LoginScreen = () => {
+const LoginScreen = (props: any): ReactElement => {
   return (
     <div>
       <Header />
@@ -16,7 +16,7 @@ const LoginScreen = () => {
   );
 };
 
-const _LoadingComponent = () => null;
+const _LoadingComponent = (props: any): ReactElement => null;
 
 const requireAuth = (
   Component,
