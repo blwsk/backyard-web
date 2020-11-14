@@ -17,14 +17,14 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="shortcut icon" href="/public/favicon.ico" />
       </Head>
 
-      <DragAndDrop
+      {/* <DragAndDrop
         style={{
           height: "100%",
           width: "100%",
         }}
-      >
-        <Component {...pageProps} />
-      </DragAndDrop>
+      > */}
+      <Component {...pageProps} />
+      {/* </DragAndDrop> */}
     </>
   );
 }

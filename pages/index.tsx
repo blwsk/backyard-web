@@ -44,7 +44,7 @@ const IndexPreviewContent = () => {
           <span>Recent content</span>
           <Link href="/my-content">
             <a>
-              <small>View All</small>
+              <small>View all</small>
             </a>
           </Link>
         </h3>

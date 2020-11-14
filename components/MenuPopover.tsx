@@ -46,7 +46,7 @@ const SettingsPopover = () => {
 
         @media (max-width: 600px) {
           .popover-body {
-            top: 52px;
+            top: 68px;
             left: 0;
             right: 0;
             align-items: flex-end;
