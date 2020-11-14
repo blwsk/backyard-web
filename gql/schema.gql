@@ -6,12 +6,17 @@ type ItemContent {
   json: String
 }
 
+type ItemOrigin {
+  emailBody: String
+}
+
 type Item {
   url: String! @unique
   createdBy: String!
   createdAt: Long!
   content: ItemContent
   source: String
+  origin: ItemOrigin
 }
 
 type List {

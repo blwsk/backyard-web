@@ -2,7 +2,7 @@ import { query as q, Client } from "faunadb";
 import algoliasearch from "algoliasearch";
 
 import { fetchContent } from "./fetchContent";
-import { Item, ItemSource } from "../types/ItemTypes";
+import { Item, ItemSource, ItemOrigin } from "../types/ItemTypes";
 import { doAsyncThing } from "./doAsyncThing";
 import { ITEMS } from "../types/SearchIndexTypes";
 
@@ -60,7 +60,8 @@ const createItem = async (
   url: string,
   contentJson: ContentJson,
   userId: string,
-  source?: ItemSource
+  source?: ItemSource,
+  itemOrigin?: ItemOrigin
 ): Promise<CreatedItem> => {
   /**
    * - fetchTextContent returns `{ body, title, metaTitle, metaDescription }`
@@ -101,6 +102,11 @@ const createItem = async (
           createdAt: Date.now(),
           content: itemContentResult.ref,
           source,
+          origin: itemOrigin
+            ? q.Create(q.Collection("ItemOrigin"), {
+                emailBody: itemOrigin.emailBody,
+              })
+            : null,
         },
       })
     );
@@ -166,7 +172,8 @@ export const saveContentItem = async (
   client: Client,
   url: string,
   userId: string,
-  source?: ItemSource
+  source?: ItemSource,
+  itemOrigin?: ItemOrigin
 ): Promise<SavedItemMetadata> => {
   /**
    * If item exists, return it
@@ -214,7 +221,8 @@ export const saveContentItem = async (
     url,
     contentJson,
     userId,
-    source
+    source,
+    itemOrigin
   );
 
   if (itemError) {
