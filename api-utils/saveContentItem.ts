@@ -100,6 +100,7 @@ const createItem = async (
           createdBy: userId,
           createdAt: Date.now(),
           content: itemContentResult.ref,
+          source,
         },
       })
     );
