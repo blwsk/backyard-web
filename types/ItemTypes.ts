@@ -12,10 +12,15 @@ export interface ItemContent {
   json: string;
 }
 
+export interface ItemOrigin {
+  emailBody?: string;
+}
+
 export interface Item {
   url: string;
   createdBy: string;
   createdAt: number;
   content?: ItemContent;
   source?: ItemSource;
+  origin?: ItemOrigin;
 }

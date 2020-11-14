@@ -164,7 +164,8 @@ const receiveEmail = async (req, res) => {
       faunaClient,
       url,
       userId,
-      EMAIL
+      EMAIL,
+      { emailBody: emailContent.body }
     );
 
     if (phoneNumber) {
