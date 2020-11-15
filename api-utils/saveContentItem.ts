@@ -93,20 +93,23 @@ const createItem = async (
 
   let itemOriginResult;
   let itemOriginError;
-  try {
-    itemOriginResult = await client.query(
-      q.Create(q.Collection("ItemOrigin"), {
-        data: {
-          emailBody: itemOrigin.emailBody,
-        },
-      })
-    );
-  } catch (err) {
-    itemOriginError = err;
-  }
 
-  if (itemOriginError) {
-    return { result: itemOriginResult, error: itemOriginError };
+  if (itemOrigin) {
+    try {
+      itemOriginResult = await client.query(
+        q.Create(q.Collection("ItemOrigin"), {
+          data: {
+            emailBody: itemOrigin.emailBody,
+          },
+        })
+      );
+    } catch (err) {
+      itemOriginError = err;
+    }
+
+    if (itemOriginError) {
+      return { result: itemOriginResult, error: itemOriginError };
+    }
   }
 
   let result;
