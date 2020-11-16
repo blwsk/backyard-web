@@ -125,7 +125,7 @@ const SelectList = ({ ids, inline = false }) => {
                 <Link
                   href={{ pathname: "/lists", query: { id: selectedListId } }}
                 >
-                  <a>View list</a>
+                  <a className="ml-2">View list</a>
                 </Link>
               )
             )}
