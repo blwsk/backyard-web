@@ -4,6 +4,14 @@ import { useAuthedSWR } from "../lib/requestHooks";
 import { gqlFetcherFactory } from "../lib/fetcherFactories";
 import ReactiveItemData from "./reactiveItemData";
 
+const getOriginEmailBody = (data) => {
+  try {
+    return data.data.findItemByID.origin.emailBody;
+  } catch (error) {
+    return null;
+  }
+};
+
 const Data = ({ itemId }) => {
   const query = gql`
     query {
@@ -15,6 +23,9 @@ const Data = ({ itemId }) => {
           metaTitle
           metaDescription
           json
+        }
+        origin {
+          emailBody
         }
       }
       clipsByItemId(itemId: "${itemId}") {
@@ -47,15 +58,14 @@ const Data = ({ itemId }) => {
   }
 
   return (
-    <>
-      <ReactiveItemData
-        url={data.data.findItemByID.url}
-        content={data.data.findItemByID.content}
-        itemId={itemId}
-        clips={data.data.clipsByItemId.data}
-        invalidateQuery={invalidateQuery}
-      />
-    </>
+    <ReactiveItemData
+      url={data.data.findItemByID.url}
+      content={data.data.findItemByID.content}
+      itemId={itemId}
+      clips={data.data.clipsByItemId.data}
+      originEmailBody={getOriginEmailBody(data)}
+      invalidateQuery={invalidateQuery}
+    />
   );
 };
 
