@@ -101,13 +101,13 @@ const SelectList = ({ ids, inline = false }) => {
           : null}
       </select>
       {!lists || isValidating ? (
-        <span style={{ marginLeft: 8 }}>Loading...</span>
+        <span className="ml-2">Loading...</span>
       ) : (
-        <span>
+        <span className="ml-2">
           {!inline && <br />}
           <span>
             <button
-              className="m-0 ml-2"
+              className="m-0"
               onClick={onCreateListItem}
               disabled={
                 !selectedListId ||
