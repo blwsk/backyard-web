@@ -1,11 +1,16 @@
-import useSWR from "swr";
+import { useState, useEffect } from "react";
 import { getHostname } from "../lib/urls";
-import { useState } from "react";
 import Selection from "./selection";
 import ItemContent from "./itemContent";
 import ItemControls from "./itemControls";
+import { ItemContent as ItemContentType } from "../types/ItemTypes";
+import { Clip } from "../types/ClipTypes";
+import { useAuthedSWR } from "../lib/requestHooks";
+import { jsonFetcherFactory } from "../lib/fetcherFactories";
 
-const ClipsList = ({ clips }) => {
+type CurentType = "content" | "clips" | "email";
+
+const ClipsList = ({ clips }: { clips: Clip[] }) => {
   return (
     <>
       {clips && clips.length > 0 ? (
@@ -26,6 +31,41 @@ const ClipsList = ({ clips }) => {
         li {
           list-style-type: none;
           margin-bottom: 12px;
+        }
+      `}</style>
+    </>
+  );
+};
+
+const EmailSandbox = ({ originEmailBody }) => {
+  const [mounted, updateMounted] = useState(true);
+  const [iframe, updateIframe] = useState<HTMLIFrameElement>();
+
+  useEffect(() => {
+    if (iframe) {
+      iframe.contentDocument.querySelectorAll("a").forEach((a) => {
+        a.target = "_blank";
+      });
+    }
+    return () => updateMounted(false);
+  }, [iframe]);
+
+  return (
+    <>
+      <div className="iframe-wrapper w-full">
+        <iframe
+          ref={(el) => {
+            setTimeout(() => mounted && updateIframe(el));
+          }}
+          srcDoc={originEmailBody}
+          width="100%"
+          height="100%"
+        />
+      </div>
+      <style jsx>{`
+        .iframe-wrapper {
+          background: white;
+          height: 50vh;
         }
       `}</style>
     </>
@@ -70,8 +110,22 @@ const Metadata = ({ hostname, url }) => {
   );
 };
 
-const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
-  const { data, error } = useSWR(
+const ReactiveItemData = ({
+  url,
+  itemId,
+  clips,
+  invalidateQuery,
+  content,
+  originEmailBody,
+}: {
+  url: string;
+  itemId: string;
+  clips: Clip[];
+  invalidateQuery(): void;
+  content: ItemContentType;
+  originEmailBody?: string;
+}) => {
+  const { data, error } = useAuthedSWR(
     /**
      * The /api/item-content endpoint does not currently use the ?id param,
      * but it is useful for ensuring that SWR does not show cached result for
@@ -86,23 +140,18 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
       }
       return `/api/item-content?id=${itemId}`;
     },
-    (path) => {
-      return fetch(path, {
-        method: "PUT",
-
-        body: JSON.stringify({
-          url,
-          id: itemId,
-        }),
-      }).then((res) => res.json());
-    },
-    { revalidateOnFocus: false }
+    jsonFetcherFactory,
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        url,
+        id: itemId,
+      }),
+      revalidateOnFocus: false,
+    }
   );
 
-  const [showClips, updateShowClips] = useState(false);
-
-  const onShowClips = () => updateShowClips(true);
-  const onShowContent = () => updateShowClips(false);
+  const [current, updateCurrent] = useState<CurentType>("content");
 
   const { hostname } = getHostname(url);
 
@@ -122,20 +171,23 @@ const ReactiveItemData = ({ url, itemId, clips, invalidateQuery, content }) => {
         {hostname && (
           <div className="my-4">
             <ItemControls
-              onShowContent={onShowContent}
-              onShowClips={onShowClips}
-              showClips={showClips}
+              current={current}
+              updateCurrent={updateCurrent}
               itemId={itemId}
+              originEmailBody={originEmailBody}
             />
           </div>
         )}
-        {!showClips ? (
+
+        {current === "content" && (
           <>
             <ItemContent data={data} content={content} url={url} />
             <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
           </>
-        ) : (
-          <ClipsList clips={clips} />
+        )}
+        {current === "clips" && <ClipsList clips={clips} />}
+        {current === "email" && (
+          <EmailSandbox originEmailBody={originEmailBody} />
         )}
       </div>
     </div>

@@ -28,18 +28,33 @@ const Button = ({
   </button>
 );
 
-const ItemControls = ({ onShowContent, onShowClips, showClips, itemId }) => {
+const ItemControls = ({ current, updateCurrent, itemId, originEmailBody }) => {
   const [showSelectList, updateShowSelectList] = useState(false);
 
   return (
     <div className="flex flex-col">
       <div className="flex">
-        <Button current={!showClips} onClick={onShowContent} first>
+        <Button
+          current={current === "content"}
+          onClick={() => updateCurrent("content")}
+          first
+        >
           Content
         </Button>
-        <Button current={showClips} onClick={onShowClips}>
+        <Button
+          current={current === "clips"}
+          onClick={() => updateCurrent("clips")}
+        >
           Clips
         </Button>
+        {originEmailBody && (
+          <Button
+            current={current === "email"}
+            onClick={() => updateCurrent("email")}
+          >
+            Email
+          </Button>
+        )}
         <Button
           current={showSelectList}
           onClick={() => {
