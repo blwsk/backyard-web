@@ -17,8 +17,8 @@ const Button = ({
   last?: boolean;
 }): ReactElement => (
   <button
-    className={classNames(`small secondary m-0 rounded-none`, {
-      current,
+    className={classNames(`text-black bg-gray-300 py-2 px-3 m-0 rounded-none`, {
+      "bg-gray-400": current,
       "rounded-l-md": first,
       "rounded-r-md": last,
     })}
@@ -28,9 +28,7 @@ const Button = ({
   </button>
 );
 
-const ItemControls = ({ current, updateCurrent, itemId, originEmailBody }) => {
-  const [showSelectList, updateShowSelectList] = useState(false);
-
+const ItemControls = ({ current, updateCurrent, originEmailBody }) => {
   return (
     <div className="flex flex-col">
       <div className="flex">
@@ -56,20 +54,13 @@ const ItemControls = ({ current, updateCurrent, itemId, originEmailBody }) => {
           </Button>
         )}
         <Button
-          current={showSelectList}
-          onClick={() => {
-            updateShowSelectList(!showSelectList);
-          }}
+          current={current === "more"}
+          onClick={() => updateCurrent("more")}
           last
         >
           More
         </Button>
       </div>
-      {showSelectList && (
-        <div className="py-2">
-          <SelectList inline ids={[itemId]} />
-        </div>
-      )}
     </div>
   );
 };

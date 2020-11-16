@@ -5,10 +5,12 @@ const Wrapper = ({
   children,
   className,
   flush,
+  nested,
 }: {
   children: any;
   className?: string;
   flush?: boolean;
+  nested?: boolean;
 }) => {
   return (
     <div
@@ -16,8 +18,9 @@ const Wrapper = ({
         "wrapper flex flex-col mx-auto w-full max-w-3xl break-words",
         {
           [className]: className,
+          "p-0": nested,
           "px-0 py-4 md:px-4": flush,
-          "p-4": !flush,
+          "p-4": !flush && !nested,
         }
       )}
     >

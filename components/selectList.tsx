@@ -83,9 +83,9 @@ const SelectList = ({ ids, inline = false }) => {
   };
 
   return (
-    <div>
+    <div className="flex items-center">
       <select
-        className="form-select"
+        className="form-select cursor-pointer"
         style={{ width: 200 }}
         value={selectedListId}
         onChange={onSelectList}
@@ -107,6 +107,7 @@ const SelectList = ({ ids, inline = false }) => {
           {!inline && <br />}
           <span>
             <button
+              className="m-0 ml-2"
               onClick={onCreateListItem}
               disabled={
                 !selectedListId ||
@@ -131,19 +132,6 @@ const SelectList = ({ ids, inline = false }) => {
           </span>
         </span>
       )}
-      <style jsx>{`
-        button {
-          background: purple;
-          color: white;
-        }
-        button:disabled {
-          cursor: auto;
-          background: gray;
-        }
-        a {
-          color: black;
-        }
-      `}</style>
     </div>
   );
 };

@@ -7,8 +7,10 @@ import { ItemContent as ItemContentType } from "../types/ItemTypes";
 import { Clip } from "../types/ClipTypes";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
+import SelectList from "./selectList";
+import Wrapper from "./wrapper";
 
-type CurentType = "content" | "clips" | "email";
+type CurentType = "content" | "clips" | "email" | "more";
 
 const ClipsList = ({ clips }: { clips: Clip[] }) => {
   return (
@@ -69,6 +71,17 @@ const EmailSandbox = ({ originEmailBody }) => {
         }
       `}</style>
     </>
+  );
+};
+
+const MoreOptions = ({ itemId }) => {
+  return (
+    <Wrapper nested>
+      <div className="well mb-4">
+        <h4>Add to a list</h4>
+        <SelectList inline ids={[itemId]} />
+      </div>
+    </Wrapper>
   );
 };
 
@@ -173,7 +186,6 @@ const ReactiveItemData = ({
             <ItemControls
               current={current}
               updateCurrent={updateCurrent}
-              itemId={itemId}
               originEmailBody={originEmailBody}
             />
           </div>
@@ -189,6 +201,7 @@ const ReactiveItemData = ({
         {current === "email" && (
           <EmailSandbox originEmailBody={originEmailBody} />
         )}
+        {current === "more" && <MoreOptions itemId={itemId} />}
       </div>
     </div>
   );

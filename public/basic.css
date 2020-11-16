@@ -161,7 +161,7 @@ input[type="submit"] {
   display: inline-block;
   border: 0;
   margin: 4px;
-  padding: 0.6em 1.2em;
+  padding: 0.5em 1em;
   cursor: pointer;
   text-align: center;
   background: var(--c2);
@@ -184,7 +184,7 @@ button:disabled:hover {
 button.small {
   background: var(--c1);
   color: var(--c3);
-  padding: 0.4em 0.6em;
+  padding: 0.3em 0.6em;
 }
 button.small.blue {
   background: var(--c2);
@@ -313,8 +313,17 @@ h6 {
 }
 
 .well input,
-.well textarea {
+.well textarea,
+.well select {
   background-color: var(--ghost);
+}
+
+.well > h1,
+.well > h2,
+.well > h3,
+.well > h4,
+.well > h5 {
+  margin-top: 0;
 }
 
 .line-clamp-2 {

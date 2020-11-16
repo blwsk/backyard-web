@@ -132,28 +132,26 @@ type PhoneNumberProps = {
 const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
   return (
     <div className="well">
-      <label htmlFor="phone">
-        <h4>Save content via SMS</h4>
-        {phoneNumber ? (
-          <div>
-            <span>
-              Your phone number is verified ✅. Send messages to the Backyard
-              phone number{", "}
-            </span>
-            <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>
-            <span>{", to add content."}</span>
-          </div>
-        ) : (
-          <div>
-            <span>
-              Verify your phone number, then send messages to the Backyard phone
-              number{", "}
-            </span>
-            <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>
-            <span>{", to add content."}</span>
-          </div>
-        )}
-      </label>
+      <h4>Save content via SMS</h4>
+      {phoneNumber ? (
+        <div>
+          <span>
+            Your phone number is verified ✅. Send messages to the Backyard
+            phone number{", "}
+          </span>
+          <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>
+          <span>{", to add content."}</span>
+        </div>
+      ) : (
+        <div>
+          <span>
+            Verify your phone number, then send messages to the Backyard phone
+            number{", "}
+          </span>
+          <a href={`tel:${TWILIO_PHONE_NUMBER}`}>{TWILIO_PHONE_NUMBER}</a>
+          <span>{", to add content."}</span>
+        </div>
+      )}
       <div className="pt-4">
         {phoneNumber ? (
           <input
@@ -224,13 +222,11 @@ type EmailIngestProps = {
 const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
   return (
     <div className="well">
-      <label htmlFor="email">
-        <h4>Add content with email</h4>
-        <div>
-          Create an email address to use when subscribing to newsletters. New
-          posts will automatically be added.
-        </div>
-      </label>
+      <h4>Add content with email</h4>
+      <div>
+        Create an email address to use when subscribing to newsletters. New
+        posts will automatically be added.
+      </div>
       <div className="pt-4">
         {emailIngestAddress ? (
           <textarea
