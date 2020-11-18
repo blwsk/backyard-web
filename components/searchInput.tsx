@@ -56,7 +56,7 @@ const SearchInput: FunctionComponent<Props> = ({
   const doThrottledSearch = useCallback(throttle(wrappedDoSearch, 1000), []);
 
   useEffect(() => {
-    if (defaultQuery && query === "") {
+    if (defaultQuery) {
       updateQuery(defaultQuery);
     }
   }, [defaultQuery]);
