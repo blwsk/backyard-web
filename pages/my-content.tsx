@@ -18,6 +18,7 @@ import SearchInput from "../components/searchInput";
 import { ListItemProps } from "../components/listItem";
 import { ITEMS } from "../types/SearchIndexTypes";
 import LoadingItem from "../components/loading/LoadingItem";
+import { classNames } from "../lib/classNames";
 
 const ContentPage = ({
   items,
@@ -125,8 +126,8 @@ const CreateList = () => {
   );
 };
 
-const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
-  const [selectionState, updateSelectionState] = useState({});
+const useItemSelection = (initialState = {}) => {
+  const [selectionState, updateSelectionState] = useState(initialState);
 
   const onSelect = (id) => {
     const temp = Object.assign({}, selectionState, {
@@ -143,17 +144,16 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
     updateSelectionState({});
   };
 
-  const numSelected = Object.keys(selectionState).length;
+  return {
+    selectionState,
+    onSelect,
+    onDeselect,
+    onClearSelection,
+  };
+};
 
+const useDeleteItems = (ids, onClearSelection) => {
   const [deletionState, updateDeletionState] = useState({
-    pending: false,
-    started: false,
-    success: false,
-    res: null,
-    error: null,
-  });
-
-  const [addToListState, updateAddToListState] = useState({
     pending: false,
     started: false,
     success: false,
@@ -182,8 +182,6 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
   };
 
   const [deletedIds, updateDeletedIds] = useState([]);
-
-  const ids = Object.keys(selectionState);
 
   const doDeleteItems = useAuthedCallback(
     "/api/delete-items",
@@ -228,6 +226,25 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
       });
   };
 
+  return {
+    deletionState,
+    onClickDelete,
+    onCancelPendingDelete,
+    deletedIds,
+    doDeleteItems,
+    onConfirmDelete,
+  };
+};
+
+const useAddToList = () => {
+  const [addToListState, updateAddToListState] = useState({
+    pending: false,
+    started: false,
+    success: false,
+    res: null,
+    error: null,
+  });
+
   const onClickAddToList = () => {
     updateAddToListState({
       pending: true,
@@ -248,6 +265,39 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
     });
   };
 
+  return {
+    addToListState,
+    onClickAddToList,
+    onCancelPendingAddToList,
+  };
+};
+
+const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
+  const {
+    selectionState,
+    onSelect,
+    onDeselect,
+    onClearSelection,
+  } = useItemSelection();
+
+  const ids = Object.keys(selectionState);
+
+  const {
+    deletionState,
+    deletedIds,
+    onClickDelete,
+    onCancelPendingDelete,
+    onConfirmDelete,
+  } = useDeleteItems(ids, onClearSelection);
+
+  const {
+    addToListState,
+    onClickAddToList,
+    onCancelPendingAddToList,
+  } = useAddToList();
+
+  const numSelected = ids.length;
+
   const hasLoadedAtleastFirstPage = pages.length > 0;
 
   return (
@@ -265,28 +315,29 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
       {hasLoadedAtleastFirstPage && (
         <>
           {hasMore ? (
-            <button onClick={onLoadMore}>Load more</button>
+            <div className="flex justify-center items-center">
+              <button onClick={onLoadMore}>Load more</button>
+            </div>
           ) : (
-            !isValidating && <div>No more content.</div>
+            !isValidating && (
+              <div className="flex justify-center items-center">
+                <div className="font-semibold">No more content.</div>
+              </div>
+            )
           )}
         </>
       )}
       <div>
         {numSelected > 0 && (
           <footer
+            className="bg-pink-400 fixed w-full inset-x-0 bottom-0"
             style={{
-              background: "pink",
-              position: "fixed",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
               height: 100,
             }}
           >
-            <div style={{ color: "black", textAlign: "center", paddingTop: 8 }}>
+            <div className="text-black text-center pt-2">
               <div>
-                <b style={{ fontWeight: 500 }}>
+                <b className="font-medium">
                   You&apos;ve selected <span>{numSelected}</span>{" "}
                   <span>{numSelected === 1 ? "item" : "items"}</span>
                 </b>
@@ -331,7 +382,7 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
             ) : (
               <div>
                 <h4>Select a list</h4>
-                <SelectList ids={Object.keys(selectionState)} />
+                <SelectList ids={ids} />
                 <br />
                 <h4>Create a new list</h4>
                 <CreateList />
@@ -432,7 +483,7 @@ const MyContent = ({ sortOrder }) => {
         )}
         {isValidating && <LoadingItem />}
       </div>
-      {error && <div style={{ color: "red" }}>Oops. Refresh the page.</div>}
+      {error && <div className="text-red-500">Oops. Refresh the page.</div>}
     </>
   );
 };
@@ -449,7 +500,9 @@ const ListControls = ({
   return (
     <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
       <select
-        className="form-select"
+        className={classNames("form-select", {
+          "cursor-pointer": !isSearchMode,
+        })}
         id="sort"
         onChange={onChangeSortOrder}
         value={isSearchMode ? "relevancy" : sortOrder}
@@ -492,7 +545,7 @@ const SearchResults: FunctionComponent<{ results: ListItemProps[] }> = ({
   if (!results) {
     return (
       <div className="flex justify-center items-center">
-        <h4 className="font-semibold">Enter a search term.</h4>
+        <div className="font-semibold">Enter a search term.</div>
       </div>
     );
   }
@@ -500,16 +553,27 @@ const SearchResults: FunctionComponent<{ results: ListItemProps[] }> = ({
   if (results.length === 0) {
     return (
       <div className="flex justify-center items-center">
-        <h4 className="font-semibold">No results.</h4>
+        <div className="font-semibold">No results.</div>
       </div>
     );
   }
 
   return (
     <div>
-      {results.map((result) => {
-        return <ContentPageItem key={result._id} item={result} />;
-      })}
+      <ContentPageList
+        pages={[
+          {
+            searchResults: {
+              before: null,
+              after: null,
+              data: results,
+            },
+          },
+        ]}
+        hasMore={false}
+        onLoadMore={() => {}}
+        isValidating={false}
+      />
     </div>
   );
 };
@@ -527,7 +591,10 @@ const WrappedMyContent = ({ router }) => {
   const searchQuery = search || "";
 
   const onChangeSortOrder = (e) => {
-    router.push(`/my-content?sort=${e.target.value}`);
+    router.push({
+      pathname: "/my-content",
+      query: { ...router.query, sort: e.target.value },
+    });
   };
 
   const isSearchMode = isSearching || searchResults;
@@ -545,6 +612,14 @@ const WrappedMyContent = ({ router }) => {
           }}
           onSearchToggle={(isSearching) => updateIsSearching(isSearching)}
           onClear={() => {
+            const nextQuery = Object.assign({}, router.query);
+            delete nextQuery.search;
+
+            router.push({
+              pathname: "/my-content",
+              query: nextQuery,
+            });
+
             updateSearchResults(null);
           }}
           isSearchMode={isSearchMode}

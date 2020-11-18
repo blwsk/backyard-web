@@ -11,9 +11,12 @@ export const sortOrderEnum = {
 };
 
 export const getResultObject = (result) =>
+  // the first three correspond to real GQL response paths
   result.itemsByUser ||
   result.itemsByUserReverse ||
-  result.mostPopularItemsByUser;
+  result.mostPopularItemsByUser ||
+  // this last one is a shim to support Algolia search results with the same components
+  result.searchResults;
 
 export const buildQuery = ({ cursorValue, sortOrder }) => {
   switch (sortOrder) {
