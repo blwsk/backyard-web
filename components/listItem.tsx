@@ -44,7 +44,7 @@ const ListItemPreview = ({
       <Link href={{ pathname: "/viewer", query: { id } }}>
         {isTwitter(url) && tweetJson ? (
           <a>
-            <div className="bg-ghost p-4 -ml-4 md:ml-0 rounded-r-md md:rounded-l-md">
+            <div className="bg-ghost p-4 -ml-4 rounded-r-md md:rounded-l-md">
               <TweetPreview tweetJson={tweetJson} />
             </div>
           </a>

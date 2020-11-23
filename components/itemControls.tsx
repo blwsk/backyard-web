@@ -1,8 +1,7 @@
-import { useState, ReactElement, MouseEventHandler } from "react";
-import SelectList from "./selectList";
+import { ReactElement, MouseEventHandler } from "react";
 import { classNames } from "../lib/classNames";
 
-const Button = ({
+export const Button = ({
   current,
   onClick,
   children,

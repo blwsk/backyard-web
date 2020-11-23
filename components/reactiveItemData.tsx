@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
+import sanitize from "sanitize-html";
+
 import { getHostname } from "../lib/urls";
 import Selection from "./selection";
 import ItemContent from "./itemContent";
-import ItemControls from "./itemControls";
+import ItemControls, { Button } from "./itemControls";
 import { ItemContent as ItemContentType } from "../types/ItemTypes";
 import { Clip } from "../types/ClipTypes";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import SelectList from "./selectList";
 import Wrapper from "./wrapper";
+import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
 
 type CurentType = "content" | "clips" | "email" | "more";
 
@@ -39,7 +42,7 @@ const ClipsList = ({ clips }: { clips: Clip[] }) => {
   );
 };
 
-const EmailSandbox = ({ originEmailBody }) => {
+const OriginalEmail = ({ originEmailBody }) => {
   const [mounted, updateMounted] = useState(true);
   const [iframe, updateIframe] = useState<HTMLIFrameElement>();
 
@@ -54,7 +57,7 @@ const EmailSandbox = ({ originEmailBody }) => {
 
   return (
     <>
-      <div className="iframe-wrapper w-full">
+      <div className="iframe-wrapper w-full rounded border border-solid border-black">
         <iframe
           ref={(el) => {
             setTimeout(() => mounted && updateIframe(el));
@@ -71,6 +74,46 @@ const EmailSandbox = ({ originEmailBody }) => {
         }
       `}</style>
     </>
+  );
+};
+
+const EmailSandbox = ({ originEmailBody, itemId, invalidateQuery }) => {
+  const html = getParsedOriginEmail(originEmailBody);
+
+  const [showParsed, updateShowParsed] = useState(!!html);
+
+  return (
+    <div>
+      {!!html && (
+        <div className="flex mb-4">
+          <Button
+            current={showParsed}
+            onClick={() => updateShowParsed(true)}
+            first
+          >
+            Parsed
+          </Button>
+          <Button
+            current={!showParsed}
+            onClick={() => updateShowParsed(false)}
+            last
+          >
+            Original
+          </Button>
+        </div>
+      )}
+      {showParsed ? (
+        <>
+          <div
+            className="rendered-html-body"
+            dangerouslySetInnerHTML={{ __html: sanitize(html) }}
+          />
+          <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
+        </>
+      ) : (
+        <OriginalEmail originEmailBody={originEmailBody} />
+      )}
+    </div>
   );
 };
 
@@ -190,7 +233,6 @@ const ReactiveItemData = ({
             />
           </div>
         )}
-
         {current === "content" && (
           <>
             <ItemContent data={data} content={content} url={url} />
@@ -199,7 +241,11 @@ const ReactiveItemData = ({
         )}
         {current === "clips" && <ClipsList clips={clips} />}
         {current === "email" && (
-          <EmailSandbox originEmailBody={originEmailBody} />
+          <EmailSandbox
+            originEmailBody={originEmailBody}
+            itemId={itemId}
+            invalidateQuery={invalidateQuery}
+          />
         )}
         {current === "more" && <MoreOptions itemId={itemId} />}
       </div>

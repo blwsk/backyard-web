@@ -1,15 +1,7 @@
-import { JSDOM } from "jsdom";
 import { Readability } from "@mozilla/readability";
 import FuzzySet from "fuzzyset.js";
 import { findEndPageUrl } from "./puppeteerUtils";
-
-export const getDom = (html: string, url?: string) => {
-  const dom = new JSDOM(html, url ? { url } : undefined);
-
-  const { document } = dom.window;
-
-  return document;
-};
+import { getDom } from "./syntheticDom";
 
 export const getMetaProperties = (
   document
