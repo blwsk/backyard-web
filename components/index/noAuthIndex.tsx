@@ -14,9 +14,9 @@ const NoAuthIndex = () => {
           Save anything, search everything, keep forever
         </h2>
         <p className="text-center mb-6 md:mb-12">
-          Subscribe to <b>newsletters</b> with a special email address. Send
-          links via <b>SMS</b> to store them. Never lose track of what you’ve
-          saved. It’s all here, <b>instantly searchable</b>.
+          Subscribe to <b>newsletters</b> with a special email address. Store
+          links via <b>SMS</b>. Never lose track of what you’ve saved. It’s all
+          here, <b>instantly searchable</b>.
         </p>
         <a href={FORM_URL} target="_blank">
           <button className="text-lg bg-orange text-white font-semibold py-3 px-5">
