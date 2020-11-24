@@ -4,9 +4,12 @@ import requireAuth from "../lib/requireAuth";
 import { useState } from "react";
 import MenuPopover from "./MenuPopover";
 
-const LogoLink = () => (
+const LogoLink = ({ text }: { text?: boolean }) => (
   <Link href="/">
-    <a className="link-black text-3xl">🏕</a>
+    <a className="flex items-center leading-4 space-x-2 link-black">
+      <span className="text-3xl">🏕</span>
+      {text && <b>Backyard</b>}
+    </a>
   </Link>
 );
 
@@ -54,10 +57,8 @@ const AuthenticatedHeader = () => {
 
 const NoAuthHeader = () => {
   return (
-    <div className="w-full space-x-6 flex justify-between">
-      <span>
-        <LogoLink />
-      </span>
+    <div className="w-full flex justify-between items-center space-x-6">
+      <LogoLink text />
       <AuthInteraction />
     </div>
   );
