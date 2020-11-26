@@ -7,7 +7,7 @@ const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
 
 const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
 
-const search = authedEndpoint(async (req, res) => {
+const search = authedEndpoint(async (req, res, { user }) => {
   const indexName: string | string[] = req.query.index;
 
   if (
@@ -44,6 +44,7 @@ const search = authedEndpoint(async (req, res) => {
 
     return index.search(searchQuery, {
       hitsPerPage: 50,
+      facetFilters: `createdBy:${user.sub}`,
     });
   });
 

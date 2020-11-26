@@ -2,6 +2,7 @@ import gql from "gql-tag";
 import { makeGqlRequest } from "../../../api-utils/makeGqlRequest";
 import { doAsyncThing } from "../../../api-utils/doAsyncThing";
 import { ItemExportData } from "../../../types/ExportTypes";
+import localEndpoint from "../../../api-utils/localEndpoint";
 
 const query = gql`
   query {
@@ -14,28 +15,16 @@ const query = gql`
           title
           metaTitle
           metaDescription
-          body
+          # body
         }
+        createdBy
       }
     }
   }
 `;
 
-const exportTextContent = async (req, res) => {
-  const [allItems, allItemsError] = await doAsyncThing(() =>
-    makeGqlRequest(JSON.stringify({ query }))
-  );
-
-  if (allItemsError) {
-    res.status(500).send({
-      error: allItemsError,
-    });
-    return;
-  }
-
-  const allItemObjects = allItems.data.allItems.data;
-
-  const cleanedObjects = allItemObjects.map((r) => {
+const clean = (a) =>
+  a.map((r) => {
     /**
      * Strip too-large bodies
      *
@@ -55,7 +44,21 @@ const exportTextContent = async (req, res) => {
     return r;
   });
 
-  const results: ItemExportData[] = cleanedObjects.map(
+const exportTextContent = async (req, res) => {
+  const [allItems, allItemsError] = await doAsyncThing(() =>
+    makeGqlRequest(JSON.stringify({ query }))
+  );
+
+  if (allItemsError) {
+    res.status(500).send({
+      error: allItemsError,
+    });
+    return;
+  }
+
+  const allItemObjects = allItems.data.allItems.data;
+
+  const results: ItemExportData[] = allItemObjects.map(
     (r): ItemExportData => ({
       ...r,
       objectID: r._id,
@@ -65,4 +68,4 @@ const exportTextContent = async (req, res) => {
   res.status(200).send(results);
 };
 
-export default exportTextContent;
+export default localEndpoint(exportTextContent);

@@ -72,7 +72,15 @@ const authedEndpoint = (
 
   const user: Auth0User = await userinfoRes.json();
 
-  return endpointFn(req, res, { user, err });
+  if (err) {
+    res.status(500).send({
+      message: "Internal auth error",
+      error: err,
+    });
+    return;
+  }
+
+  return endpointFn(req, res, { user });
 };
 
 export default authedEndpoint;

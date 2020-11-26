@@ -256,13 +256,13 @@ export const saveContentItem = async (
       objectID: itemResult.ref.id,
       _id: itemResult.ref.id,
       _ts: itemResult.ts,
+      createdBy: userId,
       url,
       content: contentJson
         ? {
             title: contentJson.title,
             metaTitle: contentJson.metaTitle,
             metaDescription: contentJson.metaDescription,
-            body: contentJson.body,
           }
         : null,
     };

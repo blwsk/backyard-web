@@ -2,6 +2,7 @@ import gql from "gql-tag";
 import { makeGqlRequest } from "../../../api-utils/makeGqlRequest";
 import { doAsyncThing } from "../../../api-utils/doAsyncThing";
 import { ClipExportData } from "../../../types/ExportTypes";
+import localEndpoint from "../../../api-utils/localEndpoint";
 
 const query = gql`
   query {
@@ -51,4 +52,4 @@ const exportTextContent = async (req, res) => {
   res.status(200).send(results);
 };
 
-export default exportTextContent;
+export default localEndpoint(exportTextContent);
