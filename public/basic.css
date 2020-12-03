@@ -286,6 +286,14 @@ h6 {
   font-size: 1em;
   font-weight: 700;
 }
+.rendered-html-body table,
+.rendered-html-body tbody,
+.rendered-html-body tr,
+.rendered-html-body td {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
 
 .list-item {
   display: flex;

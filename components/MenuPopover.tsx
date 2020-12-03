@@ -44,7 +44,7 @@ const SettingsPopover = () => {
           z-index: 100;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
           .popover-body {
             top: 68px;
             left: 0;
