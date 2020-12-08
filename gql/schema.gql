@@ -70,6 +70,11 @@ type ReceivedSMSBlobsV1 {
   userId: String!
 }
 
+type RssSubscription {
+  feedUrl: String!
+  userId: String!
+}
+
 type Query {
   allItems: [Item!]
 
@@ -107,4 +112,7 @@ type Query {
 
   userMetadataForUser(userId: String!): UserMetadata
   @resolver(name: "userMetadataForUser")
+
+  rssSubscriptionsForUser(userId: String!): [RssSubscription!]
+  @resolver(name: "rssSubscriptionsForUser", paginated: true)
 }
