@@ -8,12 +8,19 @@ import gql from "gql-tag";
 import { mutate } from "swr";
 import { PhoneNumber } from "twilio/lib/interfaces";
 import { TWILIO_PHONE_NUMBER } from "../lib/twilioConstants";
+import { validURL } from "../lib/urls";
 
 const userMetadataQuery = gql`
   query UserMetadataForUser($userId: String!) {
     userMetadataForUser(userId: $userId) {
       phoneNumber
       emailIngestAddress
+    }
+    rssSubscriptionsForUser(userId: $userId, _size: 100) {
+      data {
+        feedUrl
+        _id
+      }
     }
   }
 `;
@@ -244,9 +251,111 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
   );
 };
 
+const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
+  const [deleteState, update] = useState<"loading" | "error">(null);
+
+  const doDelete = useAuthedCallback(
+    gql`
+      mutation {  
+        deleteRssSubscription(id: ${id}) {
+          _id
+        }
+      }
+    `,
+    {},
+    gqlFetcherFactory
+  );
+
+  return (
+    <li className="flex items-center justify-between w-full">
+      <a href={feedUrl}>{feedUrl}</a>
+      <button
+        className="px-2 py-1 bg-gray-500"
+        onClick={() => {
+          update("loading");
+          doDelete()
+            .catch(() => update("error"))
+            .finally(() => mutate(userMetadataQuery));
+        }}
+      >
+        <small className="text-md">Unsubscribe</small>
+      </button>
+      {deleteState === "loading" && <span>Deleting...</span>}
+      {deleteState === "error" && <span className="text-red-500">Error</span>}
+    </li>
+  );
+};
+
+const RssSubscriptions = ({
+  rssFeeds,
+}: {
+  rssFeeds: { feedUrl: string; _id: string }[];
+}) => {
+  const [feedUrl, updateUrl] = useState<string>("");
+  const [subscribeState, update] = useState<"loading" | "error">(null);
+
+  const doSubscribe = useAuthedCallback(
+    "/api/rss/subscribe",
+    {
+      method: "POST",
+      body: JSON.stringify({ feedUrl }),
+    },
+    jsonFetcherFactory
+  );
+
+  return (
+    <div className="well">
+      <h4>Subscribe to RSS feeds</h4>
+      <div>
+        Whenever new posts are added to these feeds, they'll appear in your
+        saved content.
+      </div>
+      <div className="pt-4">
+        {rssFeeds.length > 0 ? (
+          <ul>
+            {rssFeeds.map(({ feedUrl, _id }) => (
+              <RssFeed key={_id} feedUrl={feedUrl} id={_id} />
+            ))}
+          </ul>
+        ) : (
+          <div>None! Save one 👇</div>
+        )}
+        <div className="mt-6 flex">
+          <input
+            className="form-input flex-grow"
+            type="text"
+            value={feedUrl}
+            onChange={(e) => updateUrl(e.target.value)}
+            disabled={subscribeState === "loading"}
+            placeholder="https://example.com/rss"
+          />
+          <button
+            className="mx-2"
+            onClick={() => {
+              update("loading");
+              doSubscribe()
+                .then(() => update(null))
+                .catch(() => update("error"))
+                .finally(() => mutate(userMetadataQuery));
+            }}
+            disabled={subscribeState === "loading" || !validURL(feedUrl)}
+          >
+            Subscribe
+          </button>
+          {subscribeState === "loading" && <span>Loading...</span>}
+          {subscribeState === "error" && (
+            <span className="text-red-500">Error</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SettingsForm = ({ data }) => {
   const {
     userMetadataForUser: { phoneNumber, emailIngestAddress },
+    rssSubscriptionsForUser: { data: rssFeeds },
   } = data.data;
 
   return (
@@ -256,6 +365,9 @@ const SettingsForm = ({ data }) => {
       </div>
       <div className="mb-6">
         <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
+      </div>
+      <div className="mb-6">
+        <RssSubscriptions rssFeeds={rssFeeds} />
       </div>
       <Guide />
     </div>
@@ -295,8 +407,6 @@ const Settings = () => {
     userMetadataQuery,
     gqlFetcherFactory
   );
-
-  void error, isValidating;
 
   return (
     <div>

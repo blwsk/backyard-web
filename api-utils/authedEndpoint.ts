@@ -31,6 +31,31 @@ const getTokenFromHeaderValue = (str) => {
   return;
 };
 
+export const serverToServerEndpoint = (
+  endpointFn: (req: NextApiRequest, res: NextApiResponse) => void
+) => async (req, res) => {
+  const { authorization: Authorization } = req.headers;
+
+  const token = getTokenFromHeaderValue(Authorization);
+
+  const decodedToken = jwt.decode(token, { complete: true });
+
+  const {
+    header: { alg, kid },
+  } = decodedToken;
+
+  const { getPublicKey } = await jwksClient.getSigningKeyAsync(kid);
+
+  const isVerified = jwt.verify(token, getPublicKey(), { algorithms: [alg] });
+
+  if (!isVerified) {
+    res.status(401).send(null);
+    return;
+  }
+
+  return endpointFn(req, res);
+};
+
 const authedEndpoint = (
   endpointFn: (
     req: NextApiRequest,
