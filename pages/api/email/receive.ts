@@ -160,15 +160,24 @@ const receiveEmail = async (req, res) => {
   const parsedEmailBody = generatedTextContent.body;
 
   if (validURL(url)) {
-    const { message, result, error } = await saveContentItem(
+    const { message, result, alreadySaved, error } = await saveContentItem(
       faunaClient,
       url,
       userId,
       EMAIL,
-      { emailBody: emailContent.body }
+      {
+        emailBody: emailContent.body,
+      }
     );
 
-    if (phoneNumber) {
+    if (error) {
+      console.log("SaveContentItem error", {
+        message,
+        result,
+        alreadySaved,
+        error,
+      });
+    } else if (phoneNumber && !alreadySaved) {
       const saveContentMessage = getResponseFromMessage(message, result);
 
       /**
