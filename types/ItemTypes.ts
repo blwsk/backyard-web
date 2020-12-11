@@ -1,8 +1,9 @@
 export const EMAIL = "email";
 export const SMS = "sms";
 export const MANUAL = "manual";
+export const RSS = "rss";
 
-export type ItemSource = "email" | "sms" | "manual";
+export type ItemSource = "email" | "sms" | "manual" | "rss";
 
 export interface ItemContent {
   body: string;
@@ -14,6 +15,7 @@ export interface ItemContent {
 
 export interface ItemOrigin {
   emailBody?: string;
+  rssEntryContent?: string;
 }
 
 export interface Item {
