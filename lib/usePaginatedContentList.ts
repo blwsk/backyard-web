@@ -30,6 +30,10 @@ export const buildQuery = ({ cursorValue, sortOrder }) => {
                 _ts
                 content {
                   title
+                  json
+                }
+                origin {
+                  rssEntryContent
                 }
               }
               before
@@ -47,6 +51,10 @@ export const buildQuery = ({ cursorValue, sortOrder }) => {
                 _ts
                 content {
                   title
+                  json
+                }
+                origin {
+                  rssEntryContent
                 }
               }
               before
@@ -66,6 +74,9 @@ export const buildQuery = ({ cursorValue, sortOrder }) => {
                 content {
                   title
                   json
+                }
+                origin {
+                  rssEntryContent
                 }
               }
               before

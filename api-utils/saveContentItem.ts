@@ -100,6 +100,7 @@ const createItem = async (
         q.Create(q.Collection("ItemOrigin"), {
           data: {
             emailBody: itemOrigin.emailBody,
+            rssEntryContent: itemOrigin.rssEntryContent,
           },
         })
       );
