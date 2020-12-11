@@ -35,6 +35,7 @@ export const buildQuery = ({ cursorValue, sortOrder }) => {
                 origin {
                   rssEntryContent
                 }
+                source
               }
               before
               after
@@ -56,6 +57,7 @@ export const buildQuery = ({ cursorValue, sortOrder }) => {
                 origin {
                   rssEntryContent
                 }
+                source
               }
               before
               after
@@ -78,6 +80,7 @@ export const buildQuery = ({ cursorValue, sortOrder }) => {
                 origin {
                   rssEntryContent
                 }
+                source
               }
               before
               after

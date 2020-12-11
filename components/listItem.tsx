@@ -3,6 +3,7 @@ import { stripParams, getHostname } from "../lib/urls";
 import Link from "next/link";
 import { isTwitter } from "../lib/contentTypes";
 import { TweetPreview } from "./tweetEmbed";
+import { ItemSource, MANUAL } from "../types/ItemTypes";
 
 export interface ListItemProps {
   _id: string;
@@ -12,6 +13,7 @@ export interface ListItemProps {
     title?: string;
     json?: string;
   };
+  source?: ItemSource;
 }
 
 const getTweetJson = (str) => {
@@ -70,7 +72,7 @@ const ListItem = ({
   item: ListItemProps;
   light?: boolean;
 }) => {
-  const { _id, _ts, url, content } = item;
+  const { _id, _ts, url, content, source } = item;
 
   const date = new Date(_ts / 1000);
   const dateString = date.toDateString();
@@ -89,6 +91,12 @@ const ListItem = ({
               <span>{dateString}</span>
               <span>・</span>
               <span>{timeString}</span>
+              {source && source !== MANUAL && (
+                <>
+                  <span>・</span>
+                  <span className="uppercase">{source}</span>
+                </>
+              )}
             </span>
             {hostname && (
               <>
