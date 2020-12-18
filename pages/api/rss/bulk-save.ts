@@ -25,6 +25,7 @@ interface RssEntry {
 
 const bulkSave = wrapper(async (req, res) => {
   const userId = <string>req.query.userId;
+  const feedUrl = <string>req.query.feedUrl;
 
   if (req.method !== "POST") {
     res.status(400).send(null);
@@ -43,6 +44,7 @@ const bulkSave = wrapper(async (req, res) => {
     itemsToSave.map(({ link: url, content }) =>
       saveContentItem(faunaClient, url, userId, RSS, {
         rssEntryContent: content,
+        rssFeedUrl: feedUrl,
       })
     )
   );

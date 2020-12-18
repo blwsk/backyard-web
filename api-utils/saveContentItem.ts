@@ -101,6 +101,7 @@ const createItem = async (
           data: {
             emailBody: itemOrigin.emailBody,
             rssEntryContent: itemOrigin.rssEntryContent,
+            rssFeedUrl: itemOrigin.rssFeedUrl,
           },
         })
       );

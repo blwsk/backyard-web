@@ -9,6 +9,7 @@ type ItemContent {
 type ItemOrigin {
   emailBody: String
   rssEntryContent: String
+  rssFeedUrl: String
 }
 
 type Item {

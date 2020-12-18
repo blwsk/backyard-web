@@ -16,6 +16,7 @@ export interface ItemContent {
 export interface ItemOrigin {
   emailBody?: string;
   rssEntryContent?: string;
+  rssFeedUrl?: string;
 }
 
 export interface Item {
