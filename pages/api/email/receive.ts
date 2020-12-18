@@ -127,6 +127,8 @@ const receiveEmail = async (req, res) => {
     ? readerView
     : emailReaderView;
 
+  console.log("Received Email JSON", emailContent);
+
   let createResult;
   let createError;
   try {
