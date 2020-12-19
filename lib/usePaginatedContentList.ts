@@ -7,41 +7,17 @@ export const PAGE_LENGTH = 100;
 export const sortOrderEnum = {
   ascending: "ascending",
   descending: "descending",
-  popular: "popular",
 };
 
 export const getResultObject = (result) =>
   // the first three correspond to real GQL response paths
   result.itemsByUser ||
   result.itemsByUserReverse ||
-  result.mostPopularItemsByUser ||
   // this last one is a shim to support Algolia search results with the same components
   result.searchResults;
 
 export const buildQuery = ({ cursorValue, sortOrder }) => {
   switch (sortOrder) {
-    case sortOrderEnum.popular:
-      return gql`
-          query MostPopularItemsByUser($userId: String!) {
-            mostPopularItemsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-              data {
-                url
-                _id
-                _ts
-                content {
-                  title
-                  json
-                }
-                origin {
-                  rssEntryContent
-                }
-                source
-              }
-              before
-              after
-            }
-          }
-        `;
     case sortOrderEnum.ascending:
       return gql`
           query ItemsByUser($userId: String!) {

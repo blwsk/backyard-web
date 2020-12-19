@@ -66,11 +66,7 @@ const createTextSelection = authedEndpoint(
 
     const itemRef = q.Ref(q.Collection("Item"), itemId);
 
-    let result;
-    let resultIncrement;
-    let error;
-
-    result = await Promise.all([
+    const [textSelectionResult, error] = await doAsyncThing(() =>
       client.query(
         q.Create(q.Collection("TextSelection"), {
           data: {
@@ -80,13 +76,8 @@ const createTextSelection = authedEndpoint(
             createdAt: Date.now(),
           },
         })
-      ),
-      client.query(
-        q.Call(q.Function("incrementClipCountForItem"), itemRef, user.sub)
-      ),
-    ]).catch((e) => (error = e));
-
-    void resultIncrement;
+      )
+    );
 
     if (error) {
       res.status(500).send({
@@ -94,10 +85,6 @@ const createTextSelection = authedEndpoint(
       });
       return;
     }
-
-    const [textSelectionResult, clipCountIncrementResult] = result;
-
-    void clipCountIncrementResult;
 
     const [
       textSelectionResultId,
@@ -134,8 +121,6 @@ const createTextSelection = authedEndpoint(
       }
     );
 
-    void indexForSearchResult;
-
     if (indexForSearchError) {
       console.log(indexForSearchError);
       res.status(500).send({
@@ -147,7 +132,7 @@ const createTextSelection = authedEndpoint(
     res.status(200).send({
       message: `Success. The text selection has been created.`,
       itemId,
-      result: JSON.stringify(result),
+      result: indexForSearchResult,
     });
   }
 );

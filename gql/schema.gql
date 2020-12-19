@@ -28,12 +28,6 @@ type TextSelection {
   createdAt: Long!
 }
 
-type TextSelectionCount {
-  item: Item!
-  count: Int!
-  createdBy: String!
-}
-
 type UserMetadata {
   emailIngestAddress: String
   emailIngestWebhookId: String
@@ -85,9 +79,6 @@ type Query {
 
   clipsByItemId(itemId: String!): [TextSelection!]
   @resolver(name: "clips_by_item_id", paginated: true)
-
-  mostPopularItemsByUser(userId: String!): [Item!]
-  @resolver(name: "most_clipped_items_by_user", paginated: true)
 
   userMetadataForUser(userId: String!): UserMetadata
   @resolver(name: "userMetadataForUser")
