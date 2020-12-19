@@ -21,19 +21,6 @@ type Item {
   origin: ItemOrigin
 }
 
-type List {
-  name: String!
-  createdBy: String!
-  createdAt: Long!
-}
-
-type ListItem {
-  item: Item!
-  list: List!
-  createdBy: String!
-  createdAt: Long!
-}
-
 type TextSelection {
   text: String!
   item: Item
@@ -83,22 +70,12 @@ type Query {
   allItemsReverseChrono: [Item!]
   @resolver(name: "all_Items_reverse_chrono", paginated: true)
 
-  allLists: [List!]
-
-  allListItems: [ListItem!]
-
-  findListItemsByList(id: String!): [ListItem]
-  @resolver(name: "list_items_for_list", paginated: true)
-
   allTextSelections: [TextSelection!]
 
   returnUserId(userId: String!): String @resolver(name: "return_user_id")
 
   clipsByUser(userId: String!): [TextSelection!]
   @resolver(name: "clips_by_user", paginated: true)
-
-  listsByUser(userId: String!): [List!]
-  @resolver(name: "lists_by_user", paginated: true)
 
   itemsByUser(userId: String!): [Item!]
   @resolver(name: "items_by_user", paginated: true)
