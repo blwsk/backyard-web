@@ -38,12 +38,6 @@ const ItemControls = ({ current, updateCurrent, originEmailBody }) => {
         >
           Content
         </Button>
-        <Button
-          current={current === "clips"}
-          onClick={() => updateCurrent("clips")}
-        >
-          Clips
-        </Button>
         {originEmailBody && (
           <Button
             current={current === "email"}
@@ -53,11 +47,11 @@ const ItemControls = ({ current, updateCurrent, originEmailBody }) => {
           </Button>
         )}
         <Button
-          current={current === "more"}
-          onClick={() => updateCurrent("more")}
+          current={current === "clips"}
+          onClick={() => updateCurrent("clips")}
           last
         >
-          More
+          Clips
         </Button>
       </div>
     </div>

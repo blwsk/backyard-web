@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from "react";
+import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "./logoutButton";
 import Link from "next/link";
@@ -14,10 +14,6 @@ const SettingsPopover = () => {
             <i>Welcome, {user.email}</i>
           </small>
         </div>
-
-        <Link href="/lists">
-          <a className="link-black mb-4">Lists</a>
-        </Link>
 
         <Link href="/clips">
           <a className="link-black mb-4">Clips</a>

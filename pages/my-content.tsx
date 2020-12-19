@@ -1,9 +1,7 @@
-import { mutate } from "swr";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import { useState, useEffect, FunctionComponent } from "react";
 import { withRouter } from "next/router";
-import SelectList, { listQuery } from "../components/selectList";
 import { capitalize } from "../lib/capitalize";
 import requireAuth from "../lib/requireAuth";
 import { useAuthedCallback } from "../lib/requestHooks";
@@ -61,67 +59,6 @@ const ContentPage = ({
           />
         );
       })}
-    </div>
-  );
-};
-
-const CreateList = () => {
-  const [listName, updateListName] = useState("");
-  const onChange = (e) => {
-    updateListName(e.target.value);
-  };
-  const [createState, updateCreateState] = useState({
-    started: false,
-    response: null,
-    error: null,
-  });
-
-  const doCreateList = useAuthedCallback(
-    "/api/create-list",
-    {
-      method: "POST",
-      body: JSON.stringify({ name: listName }),
-    },
-    jsonFetcherFactory
-  );
-
-  const onCreateList = () => {
-    updateCreateState({ started: true, response: null, error: null });
-
-    doCreateList()
-      .then((response) => {
-        updateCreateState({ started: false, response, error: null });
-        mutate(listQuery);
-        updateListName("");
-      })
-      .catch((error) => {
-        updateCreateState({ started: false, response: null, error });
-      });
-  };
-
-  return (
-    <div>
-      {createState.started === false ? (
-        <input
-          className="form-input"
-          type="text"
-          value={listName}
-          placeholder="List name"
-          onChange={onChange}
-          style={{ width: 200 }}
-        />
-      ) : (
-        <span>Loading...</span>
-      )}
-      <button onClick={onCreateList} disabled={createState.started}>
-        Create
-      </button>
-      <style jsx>{`
-        button {
-          background: rgb(55, 55, 55);
-          color: white;
-        }
-      `}</style>
     </div>
   );
 };
@@ -236,42 +173,6 @@ const useDeleteItems = (ids, onClearSelection) => {
   };
 };
 
-const useAddToList = () => {
-  const [addToListState, updateAddToListState] = useState({
-    pending: false,
-    started: false,
-    success: false,
-    res: null,
-    error: null,
-  });
-
-  const onClickAddToList = () => {
-    updateAddToListState({
-      pending: true,
-      started: false,
-      success: false,
-      error: null,
-      res: null,
-    });
-  };
-
-  const onCancelPendingAddToList = () => {
-    updateAddToListState({
-      pending: false,
-      started: false,
-      success: false,
-      error: null,
-      res: null,
-    });
-  };
-
-  return {
-    addToListState,
-    onClickAddToList,
-    onCancelPendingAddToList,
-  };
-};
-
 const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
   const {
     selectionState,
@@ -289,12 +190,6 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
     onCancelPendingDelete,
     onConfirmDelete,
   } = useDeleteItems(ids, onClearSelection);
-
-  const {
-    addToListState,
-    onClickAddToList,
-    onCancelPendingAddToList,
-  } = useAddToList();
 
   const numSelected = ids.length;
 
@@ -344,7 +239,6 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
               </div>
               <div>
                 <button onClick={onClickDelete}>Delete</button>
-                <button onClick={onClickAddToList}>Add to list</button>
                 <button onClick={onClearSelection}>Clear</button>
               </div>
             </div>
@@ -367,34 +261,6 @@ const ContentPageList = ({ pages, hasMore, onLoadMore, isValidating }) => {
               </div>
             )}
             {deletionState.error && (
-              <div className="error">Oops. Something went wrong.</div>
-            )}
-          </div>
-        )}
-        {addToListState.pending && (
-          <div className="pending-modal p-4">
-            <h2>
-              Add <span>{numSelected}</span>{" "}
-              <span>{numSelected === 1 ? "item" : "items"}</span> to list
-            </h2>
-            {addToListState.started ? (
-              <div>Progress...</div>
-            ) : (
-              <div>
-                <h4>Select a list</h4>
-                <SelectList ids={ids} />
-                <br />
-                <h4>Create a new list</h4>
-                <CreateList />
-                <br />
-                <div>
-                  <button onClick={onCancelPendingAddToList}>
-                    Nope. Cancel.
-                  </button>
-                </div>
-              </div>
-            )}
-            {addToListState.error && (
               <div className="error">Oops. Something went wrong.</div>
             )}
           </div>

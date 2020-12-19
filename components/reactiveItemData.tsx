@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import sanitize from "sanitize-html";
-
 import { getHostname } from "../lib/urls";
 import Selection from "./selection";
 import ItemContent from "./itemContent";
@@ -9,11 +8,9 @@ import { ItemContent as ItemContentType } from "../types/ItemTypes";
 import { Clip } from "../types/ClipTypes";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
-import SelectList from "./selectList";
-import Wrapper from "./wrapper";
 import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
 
-type CurentType = "content" | "clips" | "email" | "more";
+type CurentType = "content" | "clips" | "email";
 
 const ClipsList = ({ clips }: { clips: Clip[] }) => {
   return (
@@ -114,17 +111,6 @@ const EmailSandbox = ({ originEmailBody, itemId, invalidateQuery }) => {
         <OriginalEmail originEmailBody={originEmailBody} />
       )}
     </div>
-  );
-};
-
-const MoreOptions = ({ itemId }) => {
-  return (
-    <Wrapper nested>
-      <div className="well mb-4">
-        <h4>Add to a list</h4>
-        <SelectList inline ids={[itemId]} />
-      </div>
-    </Wrapper>
   );
 };
 
@@ -247,7 +233,6 @@ const ReactiveItemData = ({
             invalidateQuery={invalidateQuery}
           />
         )}
-        {current === "more" && <MoreOptions itemId={itemId} />}
       </div>
     </div>
   );
