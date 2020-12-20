@@ -1,6 +1,6 @@
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuthedCallback, useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory, gqlFetcherFactory } from "../lib/fetcherFactories";
 import requireAuth from "../lib/requireAuth";
@@ -24,6 +24,27 @@ const userMetadataQuery = gql`
     }
   }
 `;
+
+const CopiedAlert = ({ onTimeout, className }) => {
+  const [show, updateShow] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      updateShow(false);
+      onTimeout();
+    }, 1000);
+
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    show && (
+      <div className={className}>
+        <span className="bg-black text-white py-1 px-2 rounded">Copied</span>
+      </div>
+    )
+  );
+};
 
 const ValidatePhoneNumber = () => {
   const [phoneValue, updatePhoneValue] = useState("");
@@ -227,6 +248,9 @@ type EmailIngestProps = {
 };
 
 const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
+  const ref = useRef<HTMLTextAreaElement>();
+  const [copied, updateCopied] = useState(false);
+
   return (
     <div className="well">
       <h4>Add content with email</h4>
@@ -236,13 +260,32 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
       </div>
       <div className="pt-4">
         {emailIngestAddress ? (
-          <textarea
-            className="form-input"
-            id="email"
-            style={{ marginTop: 8, marginRight: 8, width: "100%" }}
-            readOnly
-            value={emailIngestAddress}
-          />
+          <div className="relative">
+            <textarea
+              ref={(current) => (ref.current = current)}
+              className="form-input full-width"
+              id="email"
+              style={{ marginTop: 8, marginRight: 8, width: "100%" }}
+              readOnly
+              value={emailIngestAddress}
+              onFocus={() => {
+                try {
+                  navigator.clipboard.writeText(emailIngestAddress).then(() => {
+                    updateCopied(true);
+                    ref.current.blur();
+                  });
+                } catch (error) {
+                  void error;
+                }
+              }}
+            />
+            {copied && (
+              <CopiedAlert
+                className="absolute inset-0 flex items-center justify-center"
+                onTimeout={() => updateCopied(false)}
+              />
+            )}
+          </div>
         ) : (
           <CreateEmailIngestAddress />
         )}
@@ -267,7 +310,7 @@ const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
   );
 
   return (
-    <li className="flex items-center justify-between w-full">
+    <div className="flex justify-between md:items-center flex-col md:flex-row max-w-full mb-2">
       <a href={feedUrl}>{feedUrl}</a>
       <button
         className="px-2 py-1 bg-gray-500"
@@ -282,7 +325,7 @@ const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
       </button>
       {deleteState === "loading" && <span>Deleting...</span>}
       {deleteState === "error" && <span className="text-red-500">Error</span>}
-    </li>
+    </div>
   );
 };
 
@@ -312,15 +355,15 @@ const RssSubscriptions = ({
       </div>
       <div className="pt-4">
         {rssFeeds.length > 0 ? (
-          <ul>
+          <div>
             {rssFeeds.map(({ feedUrl, _id }) => (
               <RssFeed key={_id} feedUrl={feedUrl} id={_id} />
             ))}
-          </ul>
+          </div>
         ) : (
           <div>None! Save one 👇</div>
         )}
-        <div className="mt-6 flex">
+        <div className="mt-6 flex flex-col md:flex-row">
           <input
             className="form-input flex-grow"
             type="text"

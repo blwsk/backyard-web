@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import requireAuth from "../lib/requireAuth";
@@ -64,14 +64,26 @@ const IndexPreviewContent = () => {
 };
 
 const IndexWithAuth = () => {
+  const [saveMode, updateSaveMode] = useState(false);
+
   return (
     <>
       <Header />
       <Wrapper className="align-center">
-        <h1 className="text-center">Backyard</h1>
-        <div className="my-4 w-full">
-          <SaveBar />
+        <div className="flex items-start justify-between">
+          <h1 className="mt-0">Backyard</h1>
+          <button
+            className="bg-black m-0 mt-2"
+            onClick={() => updateSaveMode(!saveMode)}
+          >
+            {saveMode ? "Exit" : "Save"}
+          </button>
         </div>
+        {saveMode && (
+          <div className="my-4 w-full">
+            <SaveBar />
+          </div>
+        )}
       </Wrapper>
       <IndexPreviewContent />
     </>

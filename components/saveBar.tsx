@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { withRouter } from "next/router";
 import { validURL } from "../lib/urls";
 
 export const SaveBar = withRouter(({ router }) => {
   const [value, updater] = useState("");
-  const [focused, updateFocused] = useState(false);
+  const [focused, updateFocused] = useState(true);
 
   const onChange = (e) => {
     updater(e.target.value);
@@ -44,6 +44,7 @@ export const SaveBar = withRouter(({ router }) => {
           type="text"
           placeholder="https://url-you-want-to-save.com"
           value={value}
+          autoFocus
           onChange={onChange}
           onFocus={onFocus}
           onBlur={onBlur}
