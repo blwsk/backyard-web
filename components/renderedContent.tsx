@@ -13,7 +13,7 @@ const sanitize = (body) => {
 const RenderedContent = ({ body }: { body: string }) => {
   return (
     <div
-      className="rendered-html-content"
+      className="rendered-html-body"
       dangerouslySetInnerHTML={{
         __html: sanitize(body),
       }}
