@@ -1,18 +1,8 @@
-import sanitizeHtml from "sanitize-html";
 import { isTwitter, isYouTube } from "../lib/contentTypes";
 import TweetEmbed from "./tweetEmbed";
 import YouTubeEmbed from "./youTubeEmbed";
 import { ItemContent as ItemContentType } from "../types/ItemTypes";
-
-const sanitize = (body) => {
-  return sanitizeHtml(body, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
-    allowedAttributes: {
-      a: ["href", "target"],
-      img: ["src"],
-    },
-  });
-};
+import RenderedContent from "./renderedContent";
 
 const ItemContent = ({
   data,
@@ -41,14 +31,7 @@ const ItemContent = ({
     return <p>Loading...</p>;
   }
 
-  return (
-    <div
-      className="rendered-html-body"
-      dangerouslySetInnerHTML={{
-        __html: sanitize(body),
-      }}
-    />
-  );
+  return <RenderedContent body={body} />;
 };
 
 export default ItemContent;

@@ -9,6 +9,7 @@ import { Clip } from "../types/ClipTypes";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
+import RenderedContent from "./renderedContent";
 
 type CurentType = "content" | "clips" | "email";
 
@@ -101,10 +102,7 @@ const EmailSandbox = ({ originEmailBody, itemId, invalidateQuery }) => {
       )}
       {showParsed ? (
         <>
-          <div
-            className="rendered-html-body"
-            dangerouslySetInnerHTML={{ __html: sanitize(html) }}
-          />
+          <RenderedContent body={html} />
           <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
         </>
       ) : (
