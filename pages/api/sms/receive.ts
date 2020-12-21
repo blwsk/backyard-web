@@ -88,7 +88,7 @@ const receiveSms = async (req, res) => {
 
     const twiml = new MessagingResponse();
 
-    const messageResponse = getResponseFromMessage(message, result, SMS);
+    let messageResponse = getResponseFromMessage(message, result);
 
     twiml.message(messageResponse);
 

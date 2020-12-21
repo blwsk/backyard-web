@@ -180,9 +180,14 @@ const receiveEmail = async (req, res) => {
         error,
       });
     } else if (phoneNumber && !alreadySaved) {
-      const saveContentMessage = getResponseFromMessage(message, result, EMAIL);
+      const saveContentMessage = getResponseFromMessage(message, result);
 
-      await sendSms(saveContentMessage, phoneNumber);
+      /**
+       *
+       */
+      const messageResponse = `✉️ Received an email, "${subject}", from ${from}.\n${saveContentMessage}`;
+
+      await sendSms(messageResponse, phoneNumber);
     }
   } else {
     console.log("Invalid URL", {
