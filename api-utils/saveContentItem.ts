@@ -2,7 +2,7 @@ import { query as q, Client } from "faunadb";
 import algoliasearch from "algoliasearch";
 
 import { fetchContent } from "./fetchContent";
-import { Item, ItemSource, ItemOrigin } from "../types/ItemTypes";
+import { Item, ItemSource, ItemOrigin, EMAIL } from "../types/ItemTypes";
 import { doAsyncThing } from "./doAsyncThing";
 import { ITEMS } from "../types/SearchIndexTypes";
 
@@ -167,7 +167,8 @@ export interface SavedItemMetadata {
 
 export const getResponseFromMessage = (
   message: SavedItemMessage,
-  result?: SavedItemDataWrapper
+  result: SavedItemDataWrapper,
+  source: ItemSource
 ): string => {
   switch (message) {
     case FindExistingItemError:
@@ -177,6 +178,12 @@ export const getResponseFromMessage = (
       return message;
 
     case Saved:
+      if (source === EMAIL) {
+        const title = result.data.content && result.data.content.title;
+        const descriptor = title ? `"${title}"` : "new content";
+
+        return `Saved ${descriptor} via email. Check it out: https://backyard.wtf/viewer?id=${result.id}`;
+      }
       return `✅ Saved. Check it out: https://backyard.wtf/viewer?id=${result.id}`;
 
     case AlreadySaved:
