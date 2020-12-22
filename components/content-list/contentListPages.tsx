@@ -171,27 +171,31 @@ const SelectionControls = ({
     <div>
       {numSelected > 0 && (
         <footer
-          className="bg-pink-400 fixed w-full inset-x-0 bottom-0"
+          className="bg-gray-300 fixed w-full inset-x-0 bottom-0"
           style={{
             height: 100,
           }}
         >
-          <div className="text-black text-center pt-2">
-            <div>
+          <div className="text-black text-center pt-3">
+            <div className="mb-1">
               <b className="font-medium">
                 You&apos;ve selected <span>{numSelected}</span>{" "}
                 <span>{numSelected === 1 ? "item" : "items"}</span>
               </b>
             </div>
             <div>
-              <button onClick={onClickDelete}>Delete</button>
-              <button onClick={onClearSelection}>Clear</button>
+              <button className="bg-black" onClick={onClickDelete}>
+                Delete
+              </button>
+              <button className="bg-gray-500" onClick={onClearSelection}>
+                Clear
+              </button>
             </div>
           </div>
         </footer>
       )}
       {deletionState.pending && (
-        <div className="pending-modal p-4">
+        <div className="pending-modal bg-gray-300 p-4">
           <h2>
             Are you sure you want to delete <span>{numSelected}</span>{" "}
             <span>{numSelected === 1 ? "item" : "items"}</span>?
@@ -200,10 +204,12 @@ const SelectionControls = ({
             <div>Progress...</div>
           ) : (
             <div>
-              <button className="primary" onClick={onConfirmDelete}>
+              <button className="bg-black" onClick={onConfirmDelete}>
                 Yes. Delete.
               </button>
-              <button onClick={onCancelPendingDelete}>Nope. Cancel.</button>
+              <button className="bg-gray-500" onClick={onCancelPendingDelete}>
+                Nope. Cancel.
+              </button>
             </div>
           )}
           {deletionState.error && (
@@ -212,16 +218,7 @@ const SelectionControls = ({
         </div>
       )}
       <style jsx>{`
-        button {
-          background: rgb(55, 55, 55);
-          color: white;
-        }
-        button.primary {
-          background: purple;
-          color: white;
-        }
         .pending-modal {
-          background: teal;
           position: fixed;
           top: 0;
           bottom: 0;
