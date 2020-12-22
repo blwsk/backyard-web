@@ -12,7 +12,7 @@ import Link from "next/link";
 import LoadingItem from "../components/loading/LoadingItem";
 import NoAuthIndex from "../components/index/noAuthIndex";
 
-const MOST_RECENT_ITEM_LIMIT = 5;
+const MOST_RECENT_ITEM_LIMIT = 10;
 
 const PreviewContentList = ({ data }) => {
   const resultObject = getResultObject(data.data);

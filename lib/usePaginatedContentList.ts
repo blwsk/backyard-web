@@ -10,7 +10,7 @@ export const sortOrderEnum = {
 };
 
 export const getResultObject = (result) =>
-  // the first three correspond to real GQL response paths
+  // the first two correspond to real GQL response paths
   result.itemsByUser ||
   result.itemsByUserReverse ||
   // this last one is a shim to support Algolia search results with the same components
