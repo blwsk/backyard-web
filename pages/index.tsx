@@ -11,6 +11,7 @@ import ContentPageItem from "../components/contentPageItem";
 import Link from "next/link";
 import LoadingItem from "../components/loading/LoadingItem";
 import NoAuthIndex from "../components/index/noAuthIndex";
+import Button from "../components/ui/Button";
 
 const MOST_RECENT_ITEM_LIMIT = 10;
 
@@ -72,12 +73,9 @@ const IndexWithAuth = () => {
       <Wrapper className="align-center">
         <div className="flex items-start justify-between">
           <h1 className="mt-0">Backyard</h1>
-          <button
-            className="bg-black m-0 mt-2"
-            onClick={() => updateSaveMode(!saveMode)}
-          >
+          <Button onClick={() => updateSaveMode(!saveMode)}>
             {saveMode ? "Exit" : "Save"}
-          </button>
+          </Button>
         </div>
         {saveMode && (
           <div className="my-4 w-full">

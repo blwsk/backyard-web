@@ -1,31 +1,4 @@
-import { ReactElement, MouseEventHandler } from "react";
-import { classNames } from "../lib/classNames";
-
-export const Button = ({
-  current,
-  onClick,
-  children,
-  first,
-  last,
-}: {
-  current: boolean;
-  loaded?: boolean;
-  onClick: MouseEventHandler;
-  children: ChildNode | string;
-  first?: boolean;
-  last?: boolean;
-}): ReactElement => (
-  <button
-    className={classNames(`text-black bg-gray-300 py-2 px-3 m-0 rounded-none`, {
-      "bg-gray-400": current,
-      "rounded-l-md": first,
-      "rounded-r-md": last,
-    })}
-    onClick={onClick}
-  >
-    {children}
-  </button>
-);
+import Button from "./ui/Button";
 
 const ItemControls = ({ current, updateCurrent, originEmailBody }) => {
   return (
@@ -34,6 +7,8 @@ const ItemControls = ({ current, updateCurrent, originEmailBody }) => {
         <Button
           current={current === "content"}
           onClick={() => updateCurrent("content")}
+          variant="selectable"
+          grouped
           first
         >
           Content
@@ -42,6 +17,8 @@ const ItemControls = ({ current, updateCurrent, originEmailBody }) => {
           <Button
             current={current === "email"}
             onClick={() => updateCurrent("email")}
+            variant="selectable"
+            grouped
           >
             Email
           </Button>
@@ -49,6 +26,8 @@ const ItemControls = ({ current, updateCurrent, originEmailBody }) => {
         <Button
           current={current === "clips"}
           onClick={() => updateCurrent("clips")}
+          variant="selectable"
+          grouped
           last
         >
           Clips

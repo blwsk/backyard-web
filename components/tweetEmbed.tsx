@@ -138,7 +138,7 @@ export const Tweet = ({
         );
 
         return (
-          <div key={t.id} className="tweet well-trim p-0">
+          <div key={t.id} className="tweet p-0">
             {author && (
               <>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between px-4 py-3">

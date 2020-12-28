@@ -3,6 +3,8 @@ import { useAuthedCallback } from "../../lib/requestHooks";
 import { jsonFetcherFactory } from "../../lib/fetcherFactories";
 import { getResultObject } from "../../lib/usePaginatedContentList";
 import ContentPageItem from "../contentPageItem";
+import Button from "../ui/Button";
+import Checkbox from "../ui/Checkbox";
 
 const ContentPage = ({
   items,
@@ -28,9 +30,7 @@ const ContentPage = ({
             item={item}
             key={_id}
             renderCheckbox={() => (
-              <input
-                className="form-checkbox cursor-pointer"
-                type="checkbox"
+              <Checkbox
                 checked={checked}
                 onChange={(e) => {
                   if (e.target.checked) {
@@ -184,12 +184,10 @@ const SelectionControls = ({
               </b>
             </div>
             <div>
-              <button className="bg-black" onClick={onClickDelete}>
-                Delete
-              </button>
-              <button className="bg-gray-500" onClick={onClearSelection}>
+              <Button onClick={onClickDelete}>Delete</Button>
+              <Button onClick={onClearSelection} variant="secondary">
                 Clear
-              </button>
+              </Button>
             </div>
           </div>
         </footer>
@@ -204,12 +202,10 @@ const SelectionControls = ({
             <div>Progress...</div>
           ) : (
             <div>
-              <button className="bg-black" onClick={onConfirmDelete}>
-                Yes. Delete.
-              </button>
-              <button className="bg-gray-500" onClick={onCancelPendingDelete}>
+              <Button onClick={onConfirmDelete}>Yes. Delete.</Button>
+              <Button onClick={onCancelPendingDelete} variant="secondary">
                 Nope. Cancel.
-              </button>
+              </Button>
             </div>
           )}
           {deletionState.error && (
@@ -282,7 +278,7 @@ const ContentListPages = ({ pages, hasMore, onLoadMore, isValidating }) => {
         <>
           {hasMore ? (
             <div className="flex justify-center items-center">
-              <button onClick={onLoadMore}>Load more</button>
+              <Button onClick={onLoadMore}>Load more</Button>
             </div>
           ) : (
             !isValidating && (

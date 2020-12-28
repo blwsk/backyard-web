@@ -6,6 +6,7 @@ import { useState, useCallback, useEffect } from "react";
 import requireAuth from "../lib/requireAuth";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { gqlFetcherFactory } from "../lib/fetcherFactories";
+import Button from "../components/ui/Button";
 
 const PAGE_LENGTH = 100;
 
@@ -115,7 +116,7 @@ const SelectionList = () => {
         {data ? (
           hasMore ? (
             <div className="m-y-4">
-              <button onClick={onLoadMoreClick}>Load more</button>
+              <Button onClick={onLoadMoreClick}>Load more</Button>
             </div>
           ) : (
             <div className="m-y-4">

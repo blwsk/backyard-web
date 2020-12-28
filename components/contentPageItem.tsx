@@ -1,6 +1,7 @@
 import { ReactNode, useMemo } from "react";
 import ListItem, { ListItemProps } from "./listItem";
 import { getHostname } from "../lib/urls";
+import { classNames } from "../lib/classNames";
 
 const colors = [
   "c62828",
@@ -38,12 +39,12 @@ const getColorFromString = (str) => {
 
 const ContentPageItem = ({
   item,
-  backgroundColor = undefined,
   renderCheckbox = () => null,
+  className,
 }: {
   item: ListItemProps;
-  backgroundColor?: string;
   renderCheckbox?: () => ReactNode;
+  className?: string;
 }) => {
   const { _id, url } = item;
 
@@ -51,12 +52,15 @@ const ContentPageItem = ({
 
   return (
     <div
-      className="content-item flex justify-between items-center p-4 mb-2 md:rounded-md"
+      className={classNames(
+        "flex justify-between items-center p-4 mb-2 md:rounded-md text-white",
+        className
+      )}
       key={_id}
       style={{
-        backgroundColor:
-          backgroundColor ||
-          getColorFromString(getHostname(url).hostname.replace("www.", "")),
+        backgroundColor: className
+          ? undefined
+          : getColorFromString(getHostname(url).hostname.replace("www.", "")),
       }}
     >
       <ListItem item={item} light />

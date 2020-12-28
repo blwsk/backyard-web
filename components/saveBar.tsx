@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "next/router";
 import { validURL } from "../lib/urls";
+import Button from "./ui/Button";
+import TextInput from "./ui/TextInput";
+import { classNames } from "../lib/classNames";
 
 export const SaveBar = withRouter(({ router }) => {
   const [value, updater] = useState("");
@@ -35,13 +38,10 @@ export const SaveBar = withRouter(({ router }) => {
   return (
     <>
       <div className="save-bar">
-        <input
-          className={`form-input ${inputError ? "error" : ""}`}
-          style={{
-            width: `100%`,
-            marginBottom: 16,
-          }}
-          type="text"
+        <TextInput
+          className={classNames("w-full mb-4", {
+            error: inputError,
+          })}
           placeholder="https://url-you-want-to-save.com"
           value={value}
           autoFocus
@@ -51,14 +51,9 @@ export const SaveBar = withRouter(({ router }) => {
           onKeyDown={onKeyDown}
         />
         {(value || focused) && (
-          <button
-            style={{ margin: 0 }}
-            onClick={onSave}
-            disabled={!isValidUrl}
-            title={inputError ? "URL is invalid" : undefined}
-          >
+          <Button onClick={onSave} disabled={!isValidUrl}>
             Save
-          </button>
+          </Button>
         )}
       </div>
       <style jsx>{`

@@ -8,6 +8,7 @@ import { useAuthedCallback } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { throttle } from "../lib/throttle";
 import { SearchIndex } from "../types/SearchIndexTypes";
+import TextInput from "./ui/TextInput";
 
 type Props = {
   defaultQuery?: string;
@@ -88,9 +89,8 @@ const SearchInput: FunctionComponent<Props> = ({
   return (
     <div className="w-full">
       <span className="flex items-center">
-        <input
-          className="form-input flex-grow"
-          type="text"
+        <TextInput
+          className="w-full"
           placeholder="Search"
           value={query}
           onChange={(e) => updateQuery(e.target.value)}

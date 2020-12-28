@@ -1,13 +1,14 @@
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { isiOs } from "../lib/isiOs";
+import Button from "./ui/Button";
 
 const LoginButton = () => {
   const { loginWithRedirect, loginWithPopup } = useAuth0();
 
   return (
-    <button
-      className="small m-0"
+    <Button
+      size="small"
       onClick={() => {
         if (isiOs()) {
           loginWithRedirect({
@@ -22,7 +23,7 @@ const LoginButton = () => {
       }}
     >
       Log In
-    </button>
+    </Button>
   );
 };
 

@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import sanitize from "sanitize-html";
 import { getHostname } from "../lib/urls";
 import Selection from "./selection";
 import ItemContent from "./itemContent";
-import ItemControls, { Button } from "./itemControls";
+import ItemControls from "./itemControls";
 import { ItemContent as ItemContentType } from "../types/ItemTypes";
 import { Clip } from "../types/ClipTypes";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
 import RenderedContent from "./renderedContent";
+import Button from "./ui/Button";
 
 type CurentType = "content" | "clips" | "email";
 
@@ -87,6 +87,9 @@ const EmailSandbox = ({ originEmailBody, itemId, invalidateQuery }) => {
           <Button
             current={showParsed}
             onClick={() => updateShowParsed(true)}
+            variant="selectable"
+            size="small"
+            grouped
             first
           >
             Parsed
@@ -94,6 +97,9 @@ const EmailSandbox = ({ originEmailBody, itemId, invalidateQuery }) => {
           <Button
             current={!showParsed}
             onClick={() => updateShowParsed(false)}
+            variant="selectable"
+            size="small"
+            grouped
             last
           >
             Original

@@ -9,6 +9,8 @@ import { mutate } from "swr";
 import { PhoneNumber } from "twilio/lib/interfaces";
 import { TWILIO_PHONE_NUMBER } from "../lib/twilioConstants";
 import { validURL } from "../lib/urls";
+import Button from "../components/ui/Button";
+import TextInput from "../components/ui/TextInput";
 
 const userMetadataQuery = gql`
   query UserMetadataForUser($userId: String!) {
@@ -79,17 +81,14 @@ const ValidatePhoneNumber = () => {
 
   return (
     <div>
-      <input
-        className="form-input"
-        type="text"
-        id="phone"
-        style={{ marginTop: 8, marginRight: 8 }}
+      <TextInput
+        className="mt-2 mr-2"
         value={phoneValue}
         onChange={(e) => updatePhoneValue(e.target.value)}
         disabled={hasSentPin || error}
         placeholder="1234567890"
       />
-      <button
+      <Button
         onClick={() => {
           doVerify()
             .then((res) => {
@@ -104,20 +103,18 @@ const ValidatePhoneNumber = () => {
         disabled={hasSentPin || error}
       >
         Verify
-      </button>
+      </Button>
       {error && <div className="color-red">❌ Pin failed to send.</div>}
       {hasSentPin &&
         (!hasConfirmedPin ? (
           <>
             <br />
-            <input
-              className="form-input"
-              type="text"
-              style={{ marginTop: 8, marginRight: 8 }}
+            <TextInput
+              className="mt-2 mr-2"
               value={pinValue}
               onChange={(e) => updatePinValue(e.target.value)}
             />
-            <button
+            <Button
               onClick={() => {
                 doConfirm()
                   .then((res) => {
@@ -137,7 +134,7 @@ const ValidatePhoneNumber = () => {
               disabled={hasConfirmedPin || pinConfirmationError}
             >
               Confirm pin
-            </button>
+            </Button>
           </>
         ) : (
           <div style={{ marginTop: 8 }}>
@@ -159,7 +156,7 @@ type PhoneNumberProps = {
 
 const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
   return (
-    <div className="well">
+    <div>
       <h4>Save content via SMS</h4>
       {phoneNumber ? (
         <div>
@@ -182,14 +179,7 @@ const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
       )}
       <div className="pt-4">
         {phoneNumber ? (
-          <input
-            className="form-input"
-            type="text"
-            id="phone"
-            style={{ marginTop: 8, marginRight: 8 }}
-            readOnly
-            value={phoneNumber}
-          />
+          <TextInput className="mt-2 mr-2" readOnly value={phoneNumber} />
         ) : (
           <ValidatePhoneNumber />
         )}
@@ -213,8 +203,7 @@ const CreateEmailIngestAddress = () => {
 
   return (
     <div>
-      <button
-        style={{ marginRight: 8 }}
+      <Button
         onClick={() => {
           updateLoading(true);
           doCreate()
@@ -235,7 +224,7 @@ const CreateEmailIngestAddress = () => {
         }}
       >
         Create
-      </button>
+      </Button>
       {loading && <span>Loading...</span>}
       {success && <span>Sucess ✅</span>}
       {error && <span className="color-red">Error ❌</span>}
@@ -252,7 +241,7 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
   const [copied, updateCopied] = useState(false);
 
   return (
-    <div className="well">
+    <div>
       <h4>Add content with email</h4>
       <div>
         Create an email address to use when subscribing to newsletters. New
@@ -312,8 +301,9 @@ const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
   return (
     <div className="flex justify-between md:items-center flex-col md:flex-row max-w-full mb-2">
       <a href={feedUrl}>{feedUrl}</a>
-      <button
-        className="px-2 py-1 bg-gray-500"
+      <Button
+        size="small"
+        variant="secondary"
         onClick={() => {
           update("loading");
           doDelete()
@@ -322,7 +312,7 @@ const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
         }}
       >
         <small className="text-md">Unsubscribe</small>
-      </button>
+      </Button>
       {deleteState === "loading" && <span>Deleting...</span>}
       {deleteState === "error" && <span className="text-red-500">Error</span>}
     </div>
@@ -347,7 +337,7 @@ const RssSubscriptions = ({
   );
 
   return (
-    <div className="well">
+    <div>
       <h4>Subscribe to RSS feeds</h4>
       <div>
         Whenever new posts are added to these feeds, they'll appear in your
@@ -364,16 +354,14 @@ const RssSubscriptions = ({
           <div>None! Save one 👇</div>
         )}
         <div className="mt-6 flex flex-col md:flex-row">
-          <input
-            className="form-input flex-grow"
-            type="text"
+          <TextInput
+            className=" flex-grow mr-2"
             value={feedUrl}
             onChange={(e) => updateUrl(e.target.value)}
             disabled={subscribeState === "loading"}
             placeholder="https://example.com/rss"
           />
-          <button
-            className="mx-2"
+          <Button
             onClick={() => {
               update("loading");
               doSubscribe()
@@ -384,7 +372,7 @@ const RssSubscriptions = ({
             disabled={subscribeState === "loading" || !validURL(feedUrl)}
           >
             Subscribe
-          </button>
+          </Button>
           {subscribeState === "loading" && <span>Loading...</span>}
           {subscribeState === "error" && (
             <span className="text-red-500">Error</span>
@@ -403,13 +391,13 @@ const SettingsForm = ({ data }) => {
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-10">
         <PhoneNumberSetting phoneNumber={phoneNumber} />
       </div>
-      <div className="mb-6">
+      <div className="mb-10">
         <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
       </div>
-      <div className="mb-6">
+      <div className="mb-10">
         <RssSubscriptions rssFeeds={rssFeeds} />
       </div>
       <Guide />
@@ -418,7 +406,7 @@ const SettingsForm = ({ data }) => {
 };
 
 const Guide = () => (
-  <div className="well">
+  <div>
     <h3>Other ways to save</h3>
     <ul>
       <li>
@@ -446,21 +434,14 @@ const Guide = () => (
 );
 
 const Settings = () => {
-  const { data, error, isValidating } = useAuthedSWR(
-    userMetadataQuery,
-    gqlFetcherFactory
-  );
+  const { data } = useAuthedSWR(userMetadataQuery, gqlFetcherFactory);
 
   return (
     <div>
       <Header />
       <Wrapper>
         <h1>Settings</h1>
-        {data ? (
-          <SettingsForm data={data} />
-        ) : (
-          <div className="well">Loading...</div>
-        )}
+        {data ? <SettingsForm data={data} /> : <div>Loading...</div>}
       </Wrapper>
     </div>
   );

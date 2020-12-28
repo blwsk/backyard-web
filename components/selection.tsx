@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuthedCallback } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { isiOs } from "../lib/isiOs";
+import Button from "./ui/Button";
 
 const Selection = ({ itemId, invalidateQuery }) => {
   const [viewportSizeKey, updateViewportSizeKey] = useState(
@@ -171,13 +172,13 @@ const Selection = ({ itemId, invalidateQuery }) => {
               <>
                 {!textSelectionSaveState.started &&
                   !textSelectionSaveState.success && (
-                    <button onClick={onSave}>Save 🗄</button>
+                    <Button onClick={onSave}>Save 🗄</Button>
                   )}
                 {textSelectionSaveState.success && (
                   <div>
                     <span style={{ marginRight: 8 }}>Success</span>
                     <Link href="/clips">
-                      <button>View</button>
+                      <Button>View</Button>
                     </Link>
                   </div>
                 )}

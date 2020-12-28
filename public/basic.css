@@ -12,32 +12,12 @@
   --c1: #1b1b1b;
   --c2: #406fd3;
   --c3: #fff;
-  --c4: #e6e6e6;
-  --c5: #000;
-
-  --c6: rgb(255, 0, 0);
-  --c7: rgb(0, 255, 0);
-  --c8: rgb(231, 231, 231);
-  --c9: rgba(0, 0, 0, 0.25);
-
-  --m1: 8px;
-  --rc: 8px;
-  --white: #fff;
-
-  --ghost: rgba(0, 0, 0, 0.05);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --c1: #d0d0d0;
     --c2: #77c5f5;
     --c3: #121212;
-    --c4: #2b2b2b;
-    --c5: #fff;
-
-    --c8: #1f1f1f;
-    --c9: rgba(255, 255, 255, 0.05);
-
-    --ghost: rgba(255, 255, 255, 0.05);
   }
 }
 html {
@@ -133,72 +113,6 @@ th {
   vertical-align: top;
   border: 1px solid;
   padding: 0.4em;
-}
-button,
-code,
-input,
-pre,
-select,
-textarea {
-  border-radius: var(--rc);
-}
-input,
-select,
-textarea,
-.form-input,
-.form-select {
-  background-color: var(--c4);
-  color: var(--c1);
-  border: 1px solid var(--c4);
-}
-
-button,
-input[type="button"],
-input[type="reset"],
-input[type="submit"] {
-  -webkit-appearance: none;
-  font-size: 1em;
-  display: inline-block;
-  border: 0;
-  margin: 4px;
-  padding: 0.5em 1em;
-  cursor: pointer;
-  text-align: center;
-  background: var(--c2);
-  color: var(--c3);
-}
-button:focus,
-button:hover,
-input:hover,
-select:hover,
-textarea:hover {
-  opacity: 0.8;
-}
-button:disabled {
-  background: var(--c4);
-}
-button:disabled:hover {
-  opacity: 1;
-  cursor: auto;
-}
-button.small {
-  background: var(--c1);
-  color: var(--c3);
-  padding: 0.3em 0.6em;
-}
-button.small.blue {
-  background: var(--c2);
-  color: var(--c3);
-  line-height: 1.4em;
-}
-button.small.secondary {
-  background: var(--c8);
-  color: var(--c5);
-  line-height: 1.4em;
-}
-button.small.current {
-  font-weight: 600;
-  font-style: italic;
 }
 
 a.link-black {
@@ -304,34 +218,6 @@ h6 {
 .list-item.light,
 .list-item.light a {
   color: var(--white);
-}
-
-.well {
-  background-color: var(--c8);
-  padding: 16px;
-  border-radius: var(--rc);
-  width: 100%;
-}
-
-.well-trim {
-  background-color: var(--c8);
-  padding: 0;
-  border-radius: var(--rc);
-  width: 100%;
-}
-
-.well input,
-.well textarea,
-.well select {
-  background-color: var(--ghost);
-}
-
-.well > h1,
-.well > h2,
-.well > h3,
-.well > h4,
-.well > h5 {
-  margin-top: 0;
 }
 
 .line-clamp-2 {
