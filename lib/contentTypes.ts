@@ -1,3 +1,7 @@
-export const isYouTube = (str) => str.indexOf("youtube.com") > -1;
+const YOUTUBE_EMP = /https:\/\/(www\.|m\.)?youtube\.com\/watch\?v=/gm;
 
-export const isTwitter = (str) => str.indexOf("twitter.com") > -1;
+export const isYouTube = (str) => YOUTUBE_EMP.test(str);
+
+const TWITTER_EXP = /https:\/\/(mobile\.)?twitter\.com/gm;
+
+export const isTwitter = (str) => TWITTER_EXP.test(str);

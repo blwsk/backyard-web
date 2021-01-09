@@ -10,6 +10,7 @@ import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
 import RenderedContent from "./renderedContent";
 import Button from "./ui/Button";
+import ErrorBoundary from "./errorBoundary";
 
 type CurentType = "content" | "clips" | "email";
 
@@ -209,34 +210,36 @@ const ReactiveItemData = ({
         </div>
       )}
       <div>
-        {hostname && <Metadata hostname={hostname} url={url} />}
-        <div className="my-4">
-          <H2 data={data} content={content} />
-          <H3 data={data} content={content} />
-        </div>
-        {hostname && (
+        <ErrorBoundary>
+          {hostname && <Metadata hostname={hostname} url={url} />}
           <div className="my-4">
-            <ItemControls
-              current={current}
-              updateCurrent={updateCurrent}
-              originEmailBody={originEmailBody}
-            />
+            <H2 data={data} content={content} />
+            <H3 data={data} content={content} />
           </div>
-        )}
-        {current === "content" && (
-          <>
-            <ItemContent data={data} content={content} url={url} />
-            <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
-          </>
-        )}
-        {current === "clips" && <ClipsList clips={clips} />}
-        {current === "email" && (
-          <EmailSandbox
-            originEmailBody={originEmailBody}
-            itemId={itemId}
-            invalidateQuery={invalidateQuery}
-          />
-        )}
+          {hostname && (
+            <div className="my-4">
+              <ItemControls
+                current={current}
+                updateCurrent={updateCurrent}
+                originEmailBody={originEmailBody}
+              />
+            </div>
+          )}
+          {current === "content" && (
+            <>
+              <ItemContent data={data} content={content} url={url} />
+              <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
+            </>
+          )}
+          {current === "clips" && <ClipsList clips={clips} />}
+          {current === "email" && (
+            <EmailSandbox
+              originEmailBody={originEmailBody}
+              itemId={itemId}
+              invalidateQuery={invalidateQuery}
+            />
+          )}
+        </ErrorBoundary>
       </div>
     </div>
   );
