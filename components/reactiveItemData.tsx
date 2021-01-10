@@ -11,6 +11,8 @@ import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
 import RenderedContent from "./renderedContent";
 import Button from "./ui/Button";
 import ErrorBoundary from "./errorBoundary";
+import { useCopy } from "../lib/useCopy";
+import { classNames } from "../lib/classNames";
 
 type CurentType = "content" | "clips" | "email";
 
@@ -138,19 +140,30 @@ const H3 = ({ data, content }) => {
 };
 
 const Metadata = ({ hostname, url }) => {
+  const { copy, showCopied } = useCopy();
+
   return (
     <>
-      <span>
+      <span className="flex items-center space-x-4">
         <a href={`//${hostname}`}>{hostname}</a>
-        <a href={url}>Original</a>
+        <span className="flex items-center space-x-1">
+          <a href={url}>Original</a>
+          <small>
+            <span
+              className={classNames("cursor-pointer", {
+                "text-green-500": showCopied,
+              })}
+              onClick={() => copy(url)}
+            >
+              (Copy)
+            </span>
+          </small>
+        </span>
       </span>
       <style jsx>{`
         span {
           display: flex;
           justify-content: flex-start;
-        }
-        span a {
-          margin-right: 16px;
         }
       `}</style>
     </>
