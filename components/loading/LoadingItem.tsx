@@ -10,7 +10,7 @@ const LoadingItem = () => (
         title: "Loading...",
       },
     }}
-    className="bg-gray-200"
+    className="bg-gray-200 dark:bg-gray-900"
   />
 );
 

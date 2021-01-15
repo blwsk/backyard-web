@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { stripParams, getHostname } from "../lib/urls";
 import Link from "next/link";
 import { isTwitter } from "../lib/contentTypes";
@@ -16,13 +16,60 @@ export interface ListItemProps {
   source?: ItemSource;
 }
 
-const getTweetJson = (str) => {
+const getTweetJson = ({ json }: { json?: string }) => {
   try {
-    return JSON.parse(str);
+    return JSON.parse(json);
   } catch (error) {
     void error;
     return null;
   }
+};
+
+const PreviewLink = ({
+  id,
+  content,
+  url,
+}: {
+  id: string;
+  url: string;
+  content?: {
+    title?: string;
+    json?: string;
+  };
+}) => {
+  const tweetJson = content && getTweetJson(content);
+
+  const withParamsStripped = stripParams(url);
+
+  const tester = isTwitter;
+  debugger;
+  if (tester(url) && tweetJson) {
+    debugger;
+    return (
+      <Link href={{ pathname: "/viewer", query: { id } }}>
+        <a>
+          <div className="p-4 -ml-4 rounded-r-md md:rounded-l-md">
+            <TweetPreview tweetJson={tweetJson} />
+          </div>
+        </a>
+      </Link>
+    );
+  }
+
+  if (content && content.title) {
+    debugger;
+    return (
+      <Link href={{ pathname: "/viewer", query: { id } }}>
+        <a className="break-words">{content.title}</a>
+      </Link>
+    );
+  }
+  debugger;
+  return (
+    <Link href={{ pathname: "/viewer", query: { id } }}>
+      <a className="break-all">{withParamsStripped}</a>
+    </Link>
+  );
 };
 
 const ListItemPreview = ({
@@ -37,25 +84,9 @@ const ListItemPreview = ({
     json?: string;
   };
 }) => {
-  const tweetJson = content && getTweetJson(content.json);
-
-  const withParamsStripped = stripParams(url);
-
   return (
     <>
-      <Link href={{ pathname: "/viewer", query: { id } }}>
-        {isTwitter(url) && tweetJson ? (
-          <a>
-            <div className="bg-ghost p-4 -ml-4 rounded-r-md md:rounded-l-md">
-              <TweetPreview tweetJson={tweetJson} />
-            </div>
-          </a>
-        ) : content && content.title ? (
-          <a className="break-words">{content.title}</a>
-        ) : (
-          <a className="break-all">{withParamsStripped}</a>
-        )}
-      </Link>
+      <PreviewLink id={id} url={url} content={content} />
       <style jsx>{`
         .bg-ghost {
           background-color: var(--ghost);

@@ -27,7 +27,10 @@ const TextInput = ({
   return (
     <input
       type="text"
-      className={classNames("form-input bg-gray-100", className)}
+      className={classNames(
+        "form-input bg-gray-100 dark:bg-gray-900 dark:border-gray-900",
+        className
+      )}
       placeholder={placeholder}
       onChange={onChange}
       value={value}

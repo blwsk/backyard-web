@@ -11,6 +11,13 @@ module.exports = {
       },
     },
   },
-  variants: {},
-  plugins: [require("@tailwindcss/custom-forms")],
+  variants: {
+    backgroundColor: ["hover", "responsive", " focus", "dark", "dark-hover"],
+    textColor: ["hover", "responsive", "focus", "dark", "dark-hover"],
+    borderColor: ["hover", "responsive", "focus", "dark", "dark-hover"],
+  },
+  plugins: [
+    require("@tailwindcss/custom-forms"),
+    require("tailwindcss-dark-mode")(),
+  ],
 };

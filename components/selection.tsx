@@ -135,9 +135,8 @@ const Selection = ({ itemId, invalidateQuery }) => {
       {upperSelectionNode && (
         <div
           key={viewportSizeKey}
+          className="bg-gray-300 text-black dark:bg-black dark:text-white"
           style={{
-            background: "var(--c1)",
-            color: "var(--c3)",
             borderRadius: 8,
 
             display: "flex",
@@ -172,16 +171,11 @@ const Selection = ({ itemId, invalidateQuery }) => {
               <>
                 {!textSelectionSaveState.started &&
                   !textSelectionSaveState.success && (
-                    <Button onClick={onSave}>Save 🗄</Button>
+                    <Button variant="secondary" onClick={onSave}>
+                      Save 🗄
+                    </Button>
                   )}
-                {textSelectionSaveState.success && (
-                  <div>
-                    <span style={{ marginRight: 8 }}>Success</span>
-                    <Link href="/clips">
-                      <Button>View</Button>
-                    </Link>
-                  </div>
-                )}
+                {textSelectionSaveState.success && <div>Success ✅</div>}
                 {textSelectionSaveState.error && <span>Error ❌</span>}
               </>
             )}

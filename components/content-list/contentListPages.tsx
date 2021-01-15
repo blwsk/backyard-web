@@ -171,19 +171,19 @@ const SelectionControls = ({
     <div>
       {numSelected > 0 && (
         <footer
-          className="bg-gray-300 fixed w-full inset-x-0 bottom-0"
+          className="bg-gray-300 dark:bg-black fixed w-full inset-x-0 bottom-0"
           style={{
             height: 100,
           }}
         >
-          <div className="text-black text-center pt-3">
+          <div className="text-black dark:text-white text-center pt-3">
             <div className="mb-1">
               <b className="font-medium">
                 You&apos;ve selected <span>{numSelected}</span>{" "}
                 <span>{numSelected === 1 ? "item" : "items"}</span>
               </b>
             </div>
-            <div>
+            <div className="space-x-2">
               <Button onClick={onClickDelete}>Delete</Button>
               <Button onClick={onClearSelection} variant="secondary">
                 Clear
@@ -193,7 +193,7 @@ const SelectionControls = ({
         </footer>
       )}
       {deletionState.pending && (
-        <div className="pending-modal bg-gray-300 p-4">
+        <div className="pending-modal bg-gray-300 dark:bg-black p-4">
           <h2>
             Are you sure you want to delete <span>{numSelected}</span>{" "}
             <span>{numSelected === 1 ? "item" : "items"}</span>?
@@ -201,7 +201,7 @@ const SelectionControls = ({
           {deletionState.started ? (
             <div>Progress...</div>
           ) : (
-            <div>
+            <div className="space-x-2">
               <Button onClick={onConfirmDelete}>Yes. Delete.</Button>
               <Button onClick={onCancelPendingDelete} variant="secondary">
                 Nope. Cancel.

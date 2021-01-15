@@ -10,6 +10,7 @@ import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
 import RenderedContent from "./renderedContent";
 import Button from "./ui/Button";
+import Icon from "./ui/Icon";
 import ErrorBoundary from "./errorBoundary";
 import { useCopy } from "../lib/useCopy";
 import { classNames } from "../lib/classNames";
@@ -146,16 +147,17 @@ const Metadata = ({ hostname, url }) => {
     <>
       <span className="flex items-center space-x-4">
         <a href={`//${hostname}`}>{hostname}</a>
-        <span className="flex items-center space-x-1">
+        <span className="flex items-center space-x-2">
           <a href={url}>Original</a>
           <small>
             <span
+              title="Copy"
               className={classNames("cursor-pointer", {
                 "text-green-500": showCopied,
               })}
               onClick={() => copy(url)}
             >
-              (Copy)
+              <Icon name="copy" size="md" />
             </span>
           </small>
         </span>

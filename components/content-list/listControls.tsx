@@ -16,9 +16,12 @@ const ListControls = ({
   return (
     <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
       <select
-        className={classNames("form-select", {
-          "cursor-pointer": !isSearchMode,
-        })}
+        className={classNames(
+          "form-select bg-gray-100 dark:bg-gray-900 dark:border-gray-900",
+          {
+            "cursor-pointer": !isSearchMode,
+          }
+        )}
         id="sort"
         onChange={onChangeSortOrder}
         value={isSearchMode ? "relevancy" : sortOrder}

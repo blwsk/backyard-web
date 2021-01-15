@@ -252,7 +252,7 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
           <div className="relative">
             <textarea
               ref={(current) => (ref.current = current)}
-              className="form-input full-width"
+              className="form-input bg-gray-100 dark:bg-gray-900 dark:border-gray-900 full-width"
               id="email"
               style={{ marginTop: 8, marginRight: 8, width: "100%" }}
               readOnly

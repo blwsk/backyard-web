@@ -40,14 +40,15 @@ const Button = ({
         /**
          * Variants
          */
-        "text-white bg-gray-900 hover:bg-black": variant === "primary",
-        "text-black bg-gray-300 hover:bg-gray-400":
+        "text-white bg-gray-800 hover:bg-gray-900 dark:text-black dark:bg-gray-400 dark-hover:bg-gray-300":
+          variant === "primary",
+        "text-black bg-gray-300 hover:bg-gray-400 dark:text-white dark:bg-gray-800 dark-hover:bg-gray-900 ":
           variant === "secondary" || variant === "selectable",
 
         /**
          * Selectable
          */
-        "bg-gray-400": variant === "selectable" && current,
+        "bg-gray-400 dark:bg-gray-900": variant === "selectable" && current,
 
         /**
          * Button groups

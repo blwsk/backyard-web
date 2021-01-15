@@ -11,6 +11,7 @@
     "date-fns": "^2.15.0",
     "dompurify": "^2.2.0",
     "faunadb": "^3.0.1",
+    "feather-icons": "^4.28.0",
     "fuzzyset.js": "^1.0.5",
     "gql-tag": "^1.0.1",
     "isomorphic-unfetch": "^3.0.0",
@@ -40,6 +41,7 @@
     "eslint": "^7.10.0",
     "eslint-plugin-react": "^7.21.3",
     "tailwindcss": "^1.9.6",
+    "tailwindcss-dark-mode": "^1.1.7",
     "typescript": "^4.0.3"
   }
 }
