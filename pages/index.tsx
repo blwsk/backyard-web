@@ -73,7 +73,7 @@ const IndexWithAuth = () => {
       <Wrapper className="align-center">
         <div className="flex items-start justify-between">
           <h1 className="mt-0">Backyard</h1>
-          <Button onClick={() => updateSaveMode(!saveMode)}>
+          <Button className="my-2" onClick={() => updateSaveMode(!saveMode)}>
             {saveMode ? "Exit" : "Save"}
           </Button>
         </div>

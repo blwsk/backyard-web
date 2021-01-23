@@ -12,6 +12,8 @@ import { validURL, getHostname } from "../lib/urls";
 import Button from "../components/ui/Button";
 import TextInput from "../components/ui/TextInput";
 import Icon from "../components/ui/Icon";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 const userMetadataQuery = gql`
   query UserMetadataForUser($userId: String!) {
@@ -405,24 +407,55 @@ const RssSubscriptions = ({
   );
 };
 
+type SettingsTab = "sms" | "email" | "rss" | "more";
+
 const SettingsForm = ({ data }) => {
   const {
     userMetadataForUser: { phoneNumber, emailIngestAddress },
     rssSubscriptionsForUser: { data: rssFeeds },
   } = data.data;
 
+  const {
+    query: { tab },
+  } = useRouter();
+
   return (
     <div>
-      <div className="mb-10">
-        <PhoneNumberSetting phoneNumber={phoneNumber} />
+      <header>
+        <Link href="?tab=sms">
+          <Button variant="selectable" current={tab === "sms"} grouped first>
+            SMS
+          </Button>
+        </Link>
+        <Link href="?tab=email">
+          <Button variant="selectable" current={tab === "email"} grouped>
+            Email
+          </Button>
+        </Link>
+        <Link href="?tab=rss">
+          <Button variant="selectable" current={tab === "rss"} grouped>
+            RSS
+          </Button>
+        </Link>
+        <Link href="?tab=more">
+          <Button variant="selectable" current={tab === "more"} grouped last>
+            More info
+          </Button>
+        </Link>
+      </header>
+      <div className="my-10">
+        {tab === "sms" ? (
+          <PhoneNumberSetting phoneNumber={phoneNumber} />
+        ) : tab === "email" ? (
+          <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
+        ) : tab === "rss" ? (
+          <RssSubscriptions rssFeeds={rssFeeds} />
+        ) : tab === "more" ? (
+          <Guide />
+        ) : (
+          <div />
+        )}
       </div>
-      <div className="mb-10">
-        <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
-      </div>
-      <div className="mb-10">
-        <RssSubscriptions rssFeeds={rssFeeds} />
-      </div>
-      <Guide />
     </div>
   );
 };
