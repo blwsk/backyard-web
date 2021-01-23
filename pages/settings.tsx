@@ -8,9 +8,10 @@ import gql from "gql-tag";
 import { mutate } from "swr";
 import { PhoneNumber } from "twilio/lib/interfaces";
 import { TWILIO_PHONE_NUMBER } from "../lib/twilioConstants";
-import { validURL } from "../lib/urls";
+import { validURL, getHostname } from "../lib/urls";
 import Button from "../components/ui/Button";
 import TextInput from "../components/ui/TextInput";
+import Icon from "../components/ui/Icon";
 
 const userMetadataQuery = gql`
   query UserMetadataForUser($userId: String!) {
@@ -299,23 +300,34 @@ const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
   );
 
   return (
-    <div className="flex justify-between md:items-center flex-col md:flex-row max-w-full mb-2">
-      <a href={feedUrl}>{feedUrl}</a>
-      <Button
-        size="small"
-        variant="secondary"
-        onClick={() => {
-          update("loading");
-          doDelete()
-            .catch(() => update("error"))
-            .finally(() => mutate(userMetadataQuery));
-        }}
-      >
-        <small className="text-md">Unsubscribe</small>
-      </Button>
-      {deleteState === "loading" && <span>Deleting...</span>}
-      {deleteState === "error" && <span className="text-red-500">Error</span>}
-    </div>
+    <tr className="">
+      <td className="border-0 flex items-center space-x-2 py-1">
+        <span>{getHostname(feedUrl).hostname}</span>
+        <a href={feedUrl} target="_blank">
+          <Icon name="external-link" size="md" />
+        </a>
+      </td>
+      <td className="border-0 text-right py-1">
+        <Button
+          size="small"
+          variant="secondary"
+          onClick={() => {
+            update("loading");
+            doDelete()
+              .catch(() => update("error"))
+              .finally(() => mutate(userMetadataQuery));
+          }}
+        >
+          <Icon name="trash" size="md" />
+        </Button>
+        {deleteState === "loading" && (
+          <span className="spin p-1">
+            <Icon name="loader" size="md" />
+          </span>
+        )}
+        {deleteState === "error" && <span className="text-red-500">Error</span>}
+      </td>
+    </tr>
   );
 };
 
@@ -344,18 +356,28 @@ const RssSubscriptions = ({
         saved content.
       </div>
       <div className="pt-4">
-        {rssFeeds.length > 0 ? (
-          <div>
-            {rssFeeds.map(({ feedUrl, _id }) => (
-              <RssFeed key={_id} feedUrl={feedUrl} id={_id} />
-            ))}
-          </div>
-        ) : (
-          <div>None! Save one 👇</div>
-        )}
+        <div className="bg-gray-900 rounded p-3">
+          {rssFeeds.length > 0 ? (
+            <table className="table-fixed w-full my-0">
+              <thead>
+                <tr className="">
+                  <th className="border-0 w-4/5 pt-1 pb-2">Feed URL</th>
+                  <th className="border-0 w-1/5 pt-1 pb-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {rssFeeds.map(({ feedUrl, _id }) => (
+                  <RssFeed key={_id} feedUrl={feedUrl} id={_id} />
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div>None! Save one 👇</div>
+          )}
+        </div>
         <div className="mt-6 flex flex-col md:flex-row">
           <TextInput
-            className=" flex-grow mr-2"
+            className=" flex-grow mb-2 md:mb-0 md:mr-2"
             value={feedUrl}
             onChange={(e) => updateUrl(e.target.value)}
             disabled={subscribeState === "loading"}
