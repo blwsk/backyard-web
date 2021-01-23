@@ -42,9 +42,7 @@ const PreviewLink = ({
   const withParamsStripped = stripParams(url);
 
   const tester = isTwitter;
-  debugger;
   if (tester(url) && tweetJson) {
-    debugger;
     return (
       <Link href={{ pathname: "/viewer", query: { id } }}>
         <a>
@@ -57,14 +55,12 @@ const PreviewLink = ({
   }
 
   if (content && content.title) {
-    debugger;
     return (
       <Link href={{ pathname: "/viewer", query: { id } }}>
         <a className="break-words">{content.title}</a>
       </Link>
     );
   }
-  debugger;
   return (
     <Link href={{ pathname: "/viewer", query: { id } }}>
       <a className="break-all">{withParamsStripped}</a>

@@ -358,7 +358,7 @@ const RssSubscriptions = ({
         saved content.
       </div>
       <div className="pt-4">
-        <div className="bg-gray-900 rounded p-3">
+        <div className="bg-gray-200 dark:bg-gray-900 rounded p-3">
           {rssFeeds.length > 0 ? (
             <table className="table-fixed w-full my-0">
               <thead>
@@ -407,8 +407,6 @@ const RssSubscriptions = ({
   );
 };
 
-type SettingsTab = "sms" | "email" | "rss" | "more";
-
 const SettingsForm = ({ data }) => {
   const {
     userMetadataForUser: { phoneNumber, emailIngestAddress },
@@ -421,7 +419,7 @@ const SettingsForm = ({ data }) => {
 
   return (
     <div>
-      <header>
+      <div>
         <Link href="?tab=sms">
           <Button variant="selectable" current={tab === "sms"} grouped first>
             SMS
@@ -442,7 +440,7 @@ const SettingsForm = ({ data }) => {
             More info
           </Button>
         </Link>
-      </header>
+      </div>
       <div className="my-10">
         {tab === "sms" ? (
           <PhoneNumberSetting phoneNumber={phoneNumber} />
