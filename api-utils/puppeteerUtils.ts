@@ -21,3 +21,26 @@ export const findEndPageUrl = async (startUrl) => {
 
   return stats.url;
 };
+
+export const getPageContent = async (startUrl) => {
+  const browser = await launchChromium({
+    headless: NODE_ENV === "development" ? false : true,
+  });
+
+  const page = await browser.newPage();
+
+  await page.goto(startUrl);
+
+  const stats: { url: string; contentHtml: string } = await page.evaluate(
+    () => {
+      return {
+        url: window.location.href,
+        contentHtml: document.documentElement.innerHTML,
+      };
+    }
+  );
+
+  await browser.close();
+
+  return stats;
+};

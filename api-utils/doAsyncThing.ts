@@ -1,5 +1,5 @@
 export const doAsyncThing = async (
-  fn: Function
+  fn: () => Promise<any>
 ): Promise<[any, Error | null, string]> => {
   let result = null;
   let error = null;

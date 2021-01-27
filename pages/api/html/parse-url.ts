@@ -5,7 +5,7 @@ import { getPageContent } from "../../../api-utils/puppeteerUtils";
 
 const parseUrlHtml = async (req, res) => {
   const url = decodeURI(req.query.url);
-  console.log("parseUrlHtml", url);
+
   const [content, contentError] = await doAsyncThing(() => getPageContent(url));
 
   if (!content || contentError) {
