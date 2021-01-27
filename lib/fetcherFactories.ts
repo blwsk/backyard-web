@@ -1,6 +1,6 @@
 import fetch from "isomorphic-unfetch";
 
-const getBaseUrl = () => {
+export const getBaseUrl = () => {
   const isProcessDev = process.env.NODE_ENV === "development";
   const isBrowserDev =
     window &&
@@ -39,7 +39,7 @@ const absolutePathFetcher = (
   });
 };
 
-const jsonParser = (res: Response): Promise<object> => res.json();
+export const jsonParser = (res: Response): Promise<object> => res.json();
 
 type Method = "GET" | "PUT" | "POST" | "DELETE";
 
@@ -81,7 +81,7 @@ export const jsonFetcherFactory = ({
     .then(jsonParser);
 };
 
-interface GqlResponseJson {
+export interface GqlResponseJson {
   data: object;
   errors?: object[];
 }

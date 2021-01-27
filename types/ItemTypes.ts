@@ -6,11 +6,11 @@ export const RSS = "rss";
 export type ItemSource = "email" | "sms" | "manual" | "rss";
 
 export interface ItemContent {
-  body: string;
-  title: string;
-  metaTitle: string;
-  metaDescription: string;
-  json: string;
+  body?: string;
+  title?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  json?: string;
 }
 
 export interface ItemOrigin {

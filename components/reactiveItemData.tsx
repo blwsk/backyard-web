@@ -22,8 +22,8 @@ const ClipsList = ({ clips }: { clips: Clip[] }) => {
     <>
       {clips && clips.length > 0 ? (
         <ul>
-          {clips.map(({ text, _id }) => (
-            <li key={_id}>
+          {clips.map(({ text, id }) => (
+            <li key={id}>
               <blockquote>{text}</blockquote>
             </li>
           ))}

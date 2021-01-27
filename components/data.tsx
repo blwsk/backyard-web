@@ -1,22 +1,22 @@
-import { mutate } from "swr";
 import gql from "gql-tag";
-import { useAuthedSWR } from "../lib/requestHooks";
-import { gqlFetcherFactory } from "../lib/fetcherFactories";
+import { useGraphql } from "../lib/requestHooks";
 import ReactiveItemData from "./reactiveItemData";
 
 const getOriginEmailBody = (data) => {
   try {
-    return data.data.findItemByID.origin.emailBody;
+    return data.data.legacyItem.origin.emailBody;
   } catch (error) {
     return null;
   }
 };
 
-const Data = ({ itemId }) => {
+const Data = ({ itemId }: { itemId: string }) => {
   const query = gql`
-    query {
-      findItemByID(id: ${itemId}) {
+    query($itemId: ID!) {
+      legacyItem(id: $itemId) {
         url
+        createdBy
+        createdAt
         content {
           body
           title
@@ -25,30 +25,32 @@ const Data = ({ itemId }) => {
           json
         }
         origin {
+          rssFeedUrl
           emailBody
         }
-      }
-      clipsByItemId(itemId: "${itemId}") {
-        data {
+        clips {
           text
-          _id
+          id
         }
       }
     }
   `;
 
-  const { data } = useAuthedSWR(query, gqlFetcherFactory);
-
-  const invalidateQuery = () => {
-    mutate(query);
+  const variables = {
+    itemId,
   };
+
+  const { data, mutate } = useGraphql({
+    query,
+    variables,
+  });
 
   if (!data) {
     return <div>Loading...</div>;
   }
 
   // 404
-  if (!data.data.findItemByID) {
+  if (!data.data.legacyItem) {
     return (
       <div>
         <h1>404</h1>
@@ -59,12 +61,12 @@ const Data = ({ itemId }) => {
 
   return (
     <ReactiveItemData
-      url={data.data.findItemByID.url}
-      content={data.data.findItemByID.content}
+      url={data.data.legacyItem.url}
+      content={data.data.legacyItem.content}
       itemId={itemId}
-      clips={data.data.clipsByItemId.data}
+      clips={data.data.legacyItem.clips}
       originEmailBody={getOriginEmailBody(data)}
-      invalidateQuery={invalidateQuery}
+      invalidateQuery={mutate}
     />
   );
 };

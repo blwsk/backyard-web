@@ -187,10 +187,17 @@ const TweetEmbed = ({ url, content: persistedTweetData }) => {
 
   let tweetJson;
 
-  try {
-    tweetJson = JSON.parse(persistedTweetData.json);
-  } catch (error) {
-    void error;
+  if (
+    typeof persistedTweetData.json === "object" &&
+    persistedTweetData.json.data
+  ) {
+    tweetJson = persistedTweetData.json;
+  } else {
+    try {
+      tweetJson = JSON.parse(persistedTweetData.json);
+    } catch (error) {
+      void error;
+    }
   }
 
   const { data } = useAuthedSWR(() => {
