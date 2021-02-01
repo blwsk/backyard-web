@@ -61,7 +61,9 @@ const deleteItems = authedEndpoint(async (req, res) => {
   const [
     deleteFromSearchResult,
     deleteFromSearchError,
-  ] = await doAsyncThing(() => index.deleteObjects(ids.map((id) => `${id}`)));
+  ] = await doAsyncThing(async () =>
+    index.deleteObjects(ids.map((id) => `${id}`))
+  );
 
   void deleteFromSearchResult;
 
