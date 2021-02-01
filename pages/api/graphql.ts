@@ -21,8 +21,9 @@ const graphql = authedEndpoint(async (req, res, { user, err }) => {
 
     try {
       gqlResponse = await unfetch(
-        "https://api.backyard.wtf/graphql",
-        // "http://localhost:8081/graphql",
+        process.env.NODE_ENV !== "development"
+          ? "https://api.backyard.wtf/graphql"
+          : "http://localhost:8081/graphql",
         {
           method: "POST",
           body: JSON.stringify({ query, variables }),

@@ -4,6 +4,7 @@ import authedEndpoint from "../../api-utils/authedEndpoint";
 import { doAsyncThing } from "../../api-utils/doAsyncThing";
 import { CLIPS } from "../../types/SearchIndexTypes";
 import { ClipExportData } from "../../types/ExportTypes";
+import { saveClip } from "../../api-utils/modern/save-clip/saveClip";
 
 const {
   ALGOLIA_APP_ID,
@@ -20,6 +21,7 @@ const client = new faunadb.Client({ secret });
 type RequestBody = {
   itemId?: string;
   text?: string;
+  modernItemId?: string;
 };
 
 const createTextSelection = authedEndpoint(
@@ -45,9 +47,13 @@ const createTextSelection = authedEndpoint(
       void error;
     }
 
-    const { itemId, text } = bodyObject;
+    const { itemId, text, modernItemId } = bodyObject;
 
-    if (typeof itemId !== "string" || typeof text !== "string") {
+    if (
+      typeof itemId !== "string" ||
+      typeof text !== "string" ||
+      typeof modernItemId !== "string"
+    ) {
       const errors = [];
 
       if (typeof itemId !== "string") {
@@ -55,6 +61,9 @@ const createTextSelection = authedEndpoint(
       }
       if (typeof text !== "string") {
         errors.push("text content must be provided via text field");
+      }
+      if (typeof modernItemId !== "string") {
+        errors.push("modernItemId must be a number");
       }
 
       res.status(400).send({
@@ -66,22 +75,39 @@ const createTextSelection = authedEndpoint(
 
     const itemRef = q.Ref(q.Collection("Item"), itemId);
 
+    const createdAt = Date.now(),
+      createdBy = user.sub;
+
     const [textSelectionResult, error] = await doAsyncThing(() =>
       client.query(
         q.Create(q.Collection("TextSelection"), {
           data: {
             text,
             item: itemRef,
-            createdBy: user.sub,
-            createdAt: Date.now(),
+            createdBy,
+            createdAt,
           },
         })
       )
     );
 
-    if (error) {
+    const legacyId = textSelectionResult.ref.id;
+
+    const [dualWriteResult, dualWriteError] = await doAsyncThing(() =>
+      saveClip(
+        {
+          text,
+          createdAt,
+          createdBy,
+          itemId: modernItemId,
+        },
+        legacyId
+      )
+    );
+
+    if (error || dualWriteError) {
       res.status(500).send({
-        error,
+        error: error || dualWriteError,
       });
       return;
     }
@@ -101,7 +127,7 @@ const createTextSelection = authedEndpoint(
     }
 
     const [indexForSearchResult, indexForSearchError] = await doAsyncThing(
-      () => {
+      async () => {
         const {
           data: { text: selectionText, createdBy, createdAt },
         } = textSelectionResult;

@@ -300,7 +300,7 @@ export const saveContentItem = async (
           ? trimmedObject
           : fullObject;
 
-      await index.saveObject(objectToIndex, {
+      return index.saveObject(objectToIndex, {
         autoGenerateObjectIDIfNotExist: true,
       });
     }
