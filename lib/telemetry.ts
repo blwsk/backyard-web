@@ -1,8 +1,8 @@
 import { newrelic } from "./newrelic";
 
 export const withTelemetry = (
-  fn: (...args: any[]) => Promise<unknown>
-): ((...args: any[]) => Promise<unknown>) => {
+  fn: (...args: any[]) => Promise<any>
+): ((...args: any[]) => Promise<any>) => {
   return (...args) => {
     return new Promise((resolve, reject) => {
       const start = window.performance.now();
