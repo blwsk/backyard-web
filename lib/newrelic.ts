@@ -4,4 +4,6 @@ declare global {
     }
   }
   
-export const newrelic = () => window && window.newrelic ? window.newrelic : { addPageAction() {} };
+export const newrelic = () => window && window.newrelic ? window.newrelic : {
+  addPageAction() {}
+};
