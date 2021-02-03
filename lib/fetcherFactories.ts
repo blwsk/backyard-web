@@ -1,6 +1,6 @@
-import fetch from "isomorphic-unfetch";
+import unfetch from "isomorphic-unfetch";
 
-const getBaseUrl = () => {
+export const getBaseUrl = () => {
   const isProcessDev = process.env.NODE_ENV === "development";
   const isBrowserDev =
     window &&
@@ -17,7 +17,7 @@ const getBaseUrl = () => {
 };
 
 const fetcherBase = (path: string, options: object): Promise<Response> => {
-  return fetch(`${getBaseUrl()}${path}`, options).then((res) => {
+  return unfetch(`${getBaseUrl()}${path}`, options).then((res) => {
     if (res.status >= 400) {
       return Promise.reject(res);
     } else {
@@ -26,20 +26,7 @@ const fetcherBase = (path: string, options: object): Promise<Response> => {
   });
 };
 
-const absolutePathFetcher = (
-  path: string,
-  options: object
-): Promise<Response> => {
-  return fetch(path, options).then((res) => {
-    if (res.status >= 400) {
-      return Promise.reject(res);
-    } else {
-      return res;
-    }
-  });
-};
-
-const jsonParser = (res: Response): Promise<object> => res.json();
+export const jsonParser = (res: Response): Promise<object> => res.json();
 
 type Method = "GET" | "PUT" | "POST" | "DELETE";
 
@@ -50,16 +37,14 @@ export interface JsonFetcherFactoryOptions {
 
 interface JsonFetcherFactoryProps {
   getAccessTokenSilently: Function;
-  absolutePath: boolean;
   options?: JsonFetcherFactoryOptions;
 }
 
 export const jsonFetcherFactory = ({
   getAccessTokenSilently,
-  absolutePath = false,
   options: factoryFunctionOptions = {},
 }: JsonFetcherFactoryProps) => (path, options = {}) => {
-  const fetcherFn = absolutePath ? absolutePathFetcher : fetcherBase;
+  const fetcherFn = fetcherBase;
 
   const optionsToPass: any = {
     ...options,
@@ -81,7 +66,7 @@ export const jsonFetcherFactory = ({
     .then(jsonParser);
 };
 
-interface GqlResponseJson {
+export interface GqlResponseJson {
   data: object;
   errors?: object[];
 }
@@ -92,7 +77,7 @@ export const gqlFetcherFactory = ({ getAccessTokenSilently, options = {} }) => (
   return getAccessTokenSilently()
     .then(
       (token: string): Promise<Response> => {
-        return fetch(`${getBaseUrl()}/api/graphql`, {
+        return unfetch(`${getBaseUrl()}/api/graphql`, {
           ...options,
           method: "POST",
           headers: {
