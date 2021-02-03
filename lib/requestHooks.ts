@@ -8,6 +8,7 @@ import {
   GqlResponseJson,
 } from "./fetcherFactories";
 import unfetch from "isomorphic-unfetch";
+import { withTelemetry } from "./telemetry";
 
 export const useAuthedSWR = (key, fetcherFactory, options = {}) => {
   const { getAccessTokenSilently: _getAccessTokenSilently } = useAuth0();
@@ -20,7 +21,7 @@ export const useAuthedSWR = (key, fetcherFactory, options = {}) => {
 
   const result = useSWR(
     key,
-    fetcherFactory({ getAccessTokenSilently, options }),
+    withTelemetry(fetcherFactory({ getAccessTokenSilently, options })),
     { revalidateOnFocus: false, refreshInterval: 60 * 60 * 1000 }
   );
 
@@ -41,12 +42,12 @@ export const useAuthedCallback = (
     });
 
   const callback = useCallback(
-    (overrides = {}) => {
+    withTelemetry((overrides = {}) => {
       return fetcherFactory({ getAccessTokenSilently })(key, {
         ...options,
         ...overrides,
       });
-    },
+    }),
     [key, options]
   );
 
@@ -88,7 +89,7 @@ export const useGraphql = ({
 
   const result = useSWR(
     key,
-    () => {
+    withTelemetry(() => {
       return getAccessTokenSilently()
         .then(
           (token: string): Promise<Response> => {
@@ -115,7 +116,7 @@ export const useGraphql = ({
             return Promise.resolve(gqlResponse);
           }
         );
-    },
+    }),
     { revalidateOnFocus: false, refreshInterval: 60 * 60 * 1000 }
   );
 
