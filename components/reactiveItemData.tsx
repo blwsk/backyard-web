@@ -79,12 +79,7 @@ const OriginalEmail = ({ originEmailBody }) => {
   );
 };
 
-const EmailSandbox = ({
-  originEmailBody,
-  itemId,
-  modernItemId,
-  invalidateQuery,
-}) => {
+const EmailSandbox = ({ originEmailBody, itemId, invalidateQuery }) => {
   const html = getParsedOriginEmail(originEmailBody);
 
   const [showParsed, updateShowParsed] = useState(!!html);
@@ -118,11 +113,7 @@ const EmailSandbox = ({
       {showParsed ? (
         <>
           <RenderedContent body={html} />
-          <Selection
-            itemId={itemId}
-            modernItemId={modernItemId}
-            invalidateQuery={invalidateQuery}
-          />
+          <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
         </>
       ) : (
         <OriginalEmail originEmailBody={originEmailBody} />
@@ -184,7 +175,6 @@ const Metadata = ({ hostname, url }) => {
 const ReactiveItemData = ({
   url,
   itemId,
-  modernItemId,
   clips,
   invalidateQuery,
   content,
@@ -192,7 +182,6 @@ const ReactiveItemData = ({
 }: {
   url: string;
   itemId: string;
-  modernItemId: string;
   clips: Clip[];
   invalidateQuery(): void;
   content: ItemContentType;
@@ -254,11 +243,7 @@ const ReactiveItemData = ({
           {current === "content" && (
             <>
               <ItemContent data={data} content={content} url={url} />
-              <Selection
-                itemId={itemId}
-                modernItemId={modernItemId}
-                invalidateQuery={invalidateQuery}
-              />
+              <Selection itemId={itemId} invalidateQuery={invalidateQuery} />
             </>
           )}
           {current === "clips" && <ClipsList clips={clips} />}
@@ -266,7 +251,6 @@ const ReactiveItemData = ({
             <EmailSandbox
               originEmailBody={originEmailBody}
               itemId={itemId}
-              modernItemId={modernItemId}
               invalidateQuery={invalidateQuery}
             />
           )}

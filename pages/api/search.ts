@@ -39,7 +39,7 @@ const search = authedEndpoint(async (req, res, { user }) => {
     return;
   }
 
-  const [searchResult, searchError] = await doAsyncThing(async () => {
+  const [searchResult, searchError] = await doAsyncThing(() => {
     const index = algoliaClient.initIndex(indexName);
 
     return index.search(searchQuery, {

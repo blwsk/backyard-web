@@ -14,7 +14,6 @@ const Data = ({ itemId }: { itemId: string }) => {
   const query = gql`
     query($itemId: ID!) {
       legacyItem(id: $itemId) {
-        id
         url
         createdBy
         createdAt
@@ -65,7 +64,6 @@ const Data = ({ itemId }: { itemId: string }) => {
       url={data.data.legacyItem.url}
       content={data.data.legacyItem.content}
       itemId={itemId}
-      modernItemId={data.data.legacyItem.id}
       clips={data.data.legacyItem.clips}
       originEmailBody={getOriginEmailBody(data)}
       invalidateQuery={mutate}

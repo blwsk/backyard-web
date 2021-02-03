@@ -1,19 +1,12 @@
 import { useEffect, useCallback, useState } from "react";
 import { debounce } from "../lib/debounce";
+import Link from "next/link";
 import { useAuthedCallback } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { isiOs } from "../lib/isiOs";
 import Button from "./ui/Button";
 
-const Selection = ({
-  itemId,
-  modernItemId,
-  invalidateQuery,
-}: {
-  itemId: string;
-  modernItemId: string;
-  invalidateQuery: () => void;
-}) => {
+const Selection = ({ itemId, invalidateQuery }) => {
   const [viewportSizeKey, updateViewportSizeKey] = useState(
     `${window.innerHeight}.${window.innerWidth}`
   );
@@ -104,7 +97,6 @@ const Selection = ({
       body: JSON.stringify({
         itemId,
         text: selection.text,
-        modernItemId,
       }),
     },
     jsonFetcherFactory

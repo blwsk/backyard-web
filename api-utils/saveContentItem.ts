@@ -265,46 +265,44 @@ export const saveContentItem = async (
     legacyId
   );
 
-  const [indexForSearchResult, indexForSearchError] = await doAsyncThing(
-    async () => {
-      const fullObject = {
-        objectID: itemResult.ref.id,
-        _id: itemResult.ref.id,
-        _ts: itemResult.ts,
-        createdBy: userId,
-        url,
-        content: contentJson
-          ? {
-              title: contentJson.title,
-              metaTitle: contentJson.metaTitle,
-              metaDescription: contentJson.metaDescription,
-            }
-          : null,
-      };
+  const [indexForSearchResult, indexForSearchError] = await doAsyncThing(() => {
+    const fullObject = {
+      objectID: itemResult.ref.id,
+      _id: itemResult.ref.id,
+      _ts: itemResult.ts,
+      createdBy: userId,
+      url,
+      content: contentJson
+        ? {
+            title: contentJson.title,
+            metaTitle: contentJson.metaTitle,
+            metaDescription: contentJson.metaDescription,
+          }
+        : null,
+    };
 
-      const trimmedObject = {
-        objectID: itemResult.ref.id,
-        _id: itemResult.ref.id,
-        _ts: itemResult.ts,
-        url,
-        content: contentJson
-          ? {
-              title: contentJson.title,
-              metaTitle: contentJson.metaTitle,
-            }
-          : null,
-      };
+    const trimmedObject = {
+      objectID: itemResult.ref.id,
+      _id: itemResult.ref.id,
+      _ts: itemResult.ts,
+      url,
+      content: contentJson
+        ? {
+            title: contentJson.title,
+            metaTitle: contentJson.metaTitle,
+          }
+        : null,
+    };
 
-      const objectToIndex =
-        Buffer.byteLength(JSON.stringify(fullObject)) >= 100000 /* bytes */
-          ? trimmedObject
-          : fullObject;
+    const objectToIndex =
+      Buffer.byteLength(JSON.stringify(fullObject)) >= 100000 /* bytes */
+        ? trimmedObject
+        : fullObject;
 
-      return index.saveObject(objectToIndex, {
-        autoGenerateObjectIDIfNotExist: true,
-      });
-    }
-  );
+    return index.saveObject(objectToIndex, {
+      autoGenerateObjectIDIfNotExist: true,
+    });
+  });
 
   void indexForSearchResult;
 

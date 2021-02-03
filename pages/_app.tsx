@@ -36,7 +36,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <title>Backyard.wtf</title>
         <link rel="shortcut icon" href="/favicon.ico" />
-        <script src="/nr.js"></script>
       </Head>
       {/* <DragAndDrop
         style={{
