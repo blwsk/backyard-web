@@ -2,6 +2,7 @@ import algoliasearch from "algoliasearch";
 import { doAsyncThing } from "../../api-utils/doAsyncThing";
 import faunadb, { query as q } from "faunadb";
 import authedEndpoint from "../../api-utils/authedEndpoint";
+import { deleteItemsBulk } from "../../api-utils/modern/deleteItemsBulk";
 
 const {
   FAUNADB_SECRET: secret,
@@ -70,6 +71,17 @@ const deleteItems = authedEndpoint(async (req, res) => {
   if (deleteFromSearchError) {
     res.status(500).send({
       error: deleteFromSearchError,
+    });
+    return;
+  }
+
+  const [dualDeleteResult, dualDeleteError] = await deleteItemsBulk(ids);
+
+  void dualDeleteResult;
+
+  if (dualDeleteError) {
+    res.status(500).send({
+      error: dualDeleteError,
     });
     return;
   }
