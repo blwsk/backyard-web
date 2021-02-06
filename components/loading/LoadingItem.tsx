@@ -1,17 +1,18 @@
 import ContentPageItem from "../contentPageItem";
+import { ListItemProps } from "../listItem";
 
-const LoadingItem = () => (
-  <ContentPageItem
-    item={{
-      _id: "0",
-      _ts: Date.now(),
-      url: "https://loading.com",
-      content: {
-        title: "Loading...",
-      },
-    }}
-    className="bg-gray-200 dark:bg-gray-900"
-  />
-);
+const LoadingItem = () => {
+  const item: ListItemProps = {
+    legacyId: "0",
+    createdAt: Date.now(),
+    url: "https://loading.com",
+    content: {
+      title: "Loading...",
+    },
+  };
+  return (
+    <ContentPageItem item={item} className="bg-gray-200 dark:bg-gray-900" />
+  );
+};
 
 export default LoadingItem;
