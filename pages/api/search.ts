@@ -56,7 +56,15 @@ const search = authedEndpoint(async (req, res, { user }) => {
     return;
   }
 
-  res.status(200).send(searchResult.hits);
+  const transformedResult = searchResult.hits.map((hit) => {
+    return {
+      ...hit,
+      legacyId: hit._id,
+      createdAt: hit._ts ? hit._ts / 1000 : hit._ts,
+    };
+  });
+
+  res.status(200).send(transformedResult);
 });
 
 export default search;

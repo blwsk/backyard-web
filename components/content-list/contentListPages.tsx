@@ -5,6 +5,7 @@ import { getResultObject } from "../../lib/usePaginatedContentList";
 import ContentPageItem from "../contentPageItem";
 import Button from "../ui/Button";
 import Checkbox from "../ui/Checkbox";
+import { ListItemProps } from "../listItem";
 
 const ContentPage = ({
   items,
@@ -12,31 +13,37 @@ const ContentPage = ({
   onDeselect,
   selectionState,
   deletedIds,
+}: {
+  items: ListItemProps[];
+  onSelect: (legacyId: string) => void;
+  onDeselect: (legacyId: string) => void;
+  selectionState: object;
+  deletedIds: string[];
 }) => {
   return (
     <div>
       {items.map((item) => {
-        const { _id } = item;
-        const isDeleted = deletedIds.indexOf(_id) > -1;
+        const { legacyId } = item;
+        const isDeleted = deletedIds.indexOf(legacyId) > -1;
 
         if (isDeleted) {
-          return <div key={_id} />;
+          return <div key={legacyId} />;
         }
 
-        const checked = !!selectionState[_id];
+        const checked = !!selectionState[legacyId];
 
         return (
           <ContentPageItem
             item={item}
-            key={_id}
+            key={legacyId}
             renderCheckbox={() => (
               <Checkbox
                 checked={checked}
                 onChange={(e) => {
                   if (e.target.checked) {
-                    onSelect(_id);
+                    onSelect(legacyId);
                   } else {
-                    onDeselect(_id);
+                    onDeselect(legacyId);
                   }
                 }}
                 disabled={false}
@@ -49,7 +56,14 @@ const ContentPage = ({
   );
 };
 
-const useItemSelection = (initialState = {}) => {
+const useItemSelection = (
+  initialState = {}
+): {
+  selectionState: object;
+  onSelect: (legacyId: string) => void;
+  onDeselect: (legacyId: string) => void;
+  onClearSelection: () => void;
+} => {
   const [selectionState, updateSelectionState] = useState(initialState);
 
   const onSelect = (id) => {
@@ -266,8 +280,8 @@ const ContentListPages = ({ pages, hasMore, onLoadMore, isValidating }) => {
     <div>
       {pages.map((result) => (
         <ContentPage
-          key={`before.${getResultObject(result).before}`}
-          items={getResultObject(result).data}
+          key={`before.${getResultObject(result).next}`}
+          items={getResultObject(result).results}
           onSelect={onSelect}
           onDeselect={onDeselect}
           selectionState={selectionState}

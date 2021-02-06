@@ -11,7 +11,7 @@ export const deleteItemsBulk = (legacyIds: string[]) => {
         : "http://localhost:8081/api/items",
       {
         method: "DELETE",
-        body: JSON.stringify([...legacyIds, "289516680180138502"]),
+        body: JSON.stringify(legacyIds),
         headers: {
           Authorization: `Bearer ${BACKYARD_SERVER_SECRET}`,
           "Content-Type": "application/json",

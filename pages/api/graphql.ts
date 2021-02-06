@@ -19,6 +19,8 @@ const graphql = authedEndpoint(async (req, res, { user, err }) => {
 
     const { query, variables } = req.body;
 
+    const { sub: userId } = user;
+
     try {
       gqlResponse = await unfetch(
         process.env.NODE_ENV !== "development"
@@ -26,7 +28,13 @@ const graphql = authedEndpoint(async (req, res, { user, err }) => {
           : "http://localhost:8081/graphql",
         {
           method: "POST",
-          body: JSON.stringify({ query, variables }),
+          body: JSON.stringify({
+            query,
+            variables: {
+              ...variables,
+              userId,
+            },
+          }),
           headers: {
             Authorization: `Bearer ${BACKYARD_SERVER_SECRET}`,
             "Content-Type": "application/json",
