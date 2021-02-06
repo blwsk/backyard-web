@@ -1,4 +1,7 @@
 export interface Clip {
-  _id: string;
+  id: string;
   text: string;
+  createdBy: string;
+  createdAt: number;
+  itemId: string;
 }

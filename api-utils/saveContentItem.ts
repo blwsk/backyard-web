@@ -2,9 +2,10 @@ import { query as q, Client } from "faunadb";
 import algoliasearch from "algoliasearch";
 
 import { fetchContent } from "./fetchContent";
-import { Item, ItemSource, ItemOrigin } from "../types/ItemTypes";
+import { Item, ItemSource, ItemOrigin, ItemContent } from "../types/ItemTypes";
 import { doAsyncThing } from "./doAsyncThing";
 import { ITEMS } from "../types/SearchIndexTypes";
+import { saveItem } from "./modern/save-item/saveItem";
 
 const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
 
@@ -42,14 +43,6 @@ const findExistingItem = async (
   return { result, error };
 };
 
-interface ContentJson {
-  body?: string;
-  title?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  json?: object;
-}
-
 interface CreatedItem {
   result?: FaunaObject;
   error?: Error;
@@ -58,8 +51,9 @@ interface CreatedItem {
 const createItem = async (
   client: Client,
   url: string,
-  contentJson: ContentJson,
-  userId: string,
+  contentJson: ItemContent,
+  createdBy: string,
+  createdAt: number,
   source?: ItemSource,
   itemOrigin?: ItemOrigin
 ): Promise<CreatedItem> => {
@@ -121,8 +115,8 @@ const createItem = async (
       q.Create(q.Collection("Item"), {
         data: {
           url,
-          createdBy: userId,
-          createdAt: Date.now(),
+          createdBy,
+          createdAt,
           content: itemContentResult.ref,
           source,
           origin: itemOriginResult ? itemOriginResult.ref : null,
@@ -235,11 +229,15 @@ export const saveContentItem = async (
     };
   }
 
+  const createdBy = userId,
+    createdAt = Date.now();
+
   const { result: itemResult, error: itemError } = await createItem(
     client,
     url,
     contentJson,
-    userId,
+    createdBy,
+    createdAt,
     source,
     itemOrigin
   );
@@ -253,44 +251,60 @@ export const saveContentItem = async (
     };
   }
 
-  const [indexForSearchResult, indexForSearchError] = await doAsyncThing(() => {
-    const fullObject = {
-      objectID: itemResult.ref.id,
-      _id: itemResult.ref.id,
-      _ts: itemResult.ts,
-      createdBy: userId,
+  const legacyId = itemResult.ref.id;
+
+  const [dualWriteResult, dualWriteError] = await saveItem(
+    {
       url,
-      content: contentJson
-        ? {
-            title: contentJson.title,
-            metaTitle: contentJson.metaTitle,
-            metaDescription: contentJson.metaDescription,
-          }
-        : null,
-    };
+      createdAt,
+      createdBy,
+      content: contentJson,
+      source,
+      origin: itemOrigin,
+    },
+    legacyId
+  );
 
-    const trimmedObject = {
-      objectID: itemResult.ref.id,
-      _id: itemResult.ref.id,
-      _ts: itemResult.ts,
-      url,
-      content: contentJson
-        ? {
-            title: contentJson.title,
-            metaTitle: contentJson.metaTitle,
-          }
-        : null,
-    };
+  const [indexForSearchResult, indexForSearchError] = await doAsyncThing(
+    async () => {
+      const fullObject = {
+        objectID: itemResult.ref.id,
+        _id: itemResult.ref.id,
+        _ts: itemResult.ts,
+        createdBy: userId,
+        url,
+        content: contentJson
+          ? {
+              title: contentJson.title,
+              metaTitle: contentJson.metaTitle,
+              metaDescription: contentJson.metaDescription,
+            }
+          : null,
+      };
 
-    const objectToIndex =
-      Buffer.byteLength(JSON.stringify(fullObject)) >= 100000 /* bytes */
-        ? trimmedObject
-        : fullObject;
+      const trimmedObject = {
+        objectID: itemResult.ref.id,
+        _id: itemResult.ref.id,
+        _ts: itemResult.ts,
+        url,
+        content: contentJson
+          ? {
+              title: contentJson.title,
+              metaTitle: contentJson.metaTitle,
+            }
+          : null,
+      };
 
-    return index.saveObject(objectToIndex, {
-      autoGenerateObjectIDIfNotExist: true,
-    });
-  });
+      const objectToIndex =
+        Buffer.byteLength(JSON.stringify(fullObject)) >= 100000 /* bytes */
+          ? trimmedObject
+          : fullObject;
+
+      return index.saveObject(objectToIndex, {
+        autoGenerateObjectIDIfNotExist: true,
+      });
+    }
+  );
 
   void indexForSearchResult;
 

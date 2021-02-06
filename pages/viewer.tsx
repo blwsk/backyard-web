@@ -10,9 +10,7 @@ const Viewer = ({ router }) => {
   return (
     <div>
       <Header />
-      <Wrapper>
-        <Data itemId={itemId} />
-      </Wrapper>
+      <Wrapper>{itemId && <Data itemId={itemId} />}</Wrapper>
     </div>
   );
 };
