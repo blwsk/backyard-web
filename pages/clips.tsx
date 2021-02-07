@@ -1,33 +1,30 @@
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import gql from "gql-tag";
-import ListItem from "../components/listItem";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import requireAuth from "../lib/requireAuth";
-import { useAuthedSWR } from "../lib/requestHooks";
-import { gqlFetcherFactory } from "../lib/fetcherFactories";
+import { useGraphql } from "../lib/requestHooks";
 import Button from "../components/ui/Button";
 
-const PAGE_LENGTH = 100;
+const PAGE_LENGTH = 50;
 
-const getResultObject = (result) => result.clipsByUser;
+const getResultObject = (result) => result.clips;
 
-const Clip = ({ item, text, _id }) => {
+const Clip = ({ text, id }) => {
   return (
-    <div key={_id} className="selection-item">
-      {item && <ListItem item={item} />}
+    <div key={id} className="selection-item">
       <blockquote>{text}</blockquote>
     </div>
   );
 };
 
-const Page = ({ pageData }) => {
+const Page = ({ results }) => {
   return (
     <>
-      {pageData.map((pageItem) => {
-        const { item, text, _id } = pageItem;
+      {results.map((clip) => {
+        const { text, id } = clip;
 
-        return <Clip key={_id} item={item} text={text} _id={_id} />;
+        return <Clip key={id} text={text} id={id} />;
       })}
     </>
   );
@@ -37,60 +34,50 @@ const PageList = ({ pages }) => {
   return (
     <>
       {pages.map((page) => {
-        const { data: pageData, before } = getResultObject(page);
+        const { results, next } = getResultObject(page);
 
-        return <Page key={before} pageData={pageData} />;
+        return <Page key={next} results={results} />;
       })}
     </>
   );
 };
 
-const usePaginatedContent = ({ cursorValue }) => {
-  const { data, error, isValidating } = useAuthedSWR(
-    gql`
-      query ClipsByUser($userId: String!) {
-        clipsByUser(userId: $userId, _size: ${PAGE_LENGTH}, _cursor: ${cursorValue}) {
-          data {
-            item {
-              url
-              _id
-              _ts
-            }
-            text
-            _id
-          }
-          before
-          after
-        }
-      }
-    `,
-    gqlFetcherFactory
-  );
-
-  return {
-    data,
-    error,
-    isValidating,
-  };
-};
-
-const SelectionList = () => {
-  const [cursor, updateCursor] = useState(null);
+const ClipList = () => {
+  const [cursor, updateCursor] = useState<string>(null);
 
   const [pages, updatesPages] = useState([]);
 
-  const cursorValue = cursor ? `"${cursor}"` : cursor;
-
-  const { data, error, isValidating } = usePaginatedContent({
-    cursorValue,
+  const { data, error, isValidating } = useGraphql({
+    query: gql`
+      query($size: Int, $cursor: ID, $userId: String!, $sortOrder: SortOrder!) {
+        clips(
+          size: $size
+          cursor: $cursor
+          userId: $userId
+          sortOrder: $sortOrder
+        ) {
+          results {
+            text
+            id
+          }
+          next
+        }
+      }
+    `,
+    variables: {
+      size: PAGE_LENGTH,
+      cursor: cursor ? cursor : undefined,
+      sortOrder: "DESC",
+      // userId will be provided in the serverless function
+    },
   });
 
   const onLoadMoreClick = () => {
-    updateCursor(getResultObject(data.data).after);
+    updateCursor(getResultObject(data.data).next);
   };
 
   useEffect(() => {
-    if (data && getResultObject(data.data).before === null) {
+    if (data && pages.length === 0) {
       /**
        * First page
        */
@@ -107,7 +94,7 @@ const SelectionList = () => {
     }
   }, [data, cursor]);
 
-  const hasMore = data && typeof getResultObject(data.data).after === "string";
+  const hasMore = data && typeof getResultObject(data.data).next === "string";
 
   return (
     <div>
@@ -140,7 +127,7 @@ const Clips = () => {
       <Header />
       <Wrapper>
         <h1>Clips</h1>
-        <SelectionList />
+        <ClipList />
       </Wrapper>
       <style jsx global>{`
         .selection-item {
