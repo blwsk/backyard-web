@@ -1,4 +1,4 @@
-import { doAsyncThing } from "../doAsyncThing";
+import { doAsyncThing } from "../../doAsyncThing";
 import unfetch from "isomorphic-unfetch";
 
 const { BACKYARD_SERVER_SECRET } = process.env;

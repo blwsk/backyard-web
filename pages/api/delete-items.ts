@@ -1,7 +1,7 @@
 import algoliasearch from "algoliasearch";
 import { doAsyncThing } from "../../api-utils/doAsyncThing";
 import authedEndpoint from "../../api-utils/authedEndpoint";
-import { deleteItemsBulk } from "../../api-utils/modern/deleteItemsBulk";
+import { deleteItemsBulk } from "../../api-utils/modern/items/deleteItemsBulk";
 
 const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
 

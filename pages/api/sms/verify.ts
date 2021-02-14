@@ -1,36 +1,14 @@
 import twilio from "twilio";
 import authedEndpoint from "../../../api-utils/authedEndpoint";
-import faunadb, { query as q } from "faunadb";
+import { verify } from "../../../api-utils/modern/sms/verify";
 import { TWILIO_PHONE_NUMBER } from "../../../lib/twilioConstants";
 
 const {
   TWILIO_ACCOUNT_SID: accountSid,
   TWILIO_AUTH_TOKEN: authToken,
-  FAUNADB_SECRET: secret,
 } = process.env;
 
 const twilioClient = twilio(accountSid, authToken);
-
-const faunaClient = new faunadb.Client({ secret });
-
-/**
- * random left-padded 4 character pin
- */
-const generateRandomPin = () => {
-  const pinInt = Math.floor(Math.random() * 10000);
-  const pinStr = `${pinInt}`;
-
-  const len = pinStr.length;
-  const mustPad = 4 - len;
-
-  let leftPadded = "";
-
-  for (let i = 0; i < mustPad; i++) {
-    leftPadded += "0";
-  }
-
-  return `${leftPadded}${pinStr}`;
-};
 
 type RequestBody = {
   phoneNumber?: string;
@@ -63,24 +41,10 @@ const verifyPhoneNumber = authedEndpoint(
       return;
     }
 
-    const pin = generateRandomPin();
-
-    let verifierCreateResult;
-    let verifierCreateError;
-    try {
-      verifierCreateResult = await faunaClient.query(
-        q.Create(q.Collection("SmsVerifierPinSet"), {
-          data: {
-            number: phoneNumber,
-            pin,
-            userId: user.sub,
-            expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes from now
-          },
-        })
-      );
-    } catch (err) {
-      verifierCreateError = err;
-    }
+    const [verifierCreateResult, verifierCreateError] = await verify({
+      phoneNumber,
+      userId: user.sub,
+    });
 
     if (verifierCreateError) {
       res.status(500).send({
@@ -89,7 +53,9 @@ const verifyPhoneNumber = authedEndpoint(
       return;
     }
 
-    void verifierCreateResult;
+    console.log(verifierCreateResult);
+
+    const { pin } = verifierCreateResult;
 
     try {
       await twilioClient.messages.create({

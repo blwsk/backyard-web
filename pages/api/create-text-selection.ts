@@ -4,7 +4,7 @@ import authedEndpoint from "../../api-utils/authedEndpoint";
 import { doAsyncThing } from "../../api-utils/doAsyncThing";
 import { CLIPS } from "../../types/SearchIndexTypes";
 import { ClipExportData } from "../../types/ExportTypes";
-import { saveClip } from "../../api-utils/modern/save-clip/saveClip";
+import { saveClip } from "../../api-utils/modern/clips/saveClip";
 
 const {
   ALGOLIA_APP_ID,

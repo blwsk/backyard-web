@@ -5,7 +5,7 @@ import { fetchContent } from "./fetchContent";
 import { Item, ItemSource, ItemOrigin, ItemContent } from "../types/ItemTypes";
 import { doAsyncThing } from "./doAsyncThing";
 import { ITEMS } from "../types/SearchIndexTypes";
-import { saveItem } from "./modern/save-item/saveItem";
+import { saveItem } from "./modern/items/saveItem";
 
 const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
 
