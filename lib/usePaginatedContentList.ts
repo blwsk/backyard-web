@@ -23,7 +23,7 @@ export const usePaginatedContentList = ({
   cursor?: string;
   sortOrder: SortOrder;
 }) => {
-  const { data, error, isValidating } = useGraphql({
+  const { data, error, isValidating } = useGraphql<any>({
     query: gql`
       query($size: Int, $cursor: ID, $userId: String!, $sortOrder: SortOrder!) {
         items(
