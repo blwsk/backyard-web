@@ -47,7 +47,7 @@ const ClipList = () => {
 
   const [pages, updatesPages] = useState([]);
 
-  const { data, error, isValidating } = useGraphql({
+  const { data, error, isValidating } = useGraphql<any>({
     query: gql`
       query($size: Int, $cursor: ID, $userId: String!, $sortOrder: SortOrder!) {
         clips(
