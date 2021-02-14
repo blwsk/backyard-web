@@ -1,5 +1,5 @@
-import unfetch from "isomorphic-unfetch";
 import authedEndpoint from "../../api-utils/authedEndpoint";
+import { graphql as graphqlModern } from "../../api-utils/modern/graphql";
 
 const { FAUNADB_SECRET: secret, BACKYARD_SERVER_SECRET } = process.env;
 
@@ -14,28 +14,13 @@ const graphql = authedEndpoint(async (req, res, { user, err }) => {
   if (v2) {
     if (err) console.log(err);
 
-    let gqlResponse;
-    let gqlError;
-
     const { query, variables } = req.body;
 
-    try {
-      gqlResponse = await unfetch(
-        process.env.NODE_ENV !== "development"
-          ? "https://api.backyard.wtf/graphql"
-          : "http://localhost:8081/graphql",
-        {
-          method: "POST",
-          body: JSON.stringify({ query, variables }),
-          headers: {
-            Authorization: `Bearer ${BACKYARD_SERVER_SECRET}`,
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((gqlRes) => gqlRes.json());
-    } catch (error) {
-      gqlError = error;
-    }
+    const [gqlResponse, gqlError] = await graphqlModern({
+      userId: user.sub,
+      query,
+      variables,
+    });
 
     if (gqlError) {
       res.status(400).send({

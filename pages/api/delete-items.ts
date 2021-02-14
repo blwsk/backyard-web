@@ -1,16 +1,9 @@
 import algoliasearch from "algoliasearch";
 import { doAsyncThing } from "../../api-utils/doAsyncThing";
-import faunadb, { query as q } from "faunadb";
 import authedEndpoint from "../../api-utils/authedEndpoint";
-import { deleteItemsBulk } from "../../api-utils/modern/deleteItemsBulk";
+import { deleteItemsBulk } from "../../api-utils/modern/items/deleteItemsBulk";
 
-const {
-  FAUNADB_SECRET: secret,
-  ALGOLIA_APP_ID,
-  ALGOLIA_ADMIN_API_KEY,
-} = process.env;
-
-const client = new faunadb.Client({ secret });
+const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
 
 const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
 
@@ -36,25 +29,6 @@ const deleteItems = authedEndpoint(async (req, res) => {
     res.status(400).send({
       message:
         "Expected request body with array of id strings. None was provided.",
-    });
-    return;
-  }
-
-  const refs = ids.map((id) => q.Ref(q.Collection("Item"), id));
-
-  let result;
-  let error;
-  try {
-    result = await client.query(
-      q.Foreach(refs, q.Lambda("ref", q.Delete(q.Var("ref"))))
-    );
-  } catch (err) {
-    error = err;
-  }
-
-  if (error) {
-    res.status(500).send({
-      error,
     });
     return;
   }
@@ -89,7 +63,7 @@ const deleteItems = authedEndpoint(async (req, res) => {
   res.status(200).send({
     message: "Success. The provided id(s) have been deleted.",
     ids,
-    result: JSON.stringify(result),
+    result: JSON.stringify(dualDeleteResult),
     deleteFromSearchResult,
   });
 });

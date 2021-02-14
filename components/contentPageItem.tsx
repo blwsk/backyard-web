@@ -46,7 +46,7 @@ const ContentPageItem = ({
   renderCheckbox?: () => ReactNode;
   className?: string;
 }) => {
-  const { _id, url } = item;
+  const { legacyId, url } = item;
 
   const checkboxNode = useMemo(() => renderCheckbox(), [renderCheckbox]);
 
@@ -56,7 +56,7 @@ const ContentPageItem = ({
         "flex justify-between items-center p-4 mb-2 md:rounded-md text-white",
         className
       )}
-      key={_id}
+      key={legacyId}
       style={{
         backgroundColor: className
           ? undefined

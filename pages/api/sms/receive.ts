@@ -9,6 +9,7 @@ import {
   getResponseFromMessage,
 } from "../../../api-utils/saveContentItem";
 import { SMS } from "../../../types/ItemTypes";
+import { getUserMetadataByPhoneNumber } from "../../../api-utils/modern/user/getUserMetadataByPhoneNumber";
 
 const { FAUNADB_SECRET: secret } = process.env;
 
@@ -29,17 +30,12 @@ const receiveSms = async (req, res) => {
 
   const fromPhoneNumber = From.replace("+1", "");
 
-  const [userMetadata, userMetadataError] = await getUserByMetadata(
-    faunaClient,
-    {
-      phoneNumber: fromPhoneNumber,
-    }
-  );
+  const [userMetadata, userMetadataError] = await getUserMetadataByPhoneNumber({
+    phoneNumber: fromPhoneNumber,
+  });
 
   const userId: string | null =
-    userMetadata && userMetadata.data && userMetadata.data.userId
-      ? userMetadata.data.userId
-      : null;
+    userMetadata && userMetadata.userId ? userMetadata.userId : null;
 
   if (userMetadataError || !userId) {
     const twiml = new MessagingResponse();

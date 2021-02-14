@@ -1,15 +1,11 @@
 import authedEndpoint from "../../../api-utils/authedEndpoint";
-import faunadb, { query as q } from "faunadb";
-import { UserMetadataUpdate } from "../../../api-utils/updateUserMetadata";
-
-const { FAUNADB_SECRET: secret } = process.env;
-
-const faunaClient = new faunadb.Client({ secret });
-
-const validPin = (pin) => typeof pin === "string" && pin.length === 4;
+import { confirm } from "../../../api-utils/modern/sms/confirm";
+import { graphql } from "../../../api-utils/modern/graphql";
+import gql from "gql-tag";
 
 type RequestBody = {
   pin?: string;
+  phoneNumber?: string;
 };
 
 const confirmPin = authedEndpoint(async (req, res, { user, err: userErr }) => {
@@ -28,7 +24,7 @@ const confirmPin = authedEndpoint(async (req, res, { user, err: userErr }) => {
     void error;
   }
 
-  const { pin } = bodyObject;
+  const { pin, phoneNumber } = bodyObject;
 
   if (typeof pin !== "string") {
     res.status(400).send({
@@ -38,62 +34,39 @@ const confirmPin = authedEndpoint(async (req, res, { user, err: userErr }) => {
     return;
   }
 
-  let findPinResult;
-  let findPinError;
-  try {
-    findPinResult = await faunaClient.query(
-      q.Let(
-        {
-          verifiersMaybe: q.Paginate(
-            q.Match(q.Index("smsVerifiersByUser"), user.sub),
-            { size: 1 }
-          ),
-        },
-        q.If(
-          q.IsEmpty(q.Var("verifiersMaybe")),
-          [],
-          q.Reduce(
-            q.Lambda(["acc", "item"], q.Var("item")),
-            null,
-            q.Select("data", q.Var("verifiersMaybe"))
-          )
-        )
-      )
-    );
-  } catch (err) {
-    findPinError = err;
-  }
-
-  if (findPinError) {
-    res.status(500).send({
-      error: findPinError,
+  if (typeof phoneNumber !== "string") {
+    res.status(400).send({
+      message: "Invalid request body",
+      error: "Missing phoneNumber",
     });
     return;
   }
 
-  const [expiresAt, pinFromDb, phoneNumber] = findPinResult;
+  const [confirmResult, confirmError] = await confirm({
+    phoneNumber,
+    userId: user.sub,
+    pin,
+  });
 
-  const expired = typeof expiresAt === "number" && Date.now() > expiresAt;
+  if (confirmError) {
+    res.status(500).send({
+      error: confirmError,
+    });
+    return;
+  }
 
-  if (expired) {
+  const { message, match } = confirmResult;
+
+  if (message === "Expired") {
     res.status(400).send({
       message: `Pin has expired.`,
     });
     return;
   }
 
-  const pinsMatch = validPin(pin) && validPin(pinFromDb) && pin === pinFromDb;
-
-  if (!pinsMatch) {
+  if (!match) {
     res.status(400).send({
       message: `Incorrect PIN.`,
-    });
-    return;
-  }
-
-  if (typeof phoneNumber !== "string") {
-    res.status(400).send({
-      message: `Invalid phoneNumber.`,
     });
     return;
   }
@@ -102,46 +75,20 @@ const confirmPin = authedEndpoint(async (req, res, { user, err: userErr }) => {
    * Woohoo! We've validated the phone number. Time to record it in our DB as "verified".
    */
 
-  const userMetadataUpdate: UserMetadataUpdate = {
-    phoneNumber,
-  };
-
-  let updateUserMetadataResult;
-  let updateUserMetadataError;
-  try {
-    updateUserMetadataResult = await faunaClient.query(
-      q.Let(
-        {
-          userMetadata: q.Let(
-            {
-              userMetadataMaybe: q.Paginate(
-                q.Match(q.Index("userMetadataForUser"), user.sub),
-                { size: 1 }
-              ),
-            },
-            q.If(
-              q.IsEmpty(q.Var("userMetadataMaybe")),
-              q.Create(q.Collection("UserMetadata"), {
-                data: {
-                  userId: user.sub,
-                },
-              }),
-              q.Reduce(
-                q.Lambda(["acc", "item"], q.Get(q.Var("item"))),
-                null,
-                q.Select("data", q.Var("userMetadataMaybe"))
-              )
-            )
-          ),
-        },
-        q.Update(q.Select("ref", q.Var("userMetadata")), {
-          data: userMetadataUpdate,
-        })
-      )
-    );
-  } catch (err) {
-    updateUserMetadataError = err;
-  }
+  const [updateUserMetadataResult, updateUserMetadataError] = await graphql({
+    query: gql`
+      mutation($userId: String!, $phoneNumber: String!) {
+        createPhoneNumber(userId: $userId, phoneNumber: $phoneNumber) {
+          phoneNumber
+        }
+      }
+    `,
+    variables: {
+      phoneNumber,
+      userId: user.sub,
+    },
+    userId: user.sub,
+  });
 
   if (updateUserMetadataError) {
     res.status(500).send({

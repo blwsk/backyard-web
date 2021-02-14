@@ -41,7 +41,7 @@ const Data = ({ itemId }: { itemId: string }) => {
     itemId,
   };
 
-  const { data, mutate } = useGraphql({
+  const { data, mutate } = useGraphql<any>({
     query,
     variables,
   });

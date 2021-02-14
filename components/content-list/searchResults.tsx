@@ -27,9 +27,8 @@ const SearchResults: FunctionComponent<{ results: ListItemProps[] }> = ({
         pages={[
           {
             searchResults: {
-              before: null,
-              after: null,
-              data: results,
+              results,
+              next: null,
             },
           },
         ]}

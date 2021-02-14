@@ -1,11 +1,14 @@
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import { useState, useEffect, useRef } from "react";
-import { useAuthedCallback, useAuthedSWR } from "../lib/requestHooks";
+import {
+  useAuthedCallback,
+  useGraphql,
+  useGraphqlMutation,
+} from "../lib/requestHooks";
 import { jsonFetcherFactory, gqlFetcherFactory } from "../lib/fetcherFactories";
 import requireAuth from "../lib/requireAuth";
 import gql from "gql-tag";
-import { mutate } from "swr";
 import { PhoneNumber } from "twilio/lib/interfaces";
 import { TWILIO_PHONE_NUMBER } from "../lib/twilioConstants";
 import { validURL, getHostname } from "../lib/urls";
@@ -14,21 +17,6 @@ import TextInput from "../components/ui/TextInput";
 import Icon from "../components/ui/Icon";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
-const userMetadataQuery = gql`
-  query UserMetadataForUser($userId: String!) {
-    userMetadataForUser(userId: $userId) {
-      phoneNumber
-      emailIngestAddress
-    }
-    rssSubscriptionsForUser(userId: $userId, _size: 100) {
-      data {
-        feedUrl
-        _id
-      }
-    }
-  }
-`;
 
 const CopiedAlert = ({ onTimeout, className }) => {
   const [show, updateShow] = useState(true);
@@ -51,7 +39,11 @@ const CopiedAlert = ({ onTimeout, className }) => {
   );
 };
 
-const ValidatePhoneNumber = () => {
+const ValidatePhoneNumber = ({
+  invalidateSettingsData,
+}: {
+  invalidateSettingsData: () => void;
+}) => {
   const [phoneValue, updatePhoneValue] = useState("");
   const [hasSentPin, updateHasSentPin] = useState(false);
   const [error, updateError] = useState(false);
@@ -77,6 +69,7 @@ const ValidatePhoneNumber = () => {
       method: "POST",
       body: JSON.stringify({
         pin: pinValue,
+        phoneNumber: phoneValue,
       }),
     },
     jsonFetcherFactory
@@ -127,7 +120,7 @@ const ValidatePhoneNumber = () => {
                     /**
                      * Refresh userMetadata query after 2 seconds
                      */
-                    setTimeout(() => mutate(userMetadataQuery), 1000);
+                    setTimeout(() => invalidateSettingsData(), 1000);
                   })
                   .catch((err) => {
                     void err;
@@ -155,9 +148,28 @@ const ValidatePhoneNumber = () => {
 
 type PhoneNumberProps = {
   phoneNumber: PhoneNumber | null;
+  invalidateSettingsData: () => void;
 };
 
-const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
+const PhoneNumberSetting = ({
+  phoneNumber,
+  invalidateSettingsData,
+}: PhoneNumberProps) => {
+  const [requestState, setRequestState] = useState<
+    "loading" | "succeeded" | "failed"
+  >(null);
+
+  const doDelete = useGraphqlMutation({
+    query: gql`
+      mutation($userId: String!) {
+        deletePhoneNumber(userId: $userId) {
+          userId
+        }
+      }
+    `,
+    variables: {},
+  });
+
   return (
     <div>
       <h4>Save content via SMS</h4>
@@ -182,66 +194,152 @@ const PhoneNumberSetting = ({ phoneNumber }: PhoneNumberProps) => {
       )}
       <div className="pt-4">
         {phoneNumber ? (
-          <TextInput className="mt-2 mr-2" readOnly value={phoneNumber} />
+          <div>
+            <TextInput className="mt-2 mr-2" readOnly value={phoneNumber} />
+            {requestState === null && (
+              <Button
+                onClick={() => {
+                  setRequestState("loading");
+                  doDelete()
+                    .then(() => {
+                      setRequestState("succeeded");
+
+                      setTimeout(() => {
+                        invalidateSettingsData();
+                        setRequestState(null);
+                      }, 1000);
+                    })
+                    .catch(() => {
+                      setRequestState("failed");
+                    });
+                }}
+              >
+                Delete
+              </Button>
+            )}
+            {requestState === "loading" && <span>Loading...</span>}
+            {requestState === "failed" && (
+              <span className="text-red-600">Error.</span>
+            )}
+            {requestState === "succeeded" && <span>Success.</span>}
+          </div>
         ) : (
-          <ValidatePhoneNumber />
+          <ValidatePhoneNumber
+            invalidateSettingsData={invalidateSettingsData}
+          />
         )}
       </div>
     </div>
   );
 };
 
-const CreateEmailIngestAddress = () => {
-  const [loading, updateLoading] = useState(false);
-  const [success, updateSuccess] = useState(false);
-  const [error, updateError] = useState(false);
+const emailIngestAddressDomain = "save.backyard.wtf";
 
-  const doCreate = useAuthedCallback(
-    "/api/email/create",
-    {
-      method: "POST",
+const CreateEmailIngestAddress = ({
+  invalidateSettingsData,
+}: {
+  invalidateSettingsData: () => void;
+}) => {
+  const [requestState, setRequestState] = useState<
+    "loading" | "succeeded" | "failed"
+  >(null);
+  const [emailIngestAddress, updateEmailIngestAddress] = useState<string>("");
+
+  const doCreate = useGraphqlMutation({
+    query: gql`
+      mutation($userId: String!, $emailIngestAddress: String!) {
+        createEmailIngestAddress(
+          userId: $userId
+          emailIngestAddress: $emailIngestAddress
+        ) {
+          userId
+          emailIngestAddress
+        }
+      }
+    `,
+    variables: {
+      emailIngestAddress: `${emailIngestAddress}@${emailIngestAddressDomain}`,
     },
-    jsonFetcherFactory
-  );
+  });
 
   return (
     <div>
-      <Button
-        onClick={() => {
-          updateLoading(true);
-          doCreate()
-            .then((res) => {
-              updateLoading(false);
+      {requestState === null && (
+        <div>
+          <TextInput
+            value={emailIngestAddress}
+            onChange={(e) => updateEmailIngestAddress(e.target.value)}
+            className="mr-2 text-right"
+          />
+          <span className="mr-2">{"@"}</span>
+          <TextInput
+            value={emailIngestAddressDomain}
+            readOnly
+            disabled
+            className="mr-2"
+          />
+          <Button
+            onClick={() => {
+              setRequestState("loading");
+              doCreate()
+                .then(() => {
+                  setRequestState("succeeded");
 
-              updateSuccess(true);
-
-              setTimeout(() => mutate(userMetadataQuery), 1000);
-            })
-            .catch((err) => {
-              void err;
-
-              updateLoading(false);
-
-              updateError(true);
-            });
-        }}
-      >
-        Create
-      </Button>
-      {loading && <span>Loading...</span>}
-      {success && <span>Sucess ✅</span>}
-      {error && <span className="color-red">Error ❌</span>}
+                  invalidateSettingsData();
+                })
+                .catch(() => {
+                  setRequestState("failed");
+                });
+            }}
+          >
+            Create
+          </Button>
+        </div>
+      )}
+      {requestState === "loading" && <div>Loading...</div>}
+      {requestState === "failed" && (
+        <div>
+          <div className="text-red-600">Something went wrong.</div>
+          <Button
+            onClick={() => {
+              setRequestState(null);
+              invalidateSettingsData();
+            }}
+          >
+            Try again
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
 
 type EmailIngestProps = {
   emailIngestAddress: string | null;
+  invalidateSettingsData: () => void;
 };
 
-const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
+const EmailIngestSetting = ({
+  emailIngestAddress,
+  invalidateSettingsData,
+}: EmailIngestProps) => {
   const ref = useRef<HTMLTextAreaElement>();
   const [copied, updateCopied] = useState(false);
+
+  const [deleteStatus, setDeleteState] = useState<
+    "loading" | "succeeded" | "failed"
+  >(null);
+
+  const doDelete = useGraphqlMutation({
+    query: gql`
+      mutation($userId: String!) {
+        deleteEmailIngestAddress(userId: $userId) {
+          userId
+        }
+      }
+    `,
+    variables: {},
+  });
 
   return (
     <div>
@@ -252,54 +350,83 @@ const EmailIngestSetting = ({ emailIngestAddress }: EmailIngestProps) => {
       </div>
       <div className="pt-4">
         {emailIngestAddress ? (
-          <div className="relative">
-            <textarea
-              ref={(current) => (ref.current = current)}
-              className="form-input bg-gray-100 dark:bg-gray-900 dark:border-gray-900 full-width"
-              id="email"
-              style={{ marginTop: 8, marginRight: 8, width: "100%" }}
-              readOnly
-              value={emailIngestAddress}
-              onFocus={() => {
-                try {
-                  navigator.clipboard.writeText(emailIngestAddress).then(() => {
-                    updateCopied(true);
-                    ref.current.blur();
-                  });
-                } catch (error) {
-                  void error;
-                }
-              }}
-            />
-            {copied && (
-              <CopiedAlert
-                className="absolute inset-0 flex items-center justify-center"
-                onTimeout={() => updateCopied(false)}
+          <div>
+            <div className="relative">
+              <textarea
+                ref={(current) => (ref.current = current)}
+                className="form-input bg-gray-100 dark:bg-gray-900 dark:border-gray-900 full-width"
+                id="email"
+                style={{ marginTop: 8, marginRight: 8, width: "100%" }}
+                readOnly
+                value={emailIngestAddress}
+                onFocus={() => {
+                  try {
+                    navigator.clipboard
+                      .writeText(emailIngestAddress)
+                      .then(() => {
+                        updateCopied(true);
+                        ref.current.blur();
+                      });
+                  } catch (error) {
+                    void error;
+                  }
+                }}
               />
+              {copied && (
+                <CopiedAlert
+                  className="absolute inset-0 flex items-center justify-center"
+                  onTimeout={() => updateCopied(false)}
+                />
+              )}
+            </div>
+            <Button
+              onClick={() =>
+                doDelete()
+                  .then(() => invalidateSettingsData())
+                  .catch(() => {
+                    setDeleteState("failed");
+                  })
+              }
+            >
+              Delete
+            </Button>
+            {deleteStatus === "failed" && (
+              <div className="text-red-600">Something went wrong.</div>
             )}
           </div>
         ) : (
-          <CreateEmailIngestAddress />
+          <CreateEmailIngestAddress
+            invalidateSettingsData={invalidateSettingsData}
+          />
         )}
       </div>
     </div>
   );
 };
 
-const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
+const RssFeed = ({
+  feedUrl,
+  id,
+  invalidateSettingsData,
+}: {
+  feedUrl: string;
+  id: string;
+  invalidateSettingsData: () => void;
+}) => {
   const [deleteState, update] = useState<"loading" | "error">(null);
 
-  const doDelete = useAuthedCallback(
-    gql`
-      mutation {  
-        deleteRssSubscription(id: ${id}) {
-          _id
+  const doDelete = useGraphqlMutation({
+    query: gql`
+      mutation($userId: String!, $feedId: String!) {
+        deleteRssSubscription(userId: $userId, feedId: $feedId) {
+          id
         }
       }
     `,
-    {},
-    gqlFetcherFactory
-  );
+    variables: {
+      feedId: id,
+    },
+  });
 
   return (
     <tr className="">
@@ -317,7 +444,7 @@ const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
             update("loading");
             doDelete()
               .catch(() => update("error"))
-              .finally(() => mutate(userMetadataQuery));
+              .finally(() => invalidateSettingsData());
           }}
         >
           <Icon name="trash" size="md" />
@@ -335,20 +462,27 @@ const RssFeed = ({ feedUrl, id }: { feedUrl: string; id: string }) => {
 
 const RssSubscriptions = ({
   rssFeeds,
+  invalidateSettingsData,
 }: {
-  rssFeeds: { feedUrl: string; _id: string }[];
+  rssFeeds: { feedUrl: string; id: string }[];
+  invalidateSettingsData: () => void;
 }) => {
   const [feedUrl, updateUrl] = useState<string>("");
   const [subscribeState, update] = useState<"loading" | "error">(null);
 
-  const doSubscribe = useAuthedCallback(
-    "/api/rss/subscribe",
-    {
-      method: "POST",
-      body: JSON.stringify({ feedUrl }),
+  const doSubscribe = useGraphqlMutation({
+    query: gql`
+      mutation($userId: String!, $feedUrl: String!) {
+        createRssSubscription(userId: $userId, feedUrl: $feedUrl) {
+          id
+          feedUrl
+        }
+      }
+    `,
+    variables: {
+      feedUrl,
     },
-    jsonFetcherFactory
-  );
+  });
 
   return (
     <div>
@@ -368,8 +502,13 @@ const RssSubscriptions = ({
                 </tr>
               </thead>
               <tbody>
-                {rssFeeds.map(({ feedUrl, _id }) => (
-                  <RssFeed key={_id} feedUrl={feedUrl} id={_id} />
+                {rssFeeds.map(({ feedUrl, id }) => (
+                  <RssFeed
+                    key={id}
+                    feedUrl={feedUrl}
+                    id={id}
+                    invalidateSettingsData={invalidateSettingsData}
+                  />
                 ))}
               </tbody>
             </table>
@@ -391,7 +530,7 @@ const RssSubscriptions = ({
               doSubscribe()
                 .then(() => update(null))
                 .catch(() => update("error"))
-                .finally(() => mutate(userMetadataQuery));
+                .finally(() => invalidateSettingsData());
             }}
             disabled={subscribeState === "loading" || !validURL(feedUrl)}
           >
@@ -407,11 +546,16 @@ const RssSubscriptions = ({
   );
 };
 
-const SettingsForm = ({ data }) => {
+const SettingsForm = ({
+  settingsData,
+  invalidateSettingsData,
+}: {
+  settingsData: { userMetadata?: UserMetadata };
+  invalidateSettingsData: () => void;
+}) => {
   const {
-    userMetadataForUser: { phoneNumber, emailIngestAddress },
-    rssSubscriptionsForUser: { data: rssFeeds },
-  } = data.data;
+    userMetadata: { phoneNumber, emailIngestAddress, rssSubscriptions },
+  } = settingsData;
 
   const {
     query: { tab },
@@ -421,7 +565,12 @@ const SettingsForm = ({ data }) => {
     <div>
       <div>
         <Link href="?tab=sms">
-          <Button variant="selectable" current={tab === "sms"} grouped first>
+          <Button
+            variant="selectable"
+            current={tab === "sms" || !tab}
+            grouped
+            first
+          >
             SMS
           </Button>
         </Link>
@@ -443,11 +592,20 @@ const SettingsForm = ({ data }) => {
       </div>
       <div className="my-10">
         {tab === "sms" ? (
-          <PhoneNumberSetting phoneNumber={phoneNumber} />
+          <PhoneNumberSetting
+            phoneNumber={phoneNumber}
+            invalidateSettingsData={invalidateSettingsData}
+          />
         ) : tab === "email" ? (
-          <EmailIngestSetting emailIngestAddress={emailIngestAddress} />
+          <EmailIngestSetting
+            emailIngestAddress={emailIngestAddress}
+            invalidateSettingsData={invalidateSettingsData}
+          />
         ) : tab === "rss" ? (
-          <RssSubscriptions rssFeeds={rssFeeds} />
+          <RssSubscriptions
+            rssFeeds={rssSubscriptions}
+            invalidateSettingsData={invalidateSettingsData}
+          />
         ) : tab === "more" ? (
           <Guide />
         ) : (
@@ -486,15 +644,46 @@ const Guide = () => (
   </div>
 );
 
+interface UserMetadata {
+  emailIngestAddress?: string;
+  phoneNumber?: string;
+  rssSubscriptions: { id: string; feedUrl: string }[];
+}
+
 const Settings = () => {
-  const { data } = useAuthedSWR(userMetadataQuery, gqlFetcherFactory);
+  const { data, mutate } = useGraphql<{
+    data: { userMetadata?: UserMetadata };
+  }>({
+    query: gql`
+      query($userId: String!) {
+        userMetadata(userId: $userId) {
+          emailIngestAddress
+          phoneNumber
+          rssSubscriptions {
+            id
+            feedUrl
+          }
+        }
+      }
+    `,
+    variables: {
+      // userId will be provided in the serverless function
+    },
+  });
 
   return (
     <div>
       <Header />
       <Wrapper>
         <h1>Settings</h1>
-        {data ? <SettingsForm data={data} /> : <div>Loading...</div>}
+        {data ? (
+          <SettingsForm
+            settingsData={data.data}
+            invalidateSettingsData={mutate}
+          />
+        ) : (
+          <div>Loading...</div>
+        )}
       </Wrapper>
     </div>
   );

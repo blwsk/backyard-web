@@ -6,7 +6,7 @@ import SearchResults from "../components/content-list/searchResults";
 import ContentList from "../components/content-list/contentList";
 import ListControls from "../components/content-list/listControls";
 import requireAuth from "../lib/requireAuth";
-import { sortOrderEnum } from "../lib/usePaginatedContentList";
+import { SortOrder } from "../lib/usePaginatedContentList";
 
 const WrappedMyContent = ({ router }) => {
   const [isSearching, updateIsSearching] = useState(false);
@@ -16,7 +16,7 @@ const WrappedMyContent = ({ router }) => {
     query: { sort, search },
   } = router;
 
-  const sortOrder = sort || sortOrderEnum.descending;
+  const sortOrder: SortOrder = sort || "DESC";
 
   const searchQuery = search || "";
 

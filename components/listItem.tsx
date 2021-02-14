@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React from "react";
 import { stripParams, getHostname } from "../lib/urls";
 import Link from "next/link";
 import { isTwitter } from "../lib/contentTypes";
@@ -6,23 +6,31 @@ import { TweetPreview } from "./tweetEmbed";
 import { ItemSource, MANUAL } from "../types/ItemTypes";
 
 export interface ListItemProps {
-  _id: string;
-  _ts: number;
+  // id: number;
+  legacyId: string;
+  createdAt: number;
   url: string;
   content?: {
     title?: string;
-    json?: string;
+    json?: object;
   };
   source?: ItemSource;
 }
 
-const getTweetJson = ({ json }: { json?: string }) => {
-  try {
-    return JSON.parse(json);
-  } catch (error) {
-    void error;
-    return null;
+const getTweetJson = ({ json }: { json?: unknown }) => {
+  if (typeof json === "object") {
+    return json;
   }
+  if (typeof json === "string") {
+    try {
+      return JSON.parse(json);
+    } catch (error) {
+      void error;
+      return null;
+    }
+  }
+
+  return null;
 };
 
 const PreviewLink = ({
@@ -34,7 +42,7 @@ const PreviewLink = ({
   url: string;
   content?: {
     title?: string;
-    json?: string;
+    json?: object;
   };
 }) => {
   const tweetJson = content && getTweetJson(content);
@@ -77,7 +85,7 @@ const ListItemPreview = ({
   url: string;
   content?: {
     title?: string;
-    json?: string;
+    json?: object;
   };
 }) => {
   return (
@@ -99,9 +107,9 @@ const ListItem = ({
   item: ListItemProps;
   light?: boolean;
 }) => {
-  const { _id, _ts, url, content, source } = item;
+  const { legacyId, createdAt, url, content, source } = item;
 
-  const date = new Date(_ts / 1000);
+  const date = new Date(createdAt);
   const dateString = date.toDateString();
   const timeString = date.toLocaleTimeString();
   const hostname = url && getHostname(url).hostname.replace("www.", "");
@@ -110,7 +118,7 @@ const ListItem = ({
     <div className={`list-item ${light ? "light" : ""} py-3`}>
       <div>
         <b>
-          <ListItemPreview id={_id} url={url} content={content} />
+          <ListItemPreview id={legacyId} url={url} content={content} />
         </b>
         <div className="mt-3">
           <small className="flex flex-col md:flex-row">

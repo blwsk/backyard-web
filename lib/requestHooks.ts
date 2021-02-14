@@ -1,6 +1,6 @@
-import useSWR from "swr";
+import useSWR, { responseInterface } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import {
   JsonFetcherFactoryOptions,
   jsonParser,
@@ -67,13 +67,13 @@ const createGraphqlKey = ({
   });
 };
 
-export const useGraphql = ({
+export const useGraphql = <Data extends unknown>({
   query,
   variables,
 }: {
   query: string;
   variables: object;
-}): any => {
+}): responseInterface<Data, Error> => {
   const { getAccessTokenSilently: _getAccessTokenSilently, user } = useAuth0();
 
   const getAccessTokenSilently = () =>
@@ -121,4 +121,63 @@ export const useGraphql = ({
   );
 
   return result;
+};
+
+export const useGraphqlMutation = ({
+  query,
+  variables,
+}: {
+  query: string;
+  variables: object;
+}): (() => Promise<unknown>) => {
+  const { getAccessTokenSilently: _getAccessTokenSilently, user } = useAuth0();
+
+  const getAccessTokenSilently = () =>
+    _getAccessTokenSilently({
+      audience: `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/api/v2/`,
+      scope: "openid profile offline_access",
+    });
+
+  const key = useMemo(
+    () =>
+      createGraphqlKey({
+        query,
+        variables: { ...variables, userId: user.sub },
+      }),
+    [query, variables, user]
+  );
+
+  const callback = useCallback(
+    withTelemetry(() => {
+      return getAccessTokenSilently()
+        .then(
+          (token: string): Promise<Response> => {
+            return unfetch(`${getBaseUrl()}/api/graphql?v=2`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: key,
+            });
+          }
+        )
+        .then(jsonParser)
+        .then(
+          (gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
+            if (
+              gqlResponse &&
+              gqlResponse.errors &&
+              gqlResponse.errors.length > 0
+            ) {
+              return Promise.reject(gqlResponse);
+            }
+            return Promise.resolve(gqlResponse);
+          }
+        );
+    }),
+    [key]
+  );
+
+  return callback;
 };

@@ -18,7 +18,7 @@ const MOST_RECENT_ITEM_LIMIT = 10;
 const PreviewContentList = ({ data }) => {
   const resultObject = getResultObject(data.data);
 
-  const mostRecentContentItems = resultObject.data.slice(
+  const mostRecentContentItems = resultObject.results.slice(
     0,
     MOST_RECENT_ITEM_LIMIT
   );
@@ -27,7 +27,7 @@ const PreviewContentList = ({ data }) => {
     <div>
       {mostRecentContentItems.length > 0 ? (
         mostRecentContentItems.map((item) => {
-          return <ContentPageItem key={item._id} item={item} />;
+          return <ContentPageItem key={item.id} item={item} />;
         })
       ) : (
         <div className="px-4">None! Save some content.</div>
@@ -37,7 +37,7 @@ const PreviewContentList = ({ data }) => {
 };
 
 const IndexPreviewContent = () => {
-  const { data } = usePaginatedContentList({ cursor: null });
+  const { data } = usePaginatedContentList({ sortOrder: "DESC" });
 
   return (
     <>

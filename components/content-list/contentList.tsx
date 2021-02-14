@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import {
   getResultObject,
+  SortOrder,
   usePaginatedContentList,
 } from "../../lib/usePaginatedContentList";
 import LoadingItem from "../loading/LoadingItem";
 import ContentListPages from "./contentListPages";
 
-const useContentPages = ({ sortOrder }) => {
-  const [cursor, updateCursor] = useState(null);
+const useContentPages = ({ sortOrder }: { sortOrder: SortOrder }) => {
+  const [cursor, updateCursor] = useState<string>(null);
 
   const [pages, updatesPages] = useState([]);
 
@@ -17,7 +18,7 @@ const useContentPages = ({ sortOrder }) => {
   });
 
   useEffect(() => {
-    if (data && getResultObject(data.data).before === null) {
+    if (data && pages.length === 0) {
       /**
        * First page
        */
@@ -35,10 +36,10 @@ const useContentPages = ({ sortOrder }) => {
   }, [data, cursor]);
 
   const onLoadMore = () => {
-    updateCursor(getResultObject(data.data).after);
+    updateCursor(getResultObject(data.data).next);
   };
 
-  const hasMore = data && typeof getResultObject(data.data).after === "string";
+  const hasMore = data && typeof getResultObject(data.data).next === "string";
 
   return {
     pages: (data || pages.length > 0) && pages,
@@ -49,7 +50,7 @@ const useContentPages = ({ sortOrder }) => {
   };
 };
 
-const ContentList = ({ sortOrder }) => {
+const ContentList = ({ sortOrder }: { sortOrder: SortOrder }) => {
   const { pages, hasMore, onLoadMore, isValidating, error } = useContentPages({
     sortOrder,
   });

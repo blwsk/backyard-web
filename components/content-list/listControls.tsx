@@ -1,5 +1,5 @@
 import { capitalize } from "../../lib/capitalize";
-import { sortOrderEnum } from "../../lib/usePaginatedContentList";
+import { SortOrder, sortOrderEnum } from "../../lib/usePaginatedContentList";
 import SearchInput from "../searchInput";
 import { ITEMS } from "../../types/SearchIndexTypes";
 import { classNames } from "../../lib/classNames";
@@ -12,6 +12,14 @@ const ListControls = ({
   onClear,
   isSearchMode,
   searchQuery,
+}: {
+  sortOrder: SortOrder;
+  onChangeSortOrder: (sortOrder: SortOrder) => void;
+  onSearch: (results: any[]) => void;
+  onSearchToggle: (search: boolean) => void;
+  onClear: () => void;
+  isSearchMode: boolean;
+  searchQuery: string;
 }) => {
   return (
     <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
@@ -23,7 +31,9 @@ const ListControls = ({
           }
         )}
         id="sort"
-        onChange={onChangeSortOrder}
+        onChange={(nextSortOrder: unknown) =>
+          onChangeSortOrder(nextSortOrder as SortOrder)
+        }
         value={isSearchMode ? "relevancy" : sortOrder}
         disabled={isSearchMode}
         title={
@@ -36,7 +46,7 @@ const ListControls = ({
           </option>
         ) : (
           Object.keys(sortOrderEnum).map((key) => (
-            <option key={key} value={key}>
+            <option key={key} value={sortOrderEnum[key]}>
               {capitalize(key)}
             </option>
           ))
