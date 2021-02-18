@@ -244,6 +244,7 @@ const CreateEmailIngestAddress = ({
     "loading" | "succeeded" | "failed"
   >(null);
   const [emailIngestAddress, updateEmailIngestAddress] = useState<string>("");
+  const [error, setError] = useState(null);
 
   const doCreate = useGraphqlMutation({
     query: gql`
@@ -270,6 +271,7 @@ const CreateEmailIngestAddress = ({
             value={emailIngestAddress}
             onChange={(e) => updateEmailIngestAddress(e.target.value)}
             className="mr-2 text-right"
+            autoFocus
           />
           <span className="mr-2">{"@"}</span>
           <TextInput
@@ -287,8 +289,9 @@ const CreateEmailIngestAddress = ({
 
                   invalidateSettingsData();
                 })
-                .catch(() => {
+                .catch((err) => {
                   setRequestState("failed");
+                  setError(err);
                 });
             }}
           >
@@ -299,10 +302,18 @@ const CreateEmailIngestAddress = ({
       {requestState === "loading" && <div>Loading...</div>}
       {requestState === "failed" && (
         <div>
-          <div className="text-red-600">Something went wrong.</div>
+          <div className="text-red-600 mb-3">
+            {error ? (
+              <span>{error.errors[0].message}</span>
+            ) : (
+              <span>Something went wrong.</span>
+            )}
+          </div>
           <Button
             onClick={() => {
               setRequestState(null);
+              updateEmailIngestAddress("");
+              setError(null);
               invalidateSettingsData();
             }}
           >
@@ -557,20 +568,15 @@ const SettingsForm = ({
     userMetadata: { phoneNumber, emailIngestAddress, rssSubscriptions },
   } = settingsData;
 
-  const {
-    query: { tab },
-  } = useRouter();
+  const { query } = useRouter();
+
+  const tab = query.tab || "sms";
 
   return (
     <div>
       <div>
         <Link href="?tab=sms">
-          <Button
-            variant="selectable"
-            current={tab === "sms" || !tab}
-            grouped
-            first
-          >
+          <Button variant="selectable" current={tab === "sms"} grouped first>
             SMS
           </Button>
         </Link>

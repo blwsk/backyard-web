@@ -8,7 +8,7 @@ const SettingsPopover = () => {
 
   return (
     <>
-      <span className="popover-body absolute p-4">
+      <span className="popover-body absolute p-4 shadow">
         <div className="mb-4">
           <small>
             <i>Welcome, {user.email}</i>
@@ -34,8 +34,6 @@ const SettingsPopover = () => {
           flex-direction: column;
           align-items: flex-start;
           background: var(--c3);
-          box-shadow: var(--ghost) 0px 16px 16px 8px;
-          border-radius: var(--rc);
           opacity: 0.99;
           z-index: 100;
         }
@@ -46,7 +44,6 @@ const SettingsPopover = () => {
             left: 0;
             right: 0;
             align-items: flex-end;
-            border-top: 1px solid var(--c4);
             width: 100%;
             border-radius: 0;
           }

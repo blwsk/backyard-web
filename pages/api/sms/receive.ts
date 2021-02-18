@@ -1,7 +1,6 @@
 import { twiml } from "twilio";
 import faunadb, { query as q } from "faunadb";
 import { doAsyncThing } from "../../../api-utils/doAsyncThing";
-import { getUserByMetadata } from "../../../api-utils/getUserByMetadata";
 import { validURL } from "../../../lib/urls";
 import {
   saveContentItem,
@@ -102,10 +101,6 @@ const receiveSms = async (req, res) => {
     res.end(twiml.toString());
     return;
   }
-
-  /**
-   * Save item here!
-   */
 
   const twiml = new MessagingResponse();
 

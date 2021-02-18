@@ -115,8 +115,8 @@ const ListItem = ({
   const hostname = url && getHostname(url).hostname.replace("www.", "");
 
   return (
-    <div className={`list-item ${light ? "light" : ""} py-3`}>
-      <div>
+    <div className={`list-item ${light ? "light" : ""} py-3 w-full`}>
+      <div className="w-full">
         <b>
           <ListItemPreview id={legacyId} url={url} content={content} />
         </b>
