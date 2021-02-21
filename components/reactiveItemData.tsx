@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getHostname } from "../lib/urls";
 import Selection from "./selection";
 import ItemContent from "./itemContent";
@@ -7,13 +7,12 @@ import { ItemContent as ItemContentType } from "../types/ItemTypes";
 import { Clip } from "../types/ClipTypes";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
-import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
-import RenderedContent from "./renderedContent";
-import Button from "./ui/Button";
+
 import Icon from "./ui/Icon";
 import ErrorBoundary from "./errorBoundary";
 import { useCopy } from "../lib/useCopy";
 import { classNames } from "../lib/classNames";
+import EmailSandbox from "./emailSandbox";
 
 type CurentType = "content" | "clips" | "email";
 
@@ -41,93 +40,6 @@ const ClipsList = ({ clips }: { clips: Clip[] }) => {
         }
       `}</style>
     </>
-  );
-};
-
-const OriginalEmail = ({ originEmailBody }) => {
-  const [mounted, updateMounted] = useState(true);
-  const [iframe, updateIframe] = useState<HTMLIFrameElement>();
-
-  useEffect(() => {
-    if (iframe) {
-      iframe.contentDocument.querySelectorAll("a").forEach((a) => {
-        a.target = "_blank";
-      });
-    }
-    return () => updateMounted(false);
-  }, [iframe]);
-
-  return (
-    <>
-      <div className="iframe-wrapper w-full rounded border border-solid border-black">
-        <iframe
-          ref={(el) => {
-            setTimeout(() => mounted && updateIframe(el));
-          }}
-          srcDoc={originEmailBody}
-          width="100%"
-          height="100%"
-        />
-      </div>
-      <style jsx>{`
-        .iframe-wrapper {
-          background: white;
-          height: 50vh;
-        }
-      `}</style>
-    </>
-  );
-};
-
-const EmailSandbox = ({
-  originEmailBody,
-  itemId,
-  modernItemId,
-  invalidateQuery,
-}) => {
-  const html = getParsedOriginEmail(originEmailBody);
-
-  const [showParsed, updateShowParsed] = useState(!!html);
-
-  return (
-    <div>
-      {!!html && (
-        <div className="flex mb-4">
-          <Button
-            current={showParsed}
-            onClick={() => updateShowParsed(true)}
-            variant="selectable"
-            size="small"
-            grouped
-            first
-          >
-            Parsed
-          </Button>
-          <Button
-            current={!showParsed}
-            onClick={() => updateShowParsed(false)}
-            variant="selectable"
-            size="small"
-            grouped
-            last
-          >
-            Original
-          </Button>
-        </div>
-      )}
-      {showParsed ? (
-        <>
-          <RenderedContent body={html} />
-          <Selection
-            itemId={itemId}
-            modernItemId={modernItemId}
-            invalidateQuery={invalidateQuery}
-          />
-        </>
-      ) : (
-        <OriginalEmail originEmailBody={originEmailBody} />
-      )}
-    </div>
   );
 };
 
@@ -253,7 +165,15 @@ const ReactiveItemData = ({
           )}
           {current === "content" && (
             <>
-              <ItemContent data={data} content={content} url={url} />
+              <ItemContent
+                data={data}
+                content={content}
+                url={url}
+                originEmailBody={originEmailBody}
+                itemId={itemId}
+                modernItemId={modernItemId}
+                invalidateQuery={invalidateQuery}
+              />
               <Selection
                 itemId={itemId}
                 modernItemId={modernItemId}

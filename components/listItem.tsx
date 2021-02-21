@@ -17,7 +17,7 @@ export interface ListItemProps {
   source?: ItemSource;
 }
 
-const getTweetJson = ({ json }: { json?: unknown }) => {
+const getJson = ({ json }: { json?: unknown }) => {
   if (typeof json === "object") {
     return json;
   }
@@ -45,7 +45,7 @@ const PreviewLink = ({
     json?: object;
   };
 }) => {
-  const tweetJson = content && getTweetJson(content);
+  const tweetJson = content && getJson(content);
 
   const tester = isTwitter;
   if (tester(url) && tweetJson) {
