@@ -182,23 +182,26 @@ export const Tweet = ({
   );
 };
 
+const getJson = ({ json }: { json?: unknown }) => {
+  if (typeof json === "object") {
+    return json;
+  }
+  if (typeof json === "string") {
+    try {
+      return JSON.parse(json);
+    } catch (error) {
+      void error;
+      return null;
+    }
+  }
+
+  return null;
+};
+
 const TweetEmbed = ({ url, content: persistedTweetData }) => {
   const id = getTweetIdFromUrl(url);
 
-  let tweetJson;
-
-  if (
-    typeof persistedTweetData.json === "object" &&
-    persistedTweetData.json.data
-  ) {
-    tweetJson = persistedTweetData.json;
-  } else {
-    try {
-      tweetJson = JSON.parse(persistedTweetData.json);
-    } catch (error) {
-      void error;
-    }
-  }
+  let tweetJson = getJson({ json: persistedTweetData });
 
   const { data } = useAuthedSWR(() => {
     if (tweetJson || !id) {
