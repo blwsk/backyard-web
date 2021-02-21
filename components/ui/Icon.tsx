@@ -1,4 +1,4 @@
-type IconName = "copy" | "trash" | "external-link" | "loader";
+type IconName = "copy" | "trash" | "external-link" | "loader" | "mail";
 
 type IconSize = "sm" | "md" | "lg" | "xl";
 

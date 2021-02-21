@@ -1,16 +1,13 @@
 import { isTwitter, isYouTube } from "../lib/contentTypes";
 import TweetEmbed from "./tweetEmbed";
 import YouTubeEmbed from "./youTubeEmbed";
-import { ItemContent as ItemContentType } from "../types/ItemTypes";
+import {
+  EmailJson,
+  isEmailJson,
+  ItemContent as ItemContentType,
+} from "../types/ItemTypes";
 import RenderedContent from "./renderedContent";
-import OriginalEmail from "./originEmailBody";
 import EmailSandbox from "./emailSandbox";
-
-const EmailBody = ({ json }: { json: { html: string } }) => {
-  const html = json.html;
-
-  return <OriginalEmail originEmailBody={html} />;
-};
 
 const ItemContent = ({
   data,
@@ -40,8 +37,8 @@ const ItemContent = ({
     }
   }
 
-  if (content.json && typeof content.json === "object") {
-    const originEmailBody: string = (content.json as { html: string }).html;
+  if (content && content.json && isEmailJson(content.json)) {
+    const originEmailBody: string = (content.json as EmailJson).html;
 
     return (
       <EmailSandbox

@@ -3,7 +3,8 @@ import { stripParams, getHostname } from "../lib/urls";
 import Link from "next/link";
 import { isTwitter } from "../lib/contentTypes";
 import { TweetPreview } from "./tweetEmbed";
-import { ItemSource, MANUAL } from "../types/ItemTypes";
+import { EmailJson, isEmailJson, ItemSource, MANUAL } from "../types/ItemTypes";
+import Icon from "./ui/Icon";
 
 export interface ListItemProps {
   // id: number;
@@ -33,6 +34,24 @@ const getJson = ({ json }: { json?: unknown }) => {
   return null;
 };
 
+const EmailJsonPreview = ({ emailJson }: { emailJson: EmailJson }) => {
+  const { from, subject } = emailJson;
+
+  return (
+    <div>
+      <div>
+        <b>{subject || <i className="font-light">No subject</i>}</b>
+      </div>
+      <div className="flex items-center">
+        <span className="mr-2 opacity-50">
+          <Icon name="mail" size="md" />
+        </span>
+        <span className="">{from}</span>
+      </div>
+    </div>
+  );
+};
+
 const PreviewLink = ({
   id,
   content,
@@ -47,8 +66,7 @@ const PreviewLink = ({
 }) => {
   const tweetJson = content && getJson(content);
 
-  const tester = isTwitter;
-  if (tester(url) && tweetJson) {
+  if (isTwitter(url) && tweetJson) {
     return (
       <Link href={{ pathname: "/viewer", query: { id } }}>
         <a>
@@ -60,10 +78,22 @@ const PreviewLink = ({
     );
   }
 
+  if (content && content.json && isEmailJson(content.json)) {
+    return (
+      <Link href={{ pathname: "/viewer", query: { id } }}>
+        <a>
+          <div className="p-4 -ml-4 rounded-r-md md:rounded-l-md">
+            <EmailJsonPreview emailJson={content.json as EmailJson} />
+          </div>
+        </a>
+      </Link>
+    );
+  }
+
   if (content && content.title) {
     return (
       <Link href={{ pathname: "/viewer", query: { id } }}>
-        <a className="break-words">{content.title}</a>
+        <a className="font-semibold break-words">{content.title}</a>
       </Link>
     );
   }
@@ -71,14 +101,14 @@ const PreviewLink = ({
   if (url) {
     return (
       <Link href={{ pathname: "/viewer", query: { id } }}>
-        <a className="break-all">{stripParams(url)}</a>
+        <a className="font-semibold break-all">{stripParams(url)}</a>
       </Link>
     );
   }
 
   return (
     <Link href={{ pathname: "/viewer", query: { id } }}>
-      <a className="break-all">Unnamed content</a>
+      <a className="font-semibold break-all">Unnamed content</a>
     </Link>
   );
 };
@@ -124,9 +154,7 @@ const ListItem = ({
   return (
     <div className={`list-item ${light ? "light" : ""} py-3 w-full`}>
       <div className="w-full">
-        <b>
-          <ListItemPreview id={legacyId} url={url} content={content} />
-        </b>
+        <ListItemPreview id={legacyId} url={url} content={content} />
         <div className="mt-3">
           <small className="flex flex-col md:flex-row">
             <span>

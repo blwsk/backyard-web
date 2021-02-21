@@ -125,10 +125,12 @@ export const Tweet = ({
   };
   tweetJson?: TweetData;
 }) => {
+  const tweetData = getTweetData({ data, tweetJson });
+  debugger;
   const {
     data: tweets,
     includes: { media, users },
-  } = getTweetData({ data, tweetJson });
+  } = tweetData;
 
   return (
     <div>
@@ -201,7 +203,7 @@ const getJson = ({ json }: { json?: unknown }) => {
 const TweetEmbed = ({ url, content: persistedTweetData }) => {
   const id = getTweetIdFromUrl(url);
 
-  let tweetJson = getJson({ json: persistedTweetData });
+  let tweetJson = persistedTweetData ? getJson(persistedTweetData) : null;
 
   const { data } = useAuthedSWR(() => {
     if (tweetJson || !id) {
@@ -209,6 +211,8 @@ const TweetEmbed = ({ url, content: persistedTweetData }) => {
     }
     return `/api/tweet?ids=${id.id}`;
   }, jsonFetcherFactory);
+
+  tweetJson = tweetJson || (data && data.tweets);
 
   return (
     <div>

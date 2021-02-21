@@ -3,7 +3,11 @@ import { getHostname } from "../lib/urls";
 import Selection from "./selection";
 import ItemContent from "./itemContent";
 import ItemControls from "./itemControls";
-import { ItemContent as ItemContentType } from "../types/ItemTypes";
+import {
+  EmailJson,
+  isEmailJson,
+  ItemContent as ItemContentType,
+} from "../types/ItemTypes";
 import { Clip } from "../types/ClipTypes";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
@@ -13,6 +17,7 @@ import ErrorBoundary from "./errorBoundary";
 import { useCopy } from "../lib/useCopy";
 import { classNames } from "../lib/classNames";
 import EmailSandbox from "./emailSandbox";
+import EmailHeader from "./emailHeader";
 
 type CurentType = "content" | "clips" | "email";
 
@@ -93,6 +98,51 @@ const Metadata = ({ hostname, url }: { hostname: string; url: string }) => {
   );
 };
 
+const ItemDataHeader = ({
+  hostname,
+  url,
+  data,
+  content,
+  current,
+  updateCurrent,
+  originEmailBody,
+}: {
+  hostname?: string;
+  url?: string;
+  data?: any;
+  content: ItemContentType;
+  originEmailBody?: string;
+  current: CurentType;
+  updateCurrent: (next: CurentType) => void;
+}) => {
+  let metadataElements = (
+    <>
+      {hostname && <Metadata hostname={hostname} url={url} />}
+      <div className="my-4">
+        <H2 data={data} content={content} />
+        <H3 data={data} content={content} />
+      </div>
+    </>
+  );
+
+  if (content && content.json && isEmailJson(content.json)) {
+    metadataElements = <EmailHeader emailJson={content.json as EmailJson} />;
+  }
+
+  return (
+    <>
+      {metadataElements}
+      <div className="my-4">
+        <ItemControls
+          current={current}
+          updateCurrent={updateCurrent}
+          originEmailBody={originEmailBody}
+        />
+      </div>
+    </>
+  );
+};
+
 const ReactiveItemData = ({
   url,
   itemId,
@@ -149,22 +199,17 @@ const ReactiveItemData = ({
       )}
       <div>
         <ErrorBoundary>
-          {hostname && <Metadata hostname={hostname} url={url} />}
-          <div className="my-4">
-            <H2 data={data} content={content} />
-            <H3 data={data} content={content} />
-          </div>
-          {hostname && (
-            <div className="my-4">
-              <ItemControls
-                current={current}
-                updateCurrent={updateCurrent}
-                originEmailBody={originEmailBody}
-              />
-            </div>
-          )}
+          <ItemDataHeader
+            hostname={hostname}
+            url={url}
+            data={data}
+            content={content}
+            current={current}
+            updateCurrent={updateCurrent}
+            originEmailBody={originEmailBody}
+          />
           {current === "content" && (
-            <>
+            <div className="relative">
               <ItemContent
                 data={data}
                 content={content}
@@ -179,7 +224,7 @@ const ReactiveItemData = ({
                 modernItemId={modernItemId}
                 invalidateQuery={invalidateQuery}
               />
-            </>
+            </div>
           )}
           {current === "clips" && <ClipsList clips={clips} />}
           {current === "email" && (
