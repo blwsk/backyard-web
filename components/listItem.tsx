@@ -9,7 +9,7 @@ export interface ListItemProps {
   // id: number;
   legacyId: string;
   createdAt: number;
-  url: string;
+  url?: string;
   content?: {
     title?: string;
     json?: object;

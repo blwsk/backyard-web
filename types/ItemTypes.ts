@@ -20,7 +20,7 @@ export interface ItemOrigin {
 }
 
 export interface Item {
-  url: string;
+  url?: string;
   createdBy: string;
   createdAt: number;
   content?: ItemContent;
