@@ -12,16 +12,18 @@ const ItemContent = ({
   data?: {
     content?: ItemContentType;
   };
-  url: string;
+  url?: string;
   content?: ItemContentType;
   originEmailBody?: string;
 }) => {
-  if (isTwitter(url)) {
-    return <TweetEmbed url={url} content={content} />;
-  }
+  if (url) {
+    if (isTwitter(url)) {
+      return <TweetEmbed url={url} content={content} />;
+    }
 
-  if (isYouTube(url)) {
-    return <YouTubeEmbed url={url} />;
+    if (isYouTube(url)) {
+      return <YouTubeEmbed url={url} />;
+    }
   }
 
   const body =

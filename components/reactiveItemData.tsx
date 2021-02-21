@@ -190,7 +190,7 @@ const ReactiveItemData = ({
   content,
   originEmailBody,
 }: {
-  url: string;
+  url?: string;
   itemId: string;
   modernItemId: string;
   clips: Clip[];
@@ -226,7 +226,7 @@ const ReactiveItemData = ({
 
   const [current, updateCurrent] = useState<CurentType>("content");
 
-  const { hostname } = getHostname(url);
+  const hostname = url ? getHostname(url) : undefined;
 
   return (
     <div>

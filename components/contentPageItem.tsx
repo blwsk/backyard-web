@@ -60,7 +60,9 @@ const ContentPageItem = ({
       style={{
         backgroundColor: className
           ? undefined
-          : getColorFromString(getHostname(url).hostname.replace("www.", "")),
+          : url
+          ? getColorFromString(getHostname(url).hostname.replace("www.", ""))
+          : undefined,
       }}
     >
       <ListItem item={item} light />
