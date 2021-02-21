@@ -149,7 +149,7 @@ const H3 = ({ data, content }) => {
   return <h3 className="line-clamp-3">{contentObj.metaDescription}</h3>;
 };
 
-const Metadata = ({ hostname, url }) => {
+const Metadata = ({ hostname, url }: { hostname: string; url: string }) => {
   const { copy, showCopied } = useCopy();
 
   return (
@@ -226,7 +226,7 @@ const ReactiveItemData = ({
 
   const [current, updateCurrent] = useState<CurentType>("content");
 
-  const hostname = url ? getHostname(url) : undefined;
+  const hostname = url && getHostname(url) ? getHostname(url) : undefined;
 
   return (
     <div>

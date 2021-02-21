@@ -61,7 +61,7 @@ const ContentPageItem = ({
         backgroundColor: className
           ? undefined
           : url
-          ? getColorFromString(getHostname(url).hostname.replace("www.", ""))
+          ? getColorFromString(getHostname(url).replace("www.", ""))
           : undefined,
       }}
     >

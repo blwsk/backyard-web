@@ -8,14 +8,9 @@ export function validURL(str) {
 
 const HOSTNAME_EXP = /^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i;
 
-export function getHostname(str) {
+export function getHostname(str): string {
   const matches = str.match(HOSTNAME_EXP);
-  return matches && matches[0] && matches[1]
-    ? {
-        withProtocol: matches[0],
-        hostname: matches[1],
-      }
-    : {};
+  return matches && matches[0] && matches[1] ? matches[1] : null;
 }
 
 export function stripParams(str) {

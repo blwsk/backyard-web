@@ -39,15 +39,13 @@ const PreviewLink = ({
   url,
 }: {
   id: string;
-  url: string;
+  url?: string;
   content?: {
     title?: string;
     json?: object;
   };
 }) => {
   const tweetJson = content && getTweetJson(content);
-
-  const withParamsStripped = stripParams(url);
 
   const tester = isTwitter;
   if (tester(url) && tweetJson) {
@@ -69,9 +67,18 @@ const PreviewLink = ({
       </Link>
     );
   }
+
+  if (url) {
+    return (
+      <Link href={{ pathname: "/viewer", query: { id } }}>
+        <a className="break-all">{stripParams(url)}</a>
+      </Link>
+    );
+  }
+
   return (
     <Link href={{ pathname: "/viewer", query: { id } }}>
-      <a className="break-all">{withParamsStripped}</a>
+      <a className="break-all">Unnamed content</a>
     </Link>
   );
 };
@@ -82,7 +89,7 @@ const ListItemPreview = ({
   content,
 }: {
   id: string;
-  url: string;
+  url?: string;
   content?: {
     title?: string;
     json?: object;
@@ -112,7 +119,7 @@ const ListItem = ({
   const date = new Date(createdAt);
   const dateString = date.toDateString();
   const timeString = date.toLocaleTimeString();
-  const hostname = url && getHostname(url).hostname.replace("www.", "");
+  const hostname = url && getHostname(url).replace("www.", "");
 
   return (
     <div className={`list-item ${light ? "light" : ""} py-3 w-full`}>

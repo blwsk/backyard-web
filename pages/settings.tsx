@@ -442,7 +442,7 @@ const RssFeed = ({
   return (
     <tr className="">
       <td className="border-0 flex items-center space-x-2 py-1">
-        <span>{getHostname(feedUrl).hostname}</span>
+        <span>{getHostname(feedUrl)}</span>
         <a href={feedUrl} target="_blank">
           <Icon name="external-link" size="md" />
         </a>
