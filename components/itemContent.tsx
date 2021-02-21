@@ -1,20 +1,31 @@
 import { isTwitter, isYouTube } from "../lib/contentTypes";
 import TweetEmbed from "./tweetEmbed";
 import YouTubeEmbed from "./youTubeEmbed";
-import { ItemContent as ItemContentType } from "../types/ItemTypes";
+import {
+  EmailJson,
+  isEmailJson,
+  ItemContent as ItemContentType,
+} from "../types/ItemTypes";
 import RenderedContent from "./renderedContent";
+import EmailSandbox from "./emailSandbox";
 
 const ItemContent = ({
   data,
   url,
   content,
+  itemId,
+  modernItemId,
+  invalidateQuery,
 }: {
   data?: {
     content?: ItemContentType;
   };
-  url?: string;
+  url?: unknown;
   content?: ItemContentType;
   originEmailBody?: string;
+  itemId: any;
+  modernItemId: any;
+  invalidateQuery: () => void;
 }) => {
   if (url) {
     if (isTwitter(url)) {
@@ -22,8 +33,21 @@ const ItemContent = ({
     }
 
     if (isYouTube(url)) {
-      return <YouTubeEmbed url={url} />;
+      return <YouTubeEmbed url={url as string} />;
     }
+  }
+
+  if (content && content.json && isEmailJson(content.json)) {
+    const originEmailBody: string = (content.json as EmailJson).html;
+
+    return (
+      <EmailSandbox
+        originEmailBody={originEmailBody}
+        itemId={itemId}
+        modernItemId={modernItemId}
+        invalidateQuery={invalidateQuery}
+      />
+    );
   }
 
   const body =

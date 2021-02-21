@@ -37,6 +37,14 @@ const getColorFromString = (str) => {
   return `#${selectedColor}`;
 };
 
+const getBackgroundColor = (url?: string) => {
+  if (url) {
+    return getColorFromString(getHostname(url).replace("www.", ""));
+  }
+
+  return `#626262`;
+};
+
 const ContentPageItem = ({
   item,
   renderCheckbox = () => null,
@@ -50,6 +58,8 @@ const ContentPageItem = ({
 
   const checkboxNode = useMemo(() => renderCheckbox(), [renderCheckbox]);
 
+  const backgroundColor = getBackgroundColor(url);
+
   return (
     <div
       className={classNames(
@@ -57,13 +67,13 @@ const ContentPageItem = ({
         className
       )}
       key={legacyId}
-      style={{
-        backgroundColor: className
-          ? undefined
-          : url
-          ? getColorFromString(getHostname(url).replace("www.", ""))
-          : undefined,
-      }}
+      style={
+        !className
+          ? {
+              backgroundColor,
+            }
+          : undefined
+      }
     >
       <ListItem item={item} light />
       {checkboxNode && <div className="ml-4">{checkboxNode}</div>}

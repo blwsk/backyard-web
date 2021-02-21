@@ -5,12 +5,30 @@ export const RSS = "rss";
 
 export type ItemSource = "email" | "sms" | "manual" | "rss";
 
+export const isEmailJson = (emailJsonMaybe: {
+  to?: string;
+  from?: string;
+  subject?: string;
+}): boolean => {
+  return (
+    typeof emailJsonMaybe.to === "string" &&
+    typeof emailJsonMaybe.from === "string"
+  );
+};
+
+export interface EmailJson {
+  to: string;
+  from: string;
+  subject?: string;
+  html: string;
+}
+
 export interface ItemContent {
   body?: string;
   title?: string;
   metaTitle?: string;
   metaDescription?: string;
-  json?: string;
+  json?: object | EmailJson;
 }
 
 export interface ItemOrigin {

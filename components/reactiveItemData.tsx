@@ -1,19 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getHostname } from "../lib/urls";
 import Selection from "./selection";
 import ItemContent from "./itemContent";
 import ItemControls from "./itemControls";
-import { ItemContent as ItemContentType } from "../types/ItemTypes";
+import {
+  EmailJson,
+  isEmailJson,
+  ItemContent as ItemContentType,
+} from "../types/ItemTypes";
 import { Clip } from "../types/ClipTypes";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
-import { getParsedOriginEmail } from "../lib/getParsedOriginEmail";
-import RenderedContent from "./renderedContent";
-import Button from "./ui/Button";
+
 import Icon from "./ui/Icon";
 import ErrorBoundary from "./errorBoundary";
 import { useCopy } from "../lib/useCopy";
 import { classNames } from "../lib/classNames";
+import EmailSandbox from "./emailSandbox";
+import EmailHeader from "./emailHeader";
 
 type CurentType = "content" | "clips" | "email";
 
@@ -41,93 +45,6 @@ const ClipsList = ({ clips }: { clips: Clip[] }) => {
         }
       `}</style>
     </>
-  );
-};
-
-const OriginalEmail = ({ originEmailBody }) => {
-  const [mounted, updateMounted] = useState(true);
-  const [iframe, updateIframe] = useState<HTMLIFrameElement>();
-
-  useEffect(() => {
-    if (iframe) {
-      iframe.contentDocument.querySelectorAll("a").forEach((a) => {
-        a.target = "_blank";
-      });
-    }
-    return () => updateMounted(false);
-  }, [iframe]);
-
-  return (
-    <>
-      <div className="iframe-wrapper w-full rounded border border-solid border-black">
-        <iframe
-          ref={(el) => {
-            setTimeout(() => mounted && updateIframe(el));
-          }}
-          srcDoc={originEmailBody}
-          width="100%"
-          height="100%"
-        />
-      </div>
-      <style jsx>{`
-        .iframe-wrapper {
-          background: white;
-          height: 50vh;
-        }
-      `}</style>
-    </>
-  );
-};
-
-const EmailSandbox = ({
-  originEmailBody,
-  itemId,
-  modernItemId,
-  invalidateQuery,
-}) => {
-  const html = getParsedOriginEmail(originEmailBody);
-
-  const [showParsed, updateShowParsed] = useState(!!html);
-
-  return (
-    <div>
-      {!!html && (
-        <div className="flex mb-4">
-          <Button
-            current={showParsed}
-            onClick={() => updateShowParsed(true)}
-            variant="selectable"
-            size="small"
-            grouped
-            first
-          >
-            Parsed
-          </Button>
-          <Button
-            current={!showParsed}
-            onClick={() => updateShowParsed(false)}
-            variant="selectable"
-            size="small"
-            grouped
-            last
-          >
-            Original
-          </Button>
-        </div>
-      )}
-      {showParsed ? (
-        <>
-          <RenderedContent body={html} />
-          <Selection
-            itemId={itemId}
-            modernItemId={modernItemId}
-            invalidateQuery={invalidateQuery}
-          />
-        </>
-      ) : (
-        <OriginalEmail originEmailBody={originEmailBody} />
-      )}
-    </div>
   );
 };
 
@@ -177,6 +94,51 @@ const Metadata = ({ hostname, url }: { hostname: string; url: string }) => {
           justify-content: flex-start;
         }
       `}</style>
+    </>
+  );
+};
+
+const ItemDataHeader = ({
+  hostname,
+  url,
+  data,
+  content,
+  current,
+  updateCurrent,
+  originEmailBody,
+}: {
+  hostname?: string;
+  url?: string;
+  data?: any;
+  content: ItemContentType;
+  originEmailBody?: string;
+  current: CurentType;
+  updateCurrent: (next: CurentType) => void;
+}) => {
+  let metadataElements = (
+    <>
+      {hostname && <Metadata hostname={hostname} url={url} />}
+      <div className="my-4">
+        <H2 data={data} content={content} />
+        <H3 data={data} content={content} />
+      </div>
+    </>
+  );
+
+  if (content && content.json && isEmailJson(content.json)) {
+    metadataElements = <EmailHeader emailJson={content.json as EmailJson} />;
+  }
+
+  return (
+    <>
+      {metadataElements}
+      <div className="my-4">
+        <ItemControls
+          current={current}
+          updateCurrent={updateCurrent}
+          originEmailBody={originEmailBody}
+        />
+      </div>
     </>
   );
 };
@@ -237,29 +199,32 @@ const ReactiveItemData = ({
       )}
       <div>
         <ErrorBoundary>
-          {hostname && <Metadata hostname={hostname} url={url} />}
-          <div className="my-4">
-            <H2 data={data} content={content} />
-            <H3 data={data} content={content} />
-          </div>
-          {hostname && (
-            <div className="my-4">
-              <ItemControls
-                current={current}
-                updateCurrent={updateCurrent}
-                originEmailBody={originEmailBody}
-              />
-            </div>
-          )}
+          <ItemDataHeader
+            hostname={hostname}
+            url={url}
+            data={data}
+            content={content}
+            current={current}
+            updateCurrent={updateCurrent}
+            originEmailBody={originEmailBody}
+          />
           {current === "content" && (
-            <>
-              <ItemContent data={data} content={content} url={url} />
+            <div className="relative">
+              <ItemContent
+                data={data}
+                content={content}
+                url={url}
+                originEmailBody={originEmailBody}
+                itemId={itemId}
+                modernItemId={modernItemId}
+                invalidateQuery={invalidateQuery}
+              />
               <Selection
                 itemId={itemId}
                 modernItemId={modernItemId}
                 invalidateQuery={invalidateQuery}
               />
-            </>
+            </div>
           )}
           {current === "clips" && <ClipsList clips={clips} />}
           {current === "email" && (
