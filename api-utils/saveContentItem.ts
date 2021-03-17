@@ -1,8 +1,6 @@
-import { query as q, Client } from "faunadb";
 import algoliasearch from "algoliasearch";
-
 import { fetchContent } from "./fetchContent";
-import { Item, ItemSource, ItemOrigin, ItemContent } from "../types/ItemTypes";
+import { Item, ItemSource, ItemOrigin } from "../types/ItemTypes";
 import { doAsyncThing } from "./doAsyncThing";
 import { ITEMS } from "../types/SearchIndexTypes";
 import { saveItem } from "./modern/items/saveItem";
@@ -13,122 +11,7 @@ const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
 
 const index = algoliaClient.initIndex(ITEMS);
 
-interface FaunaObject {
-  ref: {
-    id: string;
-  };
-  ts: number;
-  data: Item;
-}
-
-interface ExistingItem {
-  result?: FaunaObject;
-  error?: Error;
-}
-
-const findExistingItem = async (
-  client: Client,
-  url: string
-): Promise<ExistingItem> => {
-  let result;
-  let error;
-  try {
-    result = await client.query(
-      q.Get(q.Match(q.Index("unique_Item_url"), url))
-    );
-  } catch (err) {
-    error = err;
-  }
-
-  return { result, error };
-};
-
-interface CreatedItem {
-  result?: FaunaObject;
-  error?: Error;
-}
-
-const createItem = async (
-  client: Client,
-  url: string,
-  contentJson: ItemContent,
-  createdBy: string,
-  createdAt: number,
-  source?: ItemSource,
-  itemOrigin?: ItemOrigin
-): Promise<CreatedItem> => {
-  /**
-   * - fetchTextContent returns `{ body, title, metaTitle, metaDescription }`
-   * - fetchTweet returns `{ json }`
-   */
-  const { body, title, metaTitle, metaDescription, json } = contentJson;
-
-  let itemContentResult;
-  let itemContentError;
-  try {
-    itemContentResult = await client.query(
-      q.Create(q.Collection("ItemContent"), {
-        data: {
-          body,
-          title,
-          metaTitle,
-          metaDescription,
-          json: JSON.stringify(json),
-        },
-      })
-    );
-  } catch (err) {
-    itemContentError = err;
-  }
-
-  if (itemContentError) {
-    return { result: itemContentResult, error: itemContentError };
-  }
-
-  let itemOriginResult;
-  let itemOriginError;
-
-  if (itemOrigin) {
-    try {
-      itemOriginResult = await client.query(
-        q.Create(q.Collection("ItemOrigin"), {
-          data: {
-            emailBody: itemOrigin.emailBody,
-            rssEntryContent: itemOrigin.rssEntryContent,
-            rssFeedUrl: itemOrigin.rssFeedUrl,
-          },
-        })
-      );
-    } catch (err) {
-      itemOriginError = err;
-    }
-
-    if (itemOriginError) {
-      return { result: itemOriginResult, error: itemOriginError };
-    }
-  }
-
-  let result;
-  let error;
-  try {
-    result = await client.query(
-      q.Create(q.Collection("Item"), {
-        data: {
-          url,
-          createdBy,
-          createdAt,
-          content: itemContentResult.ref,
-          source,
-          origin: itemOriginResult ? itemOriginResult.ref : null,
-        },
-      })
-    );
-  } catch (err) {
-    error = err;
-  }
-
-  return { result, error };
-};
+const generateLegacyId = () => Math.floor(Math.random() * 1000000000000000);
 
 export const Saved = "Saved";
 export const AlreadySaved = "Already saved";
@@ -182,39 +65,13 @@ export const getResponseFromMessage = (
 };
 
 export const saveContentItem = async (
-  client: Client,
   url: string,
   userId: string,
   source?: ItemSource,
   itemOrigin?: ItemOrigin
 ): Promise<SavedItemMetadata> => {
   /**
-   * If item exists, return it
-   */
-  const { result, error } = await findExistingItem(client, url);
-
-  if (result) {
-    return {
-      message: AlreadySaved,
-      result: {
-        id: result.ref.id,
-        ts: result.ts,
-        data: result.data,
-      },
-      alreadySaved: true,
-    };
-  }
-
-  if (error && error.name !== "NotFound") {
-    return {
-      message: FindExistingItemError,
-      error,
-      alreadySaved: false,
-    };
-  }
-
-  /**
-   * Otherwise, fetch its content and create it
+   * Fetch its content and create it
    */
   const { result: contentJson, error: contentError } = await fetchContent({
     url,
@@ -232,28 +89,9 @@ export const saveContentItem = async (
   const createdBy = userId,
     createdAt = Date.now();
 
-  const { result: itemResult, error: itemError } = await createItem(
-    client,
-    url,
-    contentJson,
-    createdBy,
-    createdAt,
-    source,
-    itemOrigin
-  );
+  const legacyId = generateLegacyId().toString();
 
-  if (itemError) {
-    return {
-      message: CreateItemError,
-      url,
-      error: itemError,
-      alreadySaved: false,
-    };
-  }
-
-  const legacyId = itemResult.ref.id;
-
-  const [dualWriteResult, dualWriteError] = await saveItem(
+  const [saveResult, saveError] = await saveItem(
     {
       url,
       createdAt,
@@ -265,12 +103,23 @@ export const saveContentItem = async (
     legacyId
   );
 
+  if (saveError) {
+    return {
+      message: CreateItemError,
+      url,
+      error: saveError,
+      alreadySaved: false,
+    };
+  }
+
+  const microSecondTs = createdAt * 1000;
+
   const [indexForSearchResult, indexForSearchError] = await doAsyncThing(
     async () => {
       const fullObject = {
-        objectID: itemResult.ref.id,
-        _id: itemResult.ref.id,
-        _ts: itemResult.ts,
+        objectID: legacyId,
+        _id: legacyId,
+        _ts: microSecondTs,
         createdBy: userId,
         url,
         content: contentJson
@@ -283,9 +132,9 @@ export const saveContentItem = async (
       };
 
       const trimmedObject = {
-        objectID: itemResult.ref.id,
-        _id: itemResult.ref.id,
-        _ts: itemResult.ts,
+        objectID: legacyId,
+        _id: legacyId,
+        _ts: microSecondTs,
         url,
         content: contentJson
           ? {
@@ -320,9 +169,9 @@ export const saveContentItem = async (
   return {
     message: Saved,
     result: {
-      id: itemResult.ref.id,
-      ts: itemResult.ts,
-      data: itemResult.data,
+      id: legacyId,
+      ts: createdAt,
+      data: saveResult,
     },
     alreadySaved: false,
   };
