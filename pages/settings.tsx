@@ -6,7 +6,7 @@ import {
   useGraphql,
   useGraphqlMutation,
 } from "../lib/requestHooks";
-import { jsonFetcherFactory, gqlFetcherFactory } from "../lib/fetcherFactories";
+import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import requireAuth from "../lib/requireAuth";
 import gql from "gql-tag";
 import { PhoneNumber } from "twilio/lib/interfaces";

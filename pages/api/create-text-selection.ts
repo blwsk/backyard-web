@@ -1,22 +1,17 @@
 import algoliasearch from "algoliasearch";
-import faunadb, { query as q } from "faunadb";
 import authedEndpoint from "../../api-utils/authedEndpoint";
 import { doAsyncThing } from "../../api-utils/doAsyncThing";
 import { CLIPS } from "../../types/SearchIndexTypes";
 import { ClipExportData } from "../../types/ExportTypes";
 import { saveClip } from "../../api-utils/modern/clips/saveClip";
 
-const {
-  ALGOLIA_APP_ID,
-  ALGOLIA_ADMIN_API_KEY,
-  FAUNADB_SECRET: secret,
-} = process.env;
+const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
 
 const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
 
 const index = algoliaClient.initIndex(CLIPS);
 
-const client = new faunadb.Client({ secret });
+const generateLegacyId = () => Math.floor(Math.random() * 1000000000000000);
 
 type RequestBody = {
   itemId?: string;
@@ -73,27 +68,12 @@ const createTextSelection = authedEndpoint(
       return;
     }
 
-    const itemRef = q.Ref(q.Collection("Item"), itemId);
-
     const createdAt = Date.now(),
       createdBy = user.sub;
 
-    const [textSelectionResult, error] = await doAsyncThing(() =>
-      client.query(
-        q.Create(q.Collection("TextSelection"), {
-          data: {
-            text,
-            item: itemRef,
-            createdBy,
-            createdAt,
-          },
-        })
-      )
-    );
+    const legacyId = generateLegacyId().toString();
 
-    const legacyId = textSelectionResult.ref.id;
-
-    const [dualWriteResult, dualWriteError] = await doAsyncThing(() =>
+    const [createClipResult, createClipError] = await doAsyncThing(() =>
       saveClip(
         {
           text,
@@ -105,38 +85,22 @@ const createTextSelection = authedEndpoint(
       )
     );
 
-    if (error || dualWriteError) {
-      res.status(500).send({
-        error: error || dualWriteError,
-      });
-      return;
-    }
+    void createClipResult;
 
-    const [
-      textSelectionResultId,
-      textSelectionResultIdError,
-    ] = await doAsyncThing(() =>
-      client.query(q.Select(["ref", "id"], q.Get(textSelectionResult.ref)))
-    );
-
-    if (textSelectionResultIdError) {
+    if (createClipError) {
       res.status(500).send({
-        error: textSelectionResultIdError,
+        error: createClipError,
       });
       return;
     }
 
     const [indexForSearchResult, indexForSearchError] = await doAsyncThing(
       async () => {
-        const {
-          data: { text: selectionText, createdBy, createdAt },
-        } = textSelectionResult;
-
         const clipObject: ClipExportData = {
-          objectID: textSelectionResultId,
-          _id: textSelectionResultId,
+          objectID: legacyId,
+          _id: legacyId,
           itemId,
-          text: selectionText,
+          text,
           createdAt,
           createdBy,
         };

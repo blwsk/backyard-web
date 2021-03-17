@@ -21,6 +21,7 @@ export interface EmailJson {
   from: string;
   subject?: string;
   html: string;
+  envelope: string;
 }
 
 export interface ItemContent {

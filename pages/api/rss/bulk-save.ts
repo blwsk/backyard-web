@@ -1,7 +1,5 @@
-import faunadb, { query as q } from "faunadb";
 import { serverToServerEndpoint } from "../../../api-utils/authedEndpoint";
 import localEndpoint from "../../../api-utils/localEndpoint";
-import { doAsyncThing } from "../../../api-utils/doAsyncThing";
 import { RSS } from "../../../types/ItemTypes";
 import { saveContentItem } from "../../../api-utils/saveContentItem";
 
@@ -9,8 +7,6 @@ const wrapper =
   process.env.NODE_ENV === "development"
     ? localEndpoint
     : serverToServerEndpoint;
-
-const faunaClient = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
 interface RssEntry {
   title: string;
@@ -42,7 +38,7 @@ const bulkSave = wrapper(async (req, res) => {
 
   const bulkOperation = await Promise.all(
     itemsToSave.map(({ link: url, content }) =>
-      saveContentItem(faunaClient, url, userId, RSS, {
+      saveContentItem(url, userId, RSS, {
         rssEntryContent: content,
         rssFeedUrl: feedUrl,
       })

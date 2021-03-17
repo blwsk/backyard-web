@@ -1,4 +1,3 @@
-import faunadb, { query as q } from "faunadb";
 import authedEndpoint from "../../api-utils/authedEndpoint";
 import {
   saveContentItem,
@@ -10,10 +9,6 @@ import {
   IndexingError,
 } from "../../api-utils/saveContentItem";
 import { MANUAL } from "../../types/ItemTypes";
-
-const { FAUNADB_SECRET: secret } = process.env;
-
-const client = new faunadb.Client({ secret });
 
 const saveItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
   if (req.method !== "PUT") {
@@ -48,12 +43,7 @@ const saveItem = authedEndpoint(async (req, res, { user, err: userErr }) => {
     return;
   }
 
-  const saveItemResultMetadata = await saveContentItem(
-    client,
-    url,
-    user.sub,
-    MANUAL
-  );
+  const saveItemResultMetadata = await saveContentItem(url, user.sub, MANUAL);
 
   const { message, result, error, alreadySaved } = saveItemResultMetadata;
 
