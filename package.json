@@ -10,7 +10,6 @@
     "algoliasearch": "^4.5.1",
     "date-fns": "^2.15.0",
     "dompurify": "^2.2.0",
-    "faunadb": "^3.0.1",
     "feather-icons": "^4.28.0",
     "fuzzyset.js": "^1.0.5",
     "gql-tag": "^1.0.1",
