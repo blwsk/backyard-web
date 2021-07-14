@@ -65,9 +65,21 @@ const authedEndpoint = (
 ) => async (req, res) => {
   const { authorization: Authorization } = req.headers;
 
+  console.log("authed endpoint", {
+    Authorization,
+  });
+
   const token = getTokenFromHeaderValue(Authorization);
 
+  console.log("authed endpoint", {
+    token,
+  });
+
   const decodedToken = jwt.decode(token, { complete: true });
+
+  console.log("authed endpoint", {
+    decodedToken,
+  });
 
   const {
     header: { alg, kid },

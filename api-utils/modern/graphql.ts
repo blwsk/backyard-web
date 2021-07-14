@@ -38,7 +38,10 @@ export const graphql = async ({
     gqlError = error;
   }
 
-  console.log(gqlResponse, gqlError);
+  console.log("graphql service call", {
+    gqlResponse,
+    gqlError,
+  });
 
   return [gqlResponse, gqlError];
 };
