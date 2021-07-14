@@ -12,7 +12,7 @@ export const getUserMetadataByEmailIngestAddress = ({
   return doAsyncThing(() => {
     return unfetch(
       process.env.NODE_ENV !== "development"
-        ? `https://api.backyard.wtf/api/user/email?emailIngestAddress=${emailIngestAddress}`
+        ? `https://backyard.up.railway.app/api/user/email?emailIngestAddress=${emailIngestAddress}`
         : `http://localhost:8081/api/user/email?emailIngestAddress=${emailIngestAddress}`,
       {
         method: "GET",

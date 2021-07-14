@@ -17,7 +17,7 @@ export const graphql = async ({
   try {
     gqlResponse = await unfetch(
       process.env.NODE_ENV !== "development"
-        ? "https://api.backyard.wtf/graphql"
+        ? "https://backyard.up.railway.app/graphql"
         : "http://localhost:8081/graphql",
       {
         method: "POST",

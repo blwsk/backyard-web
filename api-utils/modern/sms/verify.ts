@@ -18,7 +18,7 @@ export const verify = ({
   return doAsyncThing(() => {
     return unfetch(
       process.env.NODE_ENV !== "development"
-        ? "https://api.backyard.wtf/api/sms/verify"
+        ? "https://backyard.up.railway.app/api/sms/verify"
         : "http://localhost:8081/api/sms/verify",
       {
         method: "PUT",

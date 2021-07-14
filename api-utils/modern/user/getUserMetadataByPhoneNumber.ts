@@ -12,7 +12,7 @@ export const getUserMetadataByPhoneNumber = ({
   return doAsyncThing(() => {
     return unfetch(
       process.env.NODE_ENV !== "development"
-        ? `https://api.backyard.wtf/api/user/phone?phoneNumber=${phoneNumber}`
+        ? `https://backyard.up.railway.app/api/user/phone?phoneNumber=${phoneNumber}`
         : `http://localhost:8081/api/user/phone?phoneNumber=${phoneNumber}`,
       {
         method: "GET",

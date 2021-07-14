@@ -21,7 +21,7 @@ export const saveItem = (
   return doAsyncThing(() => {
     return unfetch(
       process.env.NODE_ENV !== "development"
-        ? "https://api.backyard.wtf/api/item"
+        ? "https://backyard.up.railway.app/api/item"
         : "http://localhost:8081/api/item",
       {
         method: "POST",

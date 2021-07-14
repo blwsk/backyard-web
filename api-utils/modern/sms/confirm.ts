@@ -21,7 +21,7 @@ export const confirm = ({
   return doAsyncThing(() => {
     return unfetch(
       process.env.NODE_ENV !== "development"
-        ? "https://api.backyard.wtf/api/sms/confirm"
+        ? "https://backyard.up.railway.app/api/sms/confirm"
         : "http://localhost:8081/api/sms/confirm",
       {
         method: "PUT",

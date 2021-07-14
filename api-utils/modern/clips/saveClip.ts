@@ -19,7 +19,7 @@ export const saveClip = (
   return doAsyncThing(() => {
     return unfetch(
       process.env.NODE_ENV !== "development"
-        ? "https://api.backyard.wtf/api/clip"
+        ? "https://backyard.up.railway.app/api/clip"
         : "http://localhost:8081/api/clip",
       {
         method: "POST",

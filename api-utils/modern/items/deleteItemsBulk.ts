@@ -7,7 +7,7 @@ export const deleteItemsBulk = (legacyIds: string[]) => {
   return doAsyncThing(() => {
     return unfetch(
       process.env.NODE_ENV !== "development"
-        ? "https://api.backyard.wtf/api/items"
+        ? "https://backyard.up.railway.app/api/items"
         : "http://localhost:8081/api/items",
       {
         method: "DELETE",
