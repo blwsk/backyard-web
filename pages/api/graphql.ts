@@ -40,7 +40,7 @@ const graphql = authedEndpoint(async (req, res, { user, err }) => {
     });
   }
 
-  res.status(200).send(gqlResponse);
+  res.status(200).send({});
 });
 
 export default graphql;
