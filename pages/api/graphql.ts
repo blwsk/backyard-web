@@ -1,7 +1,7 @@
 import authedEndpoint from "../../api-utils/authedEndpoint";
 import { graphql as graphqlModern } from "../../api-utils/modern/graphql";
 
-const graphql = async (req, res, { user, err }) => {
+const graphql = authedEndpoint(async (req, res, { user, err }) => {
   if (req.method !== "POST") {
     res.status(400).send(null);
     return;
@@ -25,6 +25,6 @@ const graphql = async (req, res, { user, err }) => {
   }
 
   res.status(200).send(gqlResponse);
-};
+});
 
 export default graphql;
