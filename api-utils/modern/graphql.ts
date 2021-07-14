@@ -33,7 +33,10 @@ export const graphql = async ({
           "Content-Type": "application/json",
         },
       }
-    ).then((gqlRes) => gqlRes.json());
+    ).then((gqlRes) => {
+      console.log("gqlRes", gqlRes);
+      return gqlRes.json();
+    });
   } catch (error) {
     gqlError = error;
   }
