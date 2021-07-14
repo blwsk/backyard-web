@@ -34,17 +34,11 @@ export const graphql = async ({
         },
       }
     ).then((gqlRes) => {
-      console.log("gqlRes", gqlRes);
       return gqlRes.json();
     });
   } catch (error) {
     gqlError = error;
   }
-
-  console.log("graphql service call", {
-    gqlResponse,
-    gqlError,
-  });
 
   return [gqlResponse, gqlError];
 };
