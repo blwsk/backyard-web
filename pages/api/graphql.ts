@@ -19,20 +19,22 @@ const graphql = authedEndpoint(async (req, res, { user, err }) => {
 
   console.log("query + vars", query, variables);
 
-  const [gqlResponse, gqlError] = await graphqlModern({
-    userId: user.sub,
-    query,
-    variables,
-  });
+  // const [gqlResponse, gqlError] = await graphqlModern({
+  //   userId: user.sub,
+  //   query,
+  //   variables,
+  // });
 
-  if (gqlError) {
-    res.status(400).send({
-      error: gqlError,
-    });
-    return;
-  }
+  // if (gqlError) {
+  //   res.status(400).send({
+  //     error: gqlError,
+  //   });
+  //   return;
+  // }
 
-  res.status(200).send(gqlResponse);
+  // res.status(200).send(gqlResponse);
+
+  res.status(200).send({});
 });
 
 export default graphql;
