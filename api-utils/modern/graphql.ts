@@ -36,6 +36,7 @@ export const graphql = async ({
     ).then((gqlRes) => gqlRes.json());
   } catch (error) {
     gqlError = error;
+    console.error(error);
   }
 
   return [gqlResponse, gqlError];
