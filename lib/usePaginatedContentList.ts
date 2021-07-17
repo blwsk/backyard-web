@@ -1,7 +1,7 @@
 import gql from "gql-tag";
 import { useGraphql } from "./requestHooks";
 
-export const PAGE_LENGTH = 50;
+export const PAGE_LENGTH = 20;
 
 export const sortOrderEnum = {
   ascending: "ASC",
