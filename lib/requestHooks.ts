@@ -21,7 +21,10 @@ export const useAuthedSWR = (key, fetcherFactory, options = {}) => {
 
   const result = useSWR(
     key,
-    withTelemetry(fetcherFactory({ getAccessTokenSilently, options })),
+    withTelemetry(fetcherFactory({ getAccessTokenSilently, options }), {
+      key,
+      rest: true,
+    }),
     { revalidateOnFocus: false, refreshInterval: 60 * 60 * 1000 }
   );
 
@@ -42,12 +45,15 @@ export const useAuthedCallback = (
     });
 
   const callback = useCallback(
-    withTelemetry((overrides = {}) => {
-      return fetcherFactory({ getAccessTokenSilently })(key, {
-        ...options,
-        ...overrides,
-      });
-    }),
+    withTelemetry(
+      (overrides = {}) => {
+        return fetcherFactory({ getAccessTokenSilently })(key, {
+          ...options,
+          ...overrides,
+        });
+      },
+      { key, rest: true }
+    ),
     [key, options]
   );
 
@@ -87,36 +93,42 @@ export const useGraphql = <Data extends unknown>({
     variables: { ...variables, userId: user.sub },
   });
 
+  const ENDPONT_PATH = "/api/graphql?v=2";
+  const URI = `${getBaseUrl()}${ENDPONT_PATH}`;
+
   const result = useSWR(
     key,
-    withTelemetry(() => {
-      return getAccessTokenSilently()
-        .then(
-          (token: string): Promise<Response> => {
-            return unfetch(`${getBaseUrl()}/api/graphql?v=2`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: key,
-            });
-          }
-        )
-        .then(jsonParser)
-        .then(
-          (gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
-            if (
-              gqlResponse &&
-              gqlResponse.errors &&
-              gqlResponse.errors.length > 0
-            ) {
-              return Promise.reject(gqlResponse);
+    withTelemetry(
+      () => {
+        return getAccessTokenSilently()
+          .then(
+            (token: string): Promise<Response> => {
+              return unfetch(URI, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: key,
+              });
             }
-            return Promise.resolve(gqlResponse);
-          }
-        );
-    }),
+          )
+          .then(jsonParser)
+          .then(
+            (gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
+              if (
+                gqlResponse &&
+                gqlResponse.errors &&
+                gqlResponse.errors.length > 0
+              ) {
+                return Promise.reject(gqlResponse);
+              }
+              return Promise.resolve(gqlResponse);
+            }
+          );
+      },
+      { key: ENDPONT_PATH, graphqlQuery: true }
+    ),
     { revalidateOnFocus: false, refreshInterval: 60 * 60 * 1000 }
   );
 
@@ -147,35 +159,41 @@ export const useGraphqlMutation = ({
     [query, variables, user]
   );
 
+  const ENDPONT_PATH = "/api/graphql?v=2";
+  const URI = `${getBaseUrl()}${ENDPONT_PATH}`;
+
   const callback = useCallback(
-    withTelemetry(() => {
-      return getAccessTokenSilently()
-        .then(
-          (token: string): Promise<Response> => {
-            return unfetch(`${getBaseUrl()}/api/graphql?v=2`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: key,
-            });
-          }
-        )
-        .then(jsonParser)
-        .then(
-          (gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
-            if (
-              gqlResponse &&
-              gqlResponse.errors &&
-              gqlResponse.errors.length > 0
-            ) {
-              return Promise.reject(gqlResponse);
+    withTelemetry(
+      () => {
+        return getAccessTokenSilently()
+          .then(
+            (token: string): Promise<Response> => {
+              return unfetch(URI, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: key,
+              });
             }
-            return Promise.resolve(gqlResponse);
-          }
-        );
-    }),
+          )
+          .then(jsonParser)
+          .then(
+            (gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
+              if (
+                gqlResponse &&
+                gqlResponse.errors &&
+                gqlResponse.errors.length > 0
+              ) {
+                return Promise.reject(gqlResponse);
+              }
+              return Promise.resolve(gqlResponse);
+            }
+          );
+      },
+      { key: ENDPONT_PATH, graphqlMutation: true }
+    ),
     [key]
   );
 
