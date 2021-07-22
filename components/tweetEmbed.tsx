@@ -126,7 +126,6 @@ export const Tweet = ({
   tweetJson?: TweetData;
 }) => {
   const tweetData = getTweetData({ data, tweetJson });
-  debugger;
   const {
     data: tweets,
     includes: { media, users },
