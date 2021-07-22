@@ -39,6 +39,8 @@ export interface ItemOrigin {
 }
 
 export interface Item {
+  id: string;
+  legacyId: string;
   url?: string;
   createdBy: string;
   createdAt: number;

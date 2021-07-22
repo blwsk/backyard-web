@@ -5,6 +5,7 @@ import requireAuth from "../lib/requireAuth";
 import {
   usePaginatedContentList,
   getResultObject,
+  PaginatedContentList,
 } from "../lib/usePaginatedContentList";
 import { SaveBar } from "../components/saveBar";
 import ContentPageItem from "../components/contentPageItem";
@@ -15,8 +16,8 @@ import Button from "../components/ui/Button";
 
 const MOST_RECENT_ITEM_LIMIT = 10;
 
-const PreviewContentList = ({ data }) => {
-  const resultObject = getResultObject(data.data);
+const PreviewContentList = ({ data }: { data: PaginatedContentList }) => {
+  const resultObject = getResultObject(data);
 
   const mostRecentContentItems = resultObject.results.slice(
     0,

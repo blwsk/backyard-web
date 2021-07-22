@@ -4,10 +4,15 @@ import { Item } from "../../../types/ItemTypes";
 
 const { BACKYARD_SERVER_SECRET } = process.env;
 
-export const saveItem = (
-  { url, createdAt, createdBy, source, content, origin }: Item,
-  legacyId: string
-) => {
+export const saveItem = ({
+  url,
+  createdAt,
+  createdBy,
+  source,
+  content,
+  origin,
+  legacyId,
+}: Partial<Item>) => {
   const body = {
     url,
     createdAt,

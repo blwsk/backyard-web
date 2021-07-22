@@ -4,6 +4,7 @@ import {
   SortOrder,
   usePaginatedContentList,
 } from "../../lib/usePaginatedContentList";
+import { Item } from "../../types/ItemTypes";
 import LoadingItem from "../loading/LoadingItem";
 import ContentListPages from "./contentListPages";
 
@@ -12,37 +13,49 @@ const useContentPages = ({ sortOrder }: { sortOrder: SortOrder }) => {
 
   const [pages, updatesPages] = useState([]);
 
-  const { data, error, isValidating } = usePaginatedContentList({
+  const {
+    data: paginatedContentListData,
+    error,
+    isValidating,
+  } = usePaginatedContentList({
     cursor,
     sortOrder,
   });
 
   useEffect(() => {
-    if (data && pages.length === 0) {
+    if (paginatedContentListData && pages.length === 0) {
       /**
        * First page
        */
-      updatesPages([data.data]);
+      updatesPages([paginatedContentListData]);
       return;
     }
 
-    if (data && !isValidating && typeof cursor === "string") {
+    if (
+      paginatedContentListData &&
+      !isValidating &&
+      typeof cursor === "string"
+    ) {
       /**
        * Subsequent pages
        */
-      updatesPages([...pages, data.data]);
+      updatesPages([...pages, paginatedContentListData]);
       return;
     }
-  }, [data, cursor]);
+  }, [paginatedContentListData, cursor]);
 
   const onLoadMore = () => {
-    updateCursor(getResultObject(data.data).next);
+    updateCursor(getResultObject(paginatedContentListData).next);
   };
 
-  const hasMore = data && typeof getResultObject(data.data).next === "string";
+  const hasMore =
+    paginatedContentListData &&
+    typeof getResultObject(paginatedContentListData).next === "string";
 
   return {
-    pages: (data || pages.length > 0) && pages,
+    pages: (paginatedContentListData || pages.length > 0 ? pages : []) as {
+      results: Item[];
+    }[],
     hasMore,
     onLoadMore,
     isValidating,

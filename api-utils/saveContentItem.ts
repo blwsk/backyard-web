@@ -91,17 +91,15 @@ export const saveContentItem = async (
 
   const legacyId = generateLegacyId().toString();
 
-  const [saveResult, saveError] = await saveItem(
-    {
-      url,
-      createdAt,
-      createdBy,
-      content: contentJson,
-      source,
-      origin: itemOrigin,
-    },
-    legacyId
-  );
+  const [saveResult, saveError] = await saveItem({
+    legacyId,
+    url,
+    createdAt,
+    createdBy,
+    content: contentJson,
+    source,
+    origin: itemOrigin,
+  });
 
   if (saveError) {
     return {
