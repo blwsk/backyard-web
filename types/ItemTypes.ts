@@ -16,7 +16,21 @@ export const isEmailJson = (emailJsonMaybe: {
   );
 };
 
+export interface TweetJson {
+  data: object[];
+  includes: object[];
+
+  to?: never;
+  from?: never;
+  subject?: never;
+  html?: never;
+  envelope?: never;
+}
+
 export interface EmailJson {
+  data?: never;
+  includes?: never;
+
   to: string;
   from: string;
   subject?: string;
@@ -24,12 +38,14 @@ export interface EmailJson {
   envelope: string;
 }
 
+export type ItemJson = TweetJson | EmailJson;
+
 export interface ItemContent {
   body?: string;
   title?: string;
   metaTitle?: string;
   metaDescription?: string;
-  json?: object | EmailJson;
+  json?: ItemJson;
 }
 
 export interface ItemOrigin {
