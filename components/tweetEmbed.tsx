@@ -4,38 +4,19 @@ import { capitalize } from "../lib/capitalize";
 import { useAuthedSWR } from "../lib/requestHooks";
 import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { getTweetIdFromUrl } from "../lib/tweetIdFromUrl";
+import { TweetJson, TwitterUser } from "../types/ItemTypes";
 
 const TCO_PATTERN = /https:\/\/t.co\/[0-9a-zA-Z]\w+/g;
-
-interface TwitterUser {
-  id: string;
-  name: string;
-  username: string;
-}
-
-interface Tweet {
-  author_id: string;
-  id: string;
-  created_at: string;
-}
-
-interface TweetData {
-  data: Tweet[];
-  includes: {
-    media: any[];
-    users: TwitterUser[];
-  };
-}
 
 const getTweetData = ({
   data,
   tweetJson,
 }: {
   data?: {
-    tweets: TweetData;
+    tweets: TweetJson;
   };
-  tweetJson?: TweetData;
-}): TweetData => {
+  tweetJson?: TweetJson;
+}): TweetJson => {
   if (tweetJson) {
     return tweetJson;
   }
@@ -61,9 +42,9 @@ export const TweetPreview = ({
   tweetJson,
 }: {
   data?: {
-    tweets: TweetData;
+    tweets: TweetJson;
   };
-  tweetJson?: TweetData;
+  tweetJson?: TweetJson;
 }) => {
   const {
     data: tweets,
@@ -121,9 +102,9 @@ export const Tweet = ({
   tweetJson,
 }: {
   data?: {
-    tweets: TweetData;
+    tweets: TweetJson;
   };
-  tweetJson?: TweetData;
+  tweetJson?: TweetJson;
 }) => {
   const tweetData = getTweetData({ data, tweetJson });
   const {

@@ -1,5 +1,5 @@
 import gql from "gql-tag";
-import { Item } from "../types/ItemTypes";
+import { ItemPreview } from "../types/ItemTypes";
 import { useGraphql } from "./requestHooks";
 
 export const PAGE_LENGTH = 20;
@@ -12,31 +12,32 @@ export const sortOrderEnum = {
 export type SortOrder = "ASC" | "DESC";
 
 export interface PaginatedContentList {
-  items: {
-    results: Item[];
+  itemPreviews: {
+    results: ItemPreview[];
     next?: string;
   };
 }
 
-export interface SearchResultsContentList {
-  searchResults: {
-    results: Item[];
-    next?: string;
-  };
-}
+// export interface SearchResultsContentList {
+//   searchResults: {
+//     results: ItemPreview[];
+//     next?: string;
+//   };
+// }
 
 export const getResultObject = (
-  result: PaginatedContentList | SearchResultsContentList
+  // result: PaginatedContentList | SearchResultsContentList
+  pageResults: PaginatedContentList
 ) => {
-  let pageResults = result as PaginatedContentList;
-  let searchResults = result as SearchResultsContentList;
+  // let pageResults = result as PaginatedContentList;
+  // let searchResults = result as SearchResultsContentList;
 
-  if (pageResults.items) {
-    return pageResults.items;
-  }
+  // if (pageResults.itemPreviews) {
+  return pageResults.itemPreviews;
+  // }
 
-  // this last one is a shim to support Algolia search results with the same components
-  return searchResults.searchResults;
+  // // this last one is a shim to support Algolia search results with the same components
+  // return searchResults.searchResults;
 };
 
 export const usePaginatedContentList = ({
@@ -57,23 +58,19 @@ export const usePaginatedContentList = ({
   }>({
     query: gql`
       query($size: Int, $cursor: ID, $userId: String!, $sortOrder: SortOrder!) {
-        items(
+        itemPreviews(
           size: $size
           cursor: $cursor
           userId: $userId
           sortOrder: $sortOrder
         ) {
           results {
-            url
             createdAt
             createdBy
-            content {
-              title
-              json
-            }
-            origin {
-              rssFeedUrl
-            }
+            title
+            subtitle
+            json
+            domain
             id
             source
             legacyId

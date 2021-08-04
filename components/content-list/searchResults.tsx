@@ -1,8 +1,8 @@
 import { FunctionComponent } from "react";
-import { ListItemProps } from "../listItem";
+import { ItemPreview } from "../../types/ItemTypes";
 import ContentListPages from "./contentListPages";
 
-const SearchResults: FunctionComponent<{ results: ListItemProps[] }> = ({
+const SearchResults: FunctionComponent<{ results: ItemPreview[] }> = ({
   results,
 }) => {
   if (!results) {
@@ -26,7 +26,7 @@ const SearchResults: FunctionComponent<{ results: ListItemProps[] }> = ({
       <ContentListPages
         pages={[
           {
-            searchResults: {
+            itemPreviews: {
               results,
               next: null,
             },

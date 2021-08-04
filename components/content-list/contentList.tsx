@@ -4,7 +4,7 @@ import {
   SortOrder,
   usePaginatedContentList,
 } from "../../lib/usePaginatedContentList";
-import { Item } from "../../types/ItemTypes";
+import { ItemPreview } from "../../types/ItemTypes";
 import LoadingItem from "../loading/LoadingItem";
 import ContentListPages from "./contentListPages";
 
@@ -54,7 +54,7 @@ const useContentPages = ({ sortOrder }: { sortOrder: SortOrder }) => {
 
   return {
     pages: (paginatedContentListData || pages.length > 0 ? pages : []) as {
-      results: Item[];
+      results: ItemPreview[];
     }[],
     hasMore,
     onLoadMore,

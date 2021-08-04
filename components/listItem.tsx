@@ -1,52 +1,26 @@
 import React from "react";
-import { stripParams, getHostname } from "../lib/urls";
 import Link from "next/link";
-import { isTwitter } from "../lib/contentTypes";
 import { TweetPreview } from "./tweetEmbed";
-import { EmailJson, isEmailJson, ItemSource, MANUAL } from "../types/ItemTypes";
+import { ItemPreview, ItemSource, MANUAL, TweetJson } from "../types/ItemTypes";
 import Icon from "./ui/Icon";
 
-export interface ListItemProps {
-  // id: number;
-  legacyId: string;
-  createdAt: number;
-  url?: string;
-  content?: {
-    title?: string;
-    json?: object;
-  };
-  source?: ItemSource;
-}
-
-const getJson = ({ json }: { json?: unknown }) => {
-  if (typeof json === "object") {
-    return json;
-  }
-  if (typeof json === "string") {
-    try {
-      return JSON.parse(json);
-    } catch (error) {
-      void error;
-      return null;
-    }
-  }
-
-  return null;
-};
-
-const EmailJsonPreview = ({ emailJson }: { emailJson: EmailJson }) => {
-  const { from, subject } = emailJson;
-
+const EmailJsonPreview = ({
+  title,
+  subtitle,
+}: {
+  title?: string;
+  subtitle?: string;
+}) => {
   return (
     <div>
       <div>
-        <b>{subject || <i className="font-light">No subject</i>}</b>
+        <b>{title || <i className="font-light">No subject</i>}</b>
       </div>
       <div className="flex items-center">
         <span className="mr-2 opacity-50">
           <Icon name="mail" size="md" />
         </span>
-        <span className="">{from}</span>
+        <span className="">{subtitle}</span>
       </div>
     </div>
   );
@@ -54,19 +28,22 @@ const EmailJsonPreview = ({ emailJson }: { emailJson: EmailJson }) => {
 
 const PreviewLink = ({
   id,
-  content,
-  url,
+  hostname,
+  title,
+  subtitle,
+  json,
+  source,
 }: {
   id: string;
-  url?: string;
-  content?: {
-    title?: string;
-    json?: object;
-  };
+  hostname?: string;
+  title?: string;
+  subtitle?: string;
+  json?: object;
+  source: ItemSource;
 }) => {
-  const tweetJson = content && getJson(content);
+  const tweetJson = json as TweetJson;
 
-  if (isTwitter(url) && tweetJson) {
+  if (hostname && hostname.indexOf("twitter.com") && tweetJson) {
     return (
       <Link href={{ pathname: "/viewer", query: { id } }}>
         <a>
@@ -78,30 +55,22 @@ const PreviewLink = ({
     );
   }
 
-  if (content && content.json && isEmailJson(content.json)) {
+  if (source === "email") {
     return (
       <Link href={{ pathname: "/viewer", query: { id } }}>
         <a>
           <div className="p-4 -ml-4 rounded-r-md md:rounded-l-md">
-            <EmailJsonPreview emailJson={content.json as EmailJson} />
+            <EmailJsonPreview title={title} subtitle={subtitle} />
           </div>
         </a>
       </Link>
     );
   }
 
-  if (content && content.title) {
+  if (title) {
     return (
       <Link href={{ pathname: "/viewer", query: { id } }}>
-        <a className="font-semibold break-words">{content.title}</a>
-      </Link>
-    );
-  }
-
-  if (url) {
-    return (
-      <Link href={{ pathname: "/viewer", query: { id } }}>
-        <a className="font-semibold break-all">{stripParams(url)}</a>
+        <a className="font-semibold break-words">{title}</a>
       </Link>
     );
   }
@@ -115,19 +84,29 @@ const PreviewLink = ({
 
 const ListItemPreview = ({
   id,
-  url,
-  content,
+  hostname,
+  title,
+  subtitle,
+  json,
+  source,
 }: {
   id: string;
-  url?: string;
-  content?: {
-    title?: string;
-    json?: object;
-  };
+  hostname?: string;
+  title?: string;
+  subtitle?: string;
+  json?: object;
+  source: ItemSource;
 }) => {
   return (
     <>
-      <PreviewLink id={id} url={url} content={content} />
+      <PreviewLink
+        id={id}
+        hostname={hostname}
+        title={title}
+        subtitle={subtitle}
+        json={json}
+        source={source}
+      />
       <style jsx>{`
         .bg-ghost {
           background-color: var(--ghost);
@@ -138,23 +117,38 @@ const ListItemPreview = ({
 };
 
 const ListItem = ({
-  item,
+  itemPreview,
   light = false,
 }: {
-  item: ListItemProps;
+  itemPreview: ItemPreview;
   light?: boolean;
 }) => {
-  const { legacyId, createdAt, url, content, source } = item;
+  const {
+    legacyId,
+    createdAt,
+    domain,
+    title,
+    subtitle,
+    source,
+    json,
+  } = itemPreview;
 
   const date = new Date(createdAt);
   const dateString = date.toDateString();
   const timeString = date.toLocaleTimeString();
-  const hostname = url && getHostname(url).replace("www.", "");
+  const hostname = domain && domain.replace("www.", "");
 
   return (
     <div className={`list-item ${light ? "light" : ""} py-3 w-full`}>
       <div className="w-full">
-        <ListItemPreview id={legacyId} url={url} content={content} />
+        <ListItemPreview
+          id={`${legacyId}`}
+          hostname={hostname}
+          title={title}
+          subtitle={subtitle}
+          json={json}
+          source={source}
+        />
         <div className="mt-3">
           <small className="flex flex-col md:flex-row">
             <span>
