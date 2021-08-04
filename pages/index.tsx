@@ -27,8 +27,10 @@ const PreviewContentList = ({ data }: { data: PaginatedContentList }) => {
   return (
     <div>
       {mostRecentContentItems.length > 0 ? (
-        mostRecentContentItems.map((item) => {
-          return <ContentPageItem key={item.id} item={item} />;
+        mostRecentContentItems.map((itemPreview) => {
+          return (
+            <ContentPageItem key={itemPreview.id} itemPreview={itemPreview} />
+          );
         })
       ) : (
         <div className="px-4">None! Save some content.</div>

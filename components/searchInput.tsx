@@ -9,6 +9,16 @@ import { jsonFetcherFactory } from "../lib/fetcherFactories";
 import { throttle } from "../lib/throttle";
 import { SearchIndex } from "../types/SearchIndexTypes";
 import TextInput from "./ui/TextInput";
+import { ItemContent, ItemPreview } from "../types/ItemTypes";
+import { getHostname } from "../lib/urls";
+
+interface SearchResult {
+  content: Partial<ItemContent>;
+  createdAt: number;
+  createdBy: string;
+  legacyId: bigint;
+  url?: string;
+}
 
 type Props = {
   defaultQuery?: string;
@@ -45,8 +55,22 @@ const SearchInput: FunctionComponent<Props> = ({
   const wrappedDoSearch = useCallback(
     (options) =>
       doSearch(options)
-        .then((res) => {
-          updateResults(res);
+        .then((res: SearchResult[]) => {
+          const itemPreviews = res.map(
+            (searchResult: SearchResult): ItemPreview => {
+              return {
+                id: Math.floor(Math.random() * Date.now()),
+                legacyId: searchResult.legacyId,
+                source: "manual",
+                createdAt: searchResult.createdAt,
+                createdBy: searchResult.createdBy,
+                title: searchResult.content && searchResult.content.title,
+                domain: searchResult.url && getHostname(searchResult.url),
+              };
+            }
+          );
+
+          updateResults(itemPreviews);
         })
         .catch((err) => {
           updateError(err);

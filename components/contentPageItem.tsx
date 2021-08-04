@@ -1,7 +1,7 @@
 import { ReactNode, useMemo } from "react";
-import ListItem, { ListItemProps } from "./listItem";
-import { getHostname } from "../lib/urls";
+import ListItem from "./listItem";
 import { classNames } from "../lib/classNames";
+import { ItemPreview } from "../types/ItemTypes";
 
 const colors = [
   "c62828",
@@ -37,28 +37,28 @@ const getColorFromString = (str) => {
   return `#${selectedColor}`;
 };
 
-const getBackgroundColor = (url?: string) => {
-  if (url) {
-    return getColorFromString(getHostname(url).replace("www.", ""));
+const getBackgroundColor = (domain?: string) => {
+  if (domain) {
+    return getColorFromString(domain.replace("www.", ""));
   }
 
   return `#626262`;
 };
 
 const ContentPageItem = ({
-  item,
+  itemPreview,
   renderCheckbox = () => null,
   className,
 }: {
-  item: ListItemProps;
+  itemPreview: ItemPreview;
   renderCheckbox?: () => ReactNode;
   className?: string;
 }) => {
-  const { legacyId, url } = item;
+  const { legacyId, domain } = itemPreview;
 
   const checkboxNode = useMemo(() => renderCheckbox(), [renderCheckbox]);
 
-  const backgroundColor = getBackgroundColor(url);
+  const backgroundColor = getBackgroundColor(domain);
 
   return (
     <div
@@ -66,7 +66,7 @@ const ContentPageItem = ({
         "flex justify-between items-center p-4 mb-2 md:rounded-md text-white",
         className
       )}
-      key={legacyId}
+      key={`${legacyId}`}
       style={
         !className
           ? {
@@ -75,7 +75,7 @@ const ContentPageItem = ({
           : undefined
       }
     >
-      <ListItem item={item} light />
+      <ListItem itemPreview={itemPreview} light />
       {checkboxNode && <div className="ml-4">{checkboxNode}</div>}
     </div>
   );

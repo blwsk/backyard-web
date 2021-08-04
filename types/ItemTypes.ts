@@ -16,9 +16,24 @@ export const isEmailJson = (emailJsonMaybe: {
   );
 };
 
+export interface TwitterUser {
+  id: string;
+  name: string;
+  username: string;
+}
+
+export interface Tweet {
+  author_id: string;
+  id: string;
+  created_at: string;
+}
+
 export interface TweetJson {
-  data: object[];
-  includes: object[];
+  data: Tweet[];
+  includes: {
+    media: any[];
+    users: TwitterUser[];
+  };
 
   to?: never;
   from?: never;
@@ -63,4 +78,16 @@ export interface Item {
   content?: ItemContent;
   source?: ItemSource;
   origin?: ItemOrigin;
+}
+
+export interface ItemPreview {
+  id: number;
+  legacyId: bigint;
+  title?: string;
+  subtitle?: string;
+  json?: TweetJson;
+  source: ItemSource;
+  domain?: string;
+  createdAt: number;
+  createdBy: string;
 }

@@ -5,16 +5,16 @@ import { getResultObject } from "../../lib/usePaginatedContentList";
 import ContentPageItem from "../contentPageItem";
 import Button from "../ui/Button";
 import Checkbox from "../ui/Checkbox";
-import { ListItemProps } from "../listItem";
+import { ItemPreview } from "../../types/ItemTypes";
 
 const ContentPage = ({
-  items,
+  itemPreviews,
   onSelect,
   onDeselect,
   selectionState,
   deletedIds,
 }: {
-  items: ListItemProps[];
+  itemPreviews: ItemPreview[];
   onSelect: (legacyId: string) => void;
   onDeselect: (legacyId: string) => void;
   selectionState: object;
@@ -22,8 +22,9 @@ const ContentPage = ({
 }) => {
   return (
     <div>
-      {items.map((item) => {
-        const { legacyId } = item;
+      {itemPreviews.map((itemPreview) => {
+        const { legacyId: legacyIdBigInt } = itemPreview;
+        const legacyId = `${legacyIdBigInt}`;
         const isDeleted = deletedIds.indexOf(legacyId) > -1;
 
         if (isDeleted) {
@@ -34,7 +35,7 @@ const ContentPage = ({
 
         return (
           <ContentPageItem
-            item={item}
+            itemPreview={itemPreview}
             key={legacyId}
             renderCheckbox={() => (
               <Checkbox
@@ -281,7 +282,7 @@ const ContentListPages = ({ pages, hasMore, onLoadMore, isValidating }) => {
       {pages.map((result) => (
         <ContentPage
           key={`before.${getResultObject(result).next}`}
-          items={getResultObject(result).results}
+          itemPreviews={getResultObject(result).results}
           onSelect={onSelect}
           onDeselect={onDeselect}
           selectionState={selectionState}
