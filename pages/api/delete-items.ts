@@ -1,15 +1,5 @@
-import algoliasearch from "algoliasearch";
-import { doAsyncThing } from "../../api-utils/doAsyncThing";
 import authedEndpoint from "../../api-utils/authedEndpoint";
 import { deleteItemsBulk } from "../../api-utils/modern/items/deleteItemsBulk";
-
-const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
-
-const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
-
-const INDEX_NAME = "backyard_test";
-
-const index = algoliaClient.initIndex(INDEX_NAME);
 
 const deleteItems = authedEndpoint(async (req, res) => {
   if (req.method !== "DELETE") {
@@ -33,22 +23,6 @@ const deleteItems = authedEndpoint(async (req, res) => {
     return;
   }
 
-  const [
-    deleteFromSearchResult,
-    deleteFromSearchError,
-  ] = await doAsyncThing(async () =>
-    index.deleteObjects(ids.map((id) => `${id}`))
-  );
-
-  void deleteFromSearchResult;
-
-  if (deleteFromSearchError) {
-    res.status(500).send({
-      error: deleteFromSearchError,
-    });
-    return;
-  }
-
   const [dualDeleteResult, dualDeleteError] = await deleteItemsBulk(ids);
 
   void dualDeleteResult;
@@ -64,7 +38,6 @@ const deleteItems = authedEndpoint(async (req, res) => {
     message: "Success. The provided id(s) have been deleted.",
     ids,
     result: JSON.stringify(dualDeleteResult),
-    deleteFromSearchResult,
   });
 });
 

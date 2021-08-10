@@ -1,15 +1,6 @@
-import algoliasearch from "algoliasearch";
 import authedEndpoint from "../../api-utils/authedEndpoint";
 import { doAsyncThing } from "../../api-utils/doAsyncThing";
-import { CLIPS } from "../../types/SearchIndexTypes";
-import { ClipExportData } from "../../types/ExportTypes";
 import { saveClip } from "../../api-utils/modern/clips/saveClip";
-
-const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
-
-const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
-
-const index = algoliaClient.initIndex(CLIPS);
 
 const generateLegacyId = () => Math.floor(Math.random() * 1000000000000000);
 
@@ -85,8 +76,6 @@ const createTextSelection = authedEndpoint(
       )
     );
 
-    void createClipResult;
-
     if (createClipError) {
       res.status(500).send({
         error: createClipError,
@@ -94,35 +83,10 @@ const createTextSelection = authedEndpoint(
       return;
     }
 
-    const [indexForSearchResult, indexForSearchError] = await doAsyncThing(
-      async () => {
-        const clipObject: ClipExportData = {
-          objectID: legacyId,
-          _id: legacyId,
-          itemId,
-          text,
-          createdAt,
-          createdBy,
-        };
-
-        return index.saveObject(clipObject, {
-          autoGenerateObjectIDIfNotExist: true,
-        });
-      }
-    );
-
-    if (indexForSearchError) {
-      console.log(indexForSearchError);
-      res.status(500).send({
-        error: indexForSearchError,
-      });
-      return;
-    }
-
     res.status(200).send({
       message: `Success. The text selection has been created.`,
       itemId,
-      result: indexForSearchResult,
+      result: createClipResult,
     });
   }
 );

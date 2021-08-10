@@ -1,15 +1,6 @@
-import algoliasearch from "algoliasearch";
 import { fetchContent } from "./fetchContent";
 import { Item, ItemSource, ItemOrigin } from "../types/ItemTypes";
-import { doAsyncThing } from "./doAsyncThing";
-import { ITEMS } from "../types/SearchIndexTypes";
 import { saveItem } from "./modern/items/saveItem";
-
-const { ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY } = process.env;
-
-const algoliaClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
-
-const index = algoliaClient.initIndex(ITEMS);
 
 const generateLegacyId = () => Math.floor(Math.random() * 1000000000000000);
 
@@ -106,60 +97,6 @@ export const saveContentItem = async (
       message: CreateItemError,
       url,
       error: saveError,
-      alreadySaved: false,
-    };
-  }
-
-  const microSecondTs = createdAt * 1000;
-
-  const [indexForSearchResult, indexForSearchError] = await doAsyncThing(
-    async () => {
-      const fullObject = {
-        objectID: legacyId,
-        _id: legacyId,
-        _ts: microSecondTs,
-        createdBy: userId,
-        url,
-        content: contentJson
-          ? {
-              title: contentJson.title,
-              metaTitle: contentJson.metaTitle,
-              metaDescription: contentJson.metaDescription,
-            }
-          : null,
-      };
-
-      const trimmedObject = {
-        objectID: legacyId,
-        _id: legacyId,
-        _ts: microSecondTs,
-        url,
-        content: contentJson
-          ? {
-              title: contentJson.title,
-              metaTitle: contentJson.metaTitle,
-            }
-          : null,
-      };
-
-      const objectToIndex =
-        Buffer.byteLength(JSON.stringify(fullObject)) >= 100000 /* bytes */
-          ? trimmedObject
-          : fullObject;
-
-      return index.saveObject(objectToIndex, {
-        autoGenerateObjectIDIfNotExist: true,
-      });
-    }
-  );
-
-  void indexForSearchResult;
-
-  if (indexForSearchError) {
-    return {
-      message: IndexingError,
-      url,
-      error: indexForSearchError,
       alreadySaved: false,
     };
   }
