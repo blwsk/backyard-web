@@ -33,6 +33,9 @@ const AuthenticatedHeader = () => {
         <Link href="/my-content">
           <a className="link-black">Saved</a>
         </Link>
+        <Link href="/notes">
+          <a className="link-black">Notes</a>
+        </Link>
         <span>
           {popover(
             ({ onOpen }) => (
