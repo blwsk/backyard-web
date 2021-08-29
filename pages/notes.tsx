@@ -1,19 +1,78 @@
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import gql from "gql-tag";
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  SyntheticEvent,
+  useCallback,
+  useMemo,
+} from "react";
 import requireAuth from "../lib/requireAuth";
-import { useGraphql } from "../lib/requestHooks";
+import { useGraphql, useGraphqlMutationFactory } from "../lib/requestHooks";
 import Button from "../components/ui/Button";
+import TextArea from "../components/ui/TextArea";
+import { throttle } from "../lib/throttle";
 
 const PAGE_LENGTH = 50;
 
 const getResultObject = (result) => result.notes;
 
-const Note = ({ text, id }) => {
+const Note = ({ text, id }: { text: string; id: string }) => {
+  const [localText, updateLocalText] = useState(null);
+
+  const onChange = useGraphqlMutationFactory();
+
+  const cb = useCallback((e) => {
+    const next = e.target.value;
+    console.log(next);
+    updateLocalText(next);
+  }, []);
+
+  const persistUpdate = useMemo(
+    () =>
+      throttle((nextText) => {
+        if (nextText === null) {
+          return;
+        }
+        onChange({
+          query: `
+    mutation ($id: ID!, $userId: String!, $text: String!) {
+        updateNote(id: $id, userId: $userId, text: $text) {
+            id
+            text
+            createdAt
+            createdBy
+        }
+} 
+  `,
+          variables: {
+            id,
+            text: nextText,
+            // userId provided by serverless function
+          },
+        });
+        //   .then(() => {
+        //     debugger;
+        //   })
+        //   .catch(() => {
+        //     debugger;
+        //   });
+      }, 3000),
+    []
+  );
+
+  useEffect(() => {
+    persistUpdate(localText);
+  }, [localText]);
+
   return (
     <div key={id} className="selection-item">
-      <blockquote>{text}</blockquote>
+      <TextArea
+        onChange={cb}
+        value={localText !== null ? localText : text}
+        className="w-full"
+      />
     </div>
   );
 };

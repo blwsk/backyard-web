@@ -101,31 +101,27 @@ export const useGraphql = <Data extends unknown>({
     withTelemetry(
       () => {
         return getAccessTokenSilently()
-          .then(
-            (token: string): Promise<Response> => {
-              return unfetch(URI, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: key,
-              });
-            }
-          )
+          .then((token: string): Promise<Response> => {
+            return unfetch(URI, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: key,
+            });
+          })
           .then(jsonParser)
-          .then(
-            (gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
-              if (
-                gqlResponse &&
-                gqlResponse.errors &&
-                gqlResponse.errors.length > 0
-              ) {
-                return Promise.reject(gqlResponse);
-              }
-              return Promise.resolve(gqlResponse);
+          .then((gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
+            if (
+              gqlResponse &&
+              gqlResponse.errors &&
+              gqlResponse.errors.length > 0
+            ) {
+              return Promise.reject(gqlResponse);
             }
-          );
+            return Promise.resolve(gqlResponse);
+          });
       },
       { key: ENDPONT_PATH, graphqlQuery: true }
     ),
@@ -166,8 +162,65 @@ export const useGraphqlMutation = ({
     withTelemetry(
       () => {
         return getAccessTokenSilently()
-          .then(
-            (token: string): Promise<Response> => {
+          .then((token: string): Promise<Response> => {
+            return unfetch(URI, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: key,
+            });
+          })
+          .then(jsonParser)
+          .then((gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
+            if (
+              gqlResponse &&
+              gqlResponse.errors &&
+              gqlResponse.errors.length > 0
+            ) {
+              return Promise.reject(gqlResponse);
+            }
+            return Promise.resolve(gqlResponse);
+          });
+      },
+      { key: ENDPONT_PATH, graphqlMutation: true }
+    ),
+    [key]
+  );
+
+  return callback;
+};
+
+export const useGraphqlMutationFactory = (): (({
+  query,
+  variables,
+}: {
+  query: string;
+  variables: object;
+}) => Promise<any>) => {
+  const { getAccessTokenSilently: _getAccessTokenSilently, user } = useAuth0();
+
+  const getAccessTokenSilently = () =>
+    _getAccessTokenSilently({
+      audience: `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/api/v2/`,
+      scope: "openid profile offline_access",
+    });
+
+  const ENDPONT_PATH = "/api/graphql?v=2";
+  const URI = `${getBaseUrl()}${ENDPONT_PATH}`;
+
+  const callback = useMemo(
+    () =>
+      withTelemetry(
+        ({ query, variables }: { query: string; variables: object }) => {
+          const key = createGraphqlKey({
+            query,
+            variables: { ...variables, userId: user.sub },
+          });
+
+          return getAccessTokenSilently()
+            .then((token: string): Promise<Response> => {
               return unfetch(URI, {
                 method: "POST",
                 headers: {
@@ -176,11 +229,9 @@ export const useGraphqlMutation = ({
                 },
                 body: key,
               });
-            }
-          )
-          .then(jsonParser)
-          .then(
-            (gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
+            })
+            .then(jsonParser)
+            .then((gqlResponse: GqlResponseJson): Promise<GqlResponseJson> => {
               if (
                 gqlResponse &&
                 gqlResponse.errors &&
@@ -189,12 +240,11 @@ export const useGraphqlMutation = ({
                 return Promise.reject(gqlResponse);
               }
               return Promise.resolve(gqlResponse);
-            }
-          );
-      },
-      { key: ENDPONT_PATH, graphqlMutation: true }
-    ),
-    [key]
+            });
+        },
+        { key: ENDPONT_PATH, graphqlMutation: true }
+      ),
+    []
   );
 
   return callback;

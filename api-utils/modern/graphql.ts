@@ -14,6 +14,8 @@ export const graphql = async ({
   let gqlResponse;
   let gqlError;
 
+  console.log(userId);
+
   try {
     gqlResponse = await unfetch(
       process.env.NODE_ENV !== "development"
