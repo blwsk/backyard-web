@@ -9,23 +9,35 @@ import {
   useMemo,
 } from "react";
 import requireAuth from "../lib/requireAuth";
-import { useGraphql, useGraphqlMutationFactory } from "../lib/requestHooks";
+import {
+  useGraphql,
+  useGraphqlMutation,
+  useGraphqlMutationFactory,
+} from "../lib/requestHooks";
 import Button from "../components/ui/Button";
 import TextArea from "../components/ui/TextArea";
 import { throttle } from "../lib/throttle";
+import Timestamp from "../components/ui/Timestamp";
 
 const PAGE_LENGTH = 50;
 
 const getResultObject = (result) => result.notes;
 
-const Note = ({ text, id }: { text: string; id: string }) => {
+const Note = ({
+  text,
+  id,
+  updatedAt,
+}: {
+  text: string;
+  id: string;
+  updatedAt: number;
+}) => {
   const [localText, updateLocalText] = useState(null);
 
   const onChange = useGraphqlMutationFactory();
 
   const cb = useCallback((e) => {
     const next = e.target.value;
-    console.log(next);
     updateLocalText(next);
   }, []);
 
@@ -42,6 +54,7 @@ const Note = ({ text, id }: { text: string; id: string }) => {
             id
             text
             createdAt
+            updatedAt
             createdBy
         }
 } 
@@ -52,12 +65,6 @@ const Note = ({ text, id }: { text: string; id: string }) => {
             // userId provided by serverless function
           },
         });
-        //   .then(() => {
-        //     debugger;
-        //   })
-        //   .catch(() => {
-        //     debugger;
-        //   });
       }, 3000),
     []
   );
@@ -67,7 +74,10 @@ const Note = ({ text, id }: { text: string; id: string }) => {
   }, [localText]);
 
   return (
-    <div key={id} className="selection-item">
+    <div className="note-item">
+      <div className="mb-2">
+        <Timestamp ts={updatedAt} />
+      </div>
       <TextArea
         onChange={cb}
         value={localText !== null ? localText : text}
@@ -77,14 +87,24 @@ const Note = ({ text, id }: { text: string; id: string }) => {
   );
 };
 
-const Page = ({ results }) => {
+type Note = {
+  id: string;
+  text: string;
+  createdBy: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
+const Page = ({ results }: { results: Note[] }) => {
   return (
     <>
-      {results.map((clip) => {
-        const { text, id } = clip;
-
-        return <Note key={id} text={text} id={id} />;
-      })}
+      {results
+        .sort((noteA, noteB) => parseInt(noteB.id) - parseInt(noteA.id))
+        .map((note) => {
+          const { text, id, updatedAt } = note;
+          debugger;
+          return <Note key={id} text={text} id={id} updatedAt={updatedAt} />;
+        })}
     </>
   );
 };
@@ -101,12 +121,21 @@ const PageList = ({ pages }) => {
   );
 };
 
-const NoteList = () => {
+type NotePage = {
+  results: Note[];
+  next?: string;
+};
+
+const NoteList = ({ newlyCreatedNotes }: { newlyCreatedNotes: Note[] }) => {
   const [cursor, updateCursor] = useState<string>(null);
 
-  const [pages, updatesPages] = useState([]);
+  const [pages, updatesPages] = useState<{ notes: NotePage }[]>([]);
 
-  const { data, error, isValidating } = useGraphql<any>({
+  const { data, error, isValidating } = useGraphql<{
+    data: {
+      notes: NotePage;
+    };
+  }>({
     query: gql`
       query (
         $size: Int
@@ -123,6 +152,7 @@ const NoteList = () => {
           results {
             id
             text
+            createdBy
             createdAt
             updatedAt
           }
@@ -160,6 +190,29 @@ const NoteList = () => {
     }
   }, [data, cursor]);
 
+  useEffect(() => {
+    if (newlyCreatedNotes.length > 0) {
+      const firstPage = pages[0] || {
+        notes: {
+          results: [],
+          next: "-1",
+        },
+      };
+
+      updatesPages([
+        {
+          notes: {
+            results: Array.from(
+              new Set([...newlyCreatedNotes, ...firstPage.notes.results])
+            ),
+            next: firstPage.notes.next,
+          },
+        },
+        ...pages.slice(1),
+      ]);
+    }
+  }, [newlyCreatedNotes]);
+
   const hasMore = data && typeof getResultObject(data.data).next === "string";
 
   return (
@@ -171,11 +224,11 @@ const NoteList = () => {
             <div className="m-y-4">
               <Button onClick={onLoadMoreClick}>Load more</Button>
             </div>
-          ) : (
+          ) : pages.length > 1 ? (
             <div className="m-y-4">
               <div>All caught up.</div>
             </div>
-          )
+          ) : null
         ) : (
           <div className="m-y-4">
             <div>Loading...</div>
@@ -188,18 +241,58 @@ const NoteList = () => {
 };
 
 const Notes = () => {
+  const [newlyCreatedNotes, updateNewlyCreatedNotes] = useState([]);
+
+  const onCreateNote = useGraphqlMutation<{
+    data: {
+      createNote: Note;
+    };
+  }>({
+    query: `
+    mutation ($userId: String!, $text: String!) {
+        createNote(userId: $userId, text: $text) {
+            id
+            text
+            createdAt
+            updatedAt
+            createdBy
+        }
+    } 
+    `,
+    variables: {
+      text: "",
+      // userId is added by serverless function
+    },
+  });
+
   return (
     <div>
       <Header />
       <Wrapper>
-        <h1>Notes</h1>
-        <NoteList />
+        <div className="flex items-start justify-between">
+          <h1 className="mt-0">Notes</h1>
+          <Button
+            className="my-2"
+            onClick={() => {
+              onCreateNote().then((createdNote) => {
+                const {
+                  data: { createNote: note },
+                } = createdNote;
+
+                updateNewlyCreatedNotes([...newlyCreatedNotes, note]);
+              });
+            }}
+          >
+            New
+          </Button>
+        </div>
+        <NoteList newlyCreatedNotes={newlyCreatedNotes} />
       </Wrapper>
       <style jsx global>{`
-        .selection-item {
+        .note-item {
           margin-bottom: 16px;
         }
-        .selection-item:last-of-type {
+        .note-item:last-of-type {
           margin-bottom: 0;
         }
       `}</style>

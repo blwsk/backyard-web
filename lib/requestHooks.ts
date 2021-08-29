@@ -131,13 +131,13 @@ export const useGraphql = <Data extends unknown>({
   return result;
 };
 
-export const useGraphqlMutation = ({
+export const useGraphqlMutation = <Data extends unknown>({
   query,
   variables,
 }: {
   query: string;
   variables: object;
-}): (() => Promise<unknown>) => {
+}): (() => Promise<Data>) => {
   const { getAccessTokenSilently: _getAccessTokenSilently, user } = useAuth0();
 
   const getAccessTokenSilently = () =>
@@ -201,12 +201,6 @@ export const useGraphqlMutationFactory = (): (({
 }) => Promise<any>) => {
   const { getAccessTokenSilently: _getAccessTokenSilently, user } = useAuth0();
 
-  const getAccessTokenSilently = () =>
-    _getAccessTokenSilently({
-      audience: `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/api/v2/`,
-      scope: "openid profile offline_access",
-    });
-
   const ENDPONT_PATH = "/api/graphql?v=2";
   const URI = `${getBaseUrl()}${ENDPONT_PATH}`;
 
@@ -214,6 +208,12 @@ export const useGraphqlMutationFactory = (): (({
     () =>
       withTelemetry(
         ({ query, variables }: { query: string; variables: object }) => {
+          const getAccessTokenSilently = () =>
+            _getAccessTokenSilently({
+              audience: `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/api/v2/`,
+              scope: "openid profile offline_access",
+            });
+
           const key = createGraphqlKey({
             query,
             variables: { ...variables, userId: user.sub },

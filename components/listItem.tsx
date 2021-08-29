@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TweetPreview } from "./tweetEmbed";
 import { ItemPreview, ItemSource, MANUAL, TweetJson } from "../types/ItemTypes";
 import Icon from "./ui/Icon";
+import Timestamp from "./ui/Timestamp";
 
 const EmailJsonPreview = ({
   title,
@@ -123,19 +124,9 @@ const ListItem = ({
   itemPreview: ItemPreview;
   light?: boolean;
 }) => {
-  const {
-    legacyId,
-    createdAt,
-    domain,
-    title,
-    subtitle,
-    source,
-    json,
-  } = itemPreview;
+  const { legacyId, createdAt, domain, title, subtitle, source, json } =
+    itemPreview;
 
-  const date = new Date(createdAt);
-  const dateString = date.toDateString();
-  const timeString = date.toLocaleTimeString();
   const hostname = domain && domain.replace("www.", "");
 
   return (
@@ -152,9 +143,7 @@ const ListItem = ({
         <div className="mt-3">
           <small className="flex flex-col md:flex-row">
             <span>
-              <span>{dateString}</span>
-              <span>・</span>
-              <span>{timeString}</span>
+              <Timestamp ts={createdAt} />
               {source && source !== MANUAL && (
                 <>
                   <span>・</span>
