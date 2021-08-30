@@ -23,14 +23,69 @@ const PAGE_LENGTH = 50;
 
 const getResultObject = (result) => result.notes;
 
+const DeleteNote = ({
+  id,
+  createdBy,
+  removeNote,
+}: {
+  id: string;
+  createdBy: string;
+  removeNote: (id: string) => void;
+}) => {
+  const [clicked, updateClicked] = useState(false);
+
+  const onDeleteNote = useGraphqlMutation({
+    query: `
+    mutation ($userId: String!, $id: ID!) {
+        deleteNote(userId: $userId, id: $id)
+    } 
+    `,
+    variables: {
+      id,
+      userId: createdBy,
+      // userId is added by serverless function
+    },
+  });
+
+  return clicked === false ? (
+    <Button
+      variant="secondary"
+      size="small"
+      onClick={() => updateClicked(true)}
+    >
+      Delete
+    </Button>
+  ) : (
+    <span>
+      Confirm:{" "}
+      <Button
+        variant="secondary"
+        size="small"
+        onClick={() =>
+          onDeleteNote().then(() => {
+            updateClicked(false);
+            removeNote(id);
+          })
+        }
+      >
+        Delete
+      </Button>
+    </span>
+  );
+};
+
 const Note = ({
   text,
   id,
   updatedAt,
+  createdBy,
+  removeNote,
 }: {
   text: string;
   id: string;
   updatedAt: number;
+  createdBy: string;
+  removeNote: (id: string) => void;
 }) => {
   const [localText, updateLocalText] = useState(null);
 
@@ -75,8 +130,9 @@ const Note = ({
 
   return (
     <div className="note-item">
-      <div className="mb-2">
+      <div className="mb-2 flex justify-between">
         <Timestamp ts={updatedAt} />
+        <DeleteNote id={id} createdBy={createdBy} removeNote={removeNote} />
       </div>
       <TextArea
         onChange={cb}
@@ -96,14 +152,33 @@ type Note = {
 };
 
 const Page = ({ results }: { results: Note[] }) => {
+  const [removed, updateRemoved] = useState<string[]>([]);
+
+  const removeNote = useCallback(
+    (id: string) => {
+      updateRemoved([...removed, id]);
+    },
+    [removed]
+  );
+
   return (
     <>
       {results
+        .filter((note) => removed.indexOf(note.id) < 0)
         .sort((noteA, noteB) => parseInt(noteB.id) - parseInt(noteA.id))
         .map((note) => {
-          const { text, id, updatedAt } = note;
-          debugger;
-          return <Note key={id} text={text} id={id} updatedAt={updatedAt} />;
+          const { text, id, updatedAt, createdBy } = note;
+
+          return (
+            <Note
+              key={id}
+              text={text}
+              id={id}
+              updatedAt={updatedAt}
+              createdBy={createdBy}
+              removeNote={removeNote}
+            />
+          );
         })}
     </>
   );
