@@ -1,13 +1,8 @@
 import Header from "../components/header";
 import Wrapper from "../components/wrapper";
 import gql from "gql-tag";
-import {
-  useState,
-  useEffect,
-  SyntheticEvent,
-  useCallback,
-  useMemo,
-} from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 import requireAuth from "../lib/requireAuth";
 import {
   useGraphql,
@@ -15,9 +10,16 @@ import {
   useGraphqlMutationFactory,
 } from "../lib/requestHooks";
 import Button from "../components/ui/Button";
-import TextArea from "../components/ui/TextArea";
 import { throttle } from "../lib/throttle";
 import Timestamp from "../components/ui/Timestamp";
+
+function findDiff(str1, str2) {
+  let diff = "";
+  str2.split("").forEach(function (val, i) {
+    if (val != str1.charAt(i)) diff += val;
+  });
+  return diff;
+}
 
 const PAGE_LENGTH = 50;
 
@@ -91,11 +93,6 @@ const Note = ({
 
   const onChange = useGraphqlMutationFactory();
 
-  const cb = useCallback((e) => {
-    const next = e.target.value;
-    updateLocalText(next);
-  }, []);
-
   const persistUpdate = useMemo(
     () =>
       throttle((nextText) => {
@@ -128,16 +125,41 @@ const Note = ({
     persistUpdate(localText);
   }, [localText]);
 
+  const onInput = useCallback<(e: ContentEditableEvent) => void>(
+    (e) => {
+      const target = e.target;
+      const next = target.value;
+
+      console.log(window.getSelection());
+
+      const diff = localText && next ? findDiff(localText, next) : null;
+
+      updateLocalText(next);
+
+      console.log(diff);
+    },
+    [findDiff, localText]
+  );
+
+  const innerRef = useRef();
+
   return (
     <div className="note-item">
-      <div className="mb-2 flex justify-between">
+      <div className="mb-2 flex justify-between font-medium">
         <Timestamp ts={updatedAt} />
         <DeleteNote id={id} createdBy={createdBy} removeNote={removeNote} />
       </div>
-      <TextArea
-        onChange={cb}
-        value={localText !== null ? localText : text}
-        className="w-full"
+      <ContentEditable
+        innerRef={innerRef}
+        html={localText !== null ? localText : text}
+        onKeyDown={(e) => {
+          if (e.keyCode === 9) {
+            document.execCommand("insertHTML", false, "&nbsp;&nbsp;");
+            e.preventDefault();
+          }
+        }}
+        onChange={onInput}
+        className="w-full p-2 border-2 border-gray-200 rounded"
       />
     </div>
   );
@@ -365,7 +387,7 @@ const Notes = () => {
       </Wrapper>
       <style jsx global>{`
         .note-item {
-          margin-bottom: 16px;
+          margin-bottom: 20px;
         }
         .note-item:last-of-type {
           margin-bottom: 0;
