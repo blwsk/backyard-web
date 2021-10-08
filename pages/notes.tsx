@@ -130,8 +130,6 @@ const Note = ({
       const target = e.target;
       const next = target.value;
 
-      console.log(window.getSelection());
-
       const diff = localText && next ? findDiff(localText, next) : null;
 
       updateLocalText(next);
